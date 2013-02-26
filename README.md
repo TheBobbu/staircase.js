@@ -1,6 +1,7 @@
 staircase.js
 ============
 Part of the Lead Generation Platform
+
 Developed by Ryan Boylett <ry-ry.co.uk> for Virtuoso Advertising Ltd.
 ============
 
