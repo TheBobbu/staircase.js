@@ -1,469 +1,473 @@
+/*
+   ¬	  Staircase Form Validation Library
+    ¬	  Current Version: 4.1-a2
+     ¬	  
+      ¬	  Copyright © Virtuoso Advertising 2013
+*/
 
-/* Staircase - AMP form step and validation management
- * Version 2.4a3
- */
+var Staircase;
 
-// Add some essential instant-css
-document.write('<style type="text/css">var, #sc-title, .condition { display: none; } .staircase, .step, .indicator { display: block; } .pip, .result { display: inline-block; } .error { border-color: #f00; border-radius: 2px; } label.error { border-width: 1px; border-style: solid; }</style>');
-
-// Initialize the jQuery library if it has not already been included
-if(!window.jQuery)document.write('<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>');var staircase=
-
-// Define the staircase class
+window.onload = function()
 {
-  // Function to fire when the class is initialized
-	__construct__: function($)
+	if(!window['Sizzle'] && !window['jQuery'])
+		throw new Error('Sizzle not found, embed a copy from sizzlejs.com or use jQuery');
+	else
 	{
-		var docTitle = (($('#sc-title').size() > 0 ? $('#sc-title').hide().html() : false) || null);
-		if(!docTitle) docTitle = $('h1').first().html();
-		if(!docTitle) docTitle = $('img').first().attr('alt');
-		if(!docTitle) docTitle = $('h2').first().html();
-		if(!docTitle) docTitle = window.location.href;
+		var Sizzle;
 
-		document.title = docTitle;
+		if(window['Sizzle'])
+			Sizzle = window['Sizzle'];
+		else if(window['jQuery'] && window['jQuery']['find'])
+			Sizzle = window['jQuery']['find'];
+	}
 
-		$('input[type="text"], input[type="password"], input[type="file"], textarea, select').attr('bypass_validation', '1');
+	Sizzle('html')[0].className += 'staircase-enabled';
 
-		staircase.init.call(this, $);
-	},
-
-	// Validation Definitions
-	validation:
+	new (Staircase = function()
 	{
-		email: /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
-		firstName: /^([A-Za-z\.-]+)$/,
-		lastName: /^([A-Za-z\.-]+)$/,
-		name: /^([ A-Za-z\.]+)$/,
-		telephone: /^(\+([0-9]{1,5})|0)(?!.*(\d)\1{7,})\d{7,}$/,
-		mobile: /^(\+([0-9]{1,5})|07)(?!.*(\d)\1{7,})\d{7,}$/,
-		number: /^([0-9]+)$/,
-		currency: /^([0-9\,]+)(\.([0-9]{2}))?$/,
-		USzipcode: /^(^\d{5}$)|(^\d{5}-\d{4}$)$/,
-		UKpostcode: /^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) {0,1}[0-9][A-Za-z]{2})$/,
-		timeSuffix: /^(am|pm)$/i,
-		filename: /^(([^\/\\\?%\*:|"<>]+)?\.([^\/\\\?%\*:|"<>\.]+)|([^\/\\\?%\*:|"<>\.]+))$/,
-		select: '-- Please Select --',
-		'default': /^(?!\s*$).+/
-	},
+		var Supports = (function()		{ var div = document.createElement('div'), vendors = 'Khtml Ms O Moz Webkit'.split(' '), len = vendors.length; return function(prop) { if(prop in div.style) return true; prop = prop.replace(/^[a-z]/, function(val){ return val.toUpperCase(); }); while(len--) if(vendors[len] + prop in div.style) return true; return false; } })();
+			Class = function(o, a)		{ var b = o.className.split(' '), c = a.split(' '), d = e = []; for(i in b) if(b[i] && b[i] != '' && typeof b[i] == 'string') d.push(b[i]); for(i in c) if(c[i] && c[i] != '' && typeof c[i] == 'string') d.push(c[i]); e = Filter.call(d, function(elem, pos, self){ return in_array(elem, self) == pos }); o.className = e.join(' '); return o; },
+			CSS = function(o, a, b)		{ if(typeof o == 'array') { for(i in o) if(typeof o[i] == 'object') CSS(o[i], a, b); return o; } if(typeof a == 'object') for(i in a) o.style[i] = a; else if(typeof a == 'string' && b && typeof b == 'string') o.style[a] = b; return o; },
+			Filter = function(fun)		{ "use strict"; if(this === void 0 || this === null) throw new TypeError(); var t = Object(this), len = t.length >>> 0; if(typeof fun !== "function") throw new TypeError(); var res = [], thisp = arguments[1]; for(var i = 0; i < len; i++) if(i in t) { var val = t[i]; if(fun.call(thisp, val, i, t)) res.push(val); } return res; },
+			Fire = function(o, a)		{ var event; if(document.createEvent) { event = document.createEvent('HTMLEvents'); event.initEvent(a, true, true); } else { event = document.createEventObject(); event.eventType = a; } event.eventName = a; event.memo = {}; if(document.createEvent) o.dispatchEvent(event); else o.fireEvent('on' + event.eventType, event); },
+			in_array = function(a, b)	{ for(i in b) if(b[i] == a) return i; return -1; },
+			Nearest = function(o, a)	{ var els = []; while(o) { els.unshift(o); o = o.parentNode; } els.reverse(); for(i in els) if(Test(els[i], a)) return els[i]; return null; },
+			Test = function(o, a)		{ if(!o || o == null || o == undefined) return null; return Sizzle.matchesSelector(o, a) ? o : null; },
+			Unclass = function(o, a)	{ var b = o.className.split(' '), c = a.split(' '), d = []; for(i in b) if(b[i] && b[i] != '') for(j in c) if(c[j] && c[j] != '' && b[i] != c[j]) d.push(b[i]); o.className = d.join(' '); },
 
-	// Generic Validation Messages
-	validation_strings:
-	{
-		email: 'Please enter a valid email address.',
-		firstName: 'Please enter a valid first name.',
-		lastName: 'Please enter a valid last name.',
-		name: 'Please enter a valid name.',
-		telephone: 'Please enter a valid telephone number of 10 or 11 digits beginning with 0, including your area code. Mobile numbers must begin with 07.',
-		mobile: 'Please enter a valid mobile telephone number of 10 or 11 digits beginning with 07.',
-		number: 'Please enter a valid integer.',
-		currency: 'Please enter a valid price.',
-		USzipcode: 'Please enter a valid US Zipcode.',
-		UKpostcode: 'Please enter a valid UK Postcode.',
-		timeSuffix: 'Please enter either AM or PM.',
-		filename: 'Please enter a valid filename.',
-		select: 'Please select an option from the highlighted menu.',
-		'default': 'Please ensure all highlighted fields are filled in correctly.'
-	},
+			json_decode = function(b)	{ var c=window.JSON;if(typeof c==='object'&&typeof c.parse==='function'){try{return c.parse(b)}catch(err){if(!(err instanceof SyntaxError)){throw new Error('Unexpected error type in json_decode()');}this.php_js=this.php_js||{};this.php_js.last_error_json=4;return null}}var d=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;var j;var e=b;d.lastIndex=0;if(d.test(e)){e=e.replace(d,function(a){return'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4)})}if((/^[\],:{}\s]*$/).test(e.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,'@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,']').replace(/(?:^|:|,)(?:\s*\[)+/g,''))){j=eval('('+e+')');return j}this.php_js=this.php_js||{};this.php_js.last_error_json=4;return null },
 
-	conditions_glob_alert: [],
-	parse_conditions: function($, step)
-	{
-		var cont = true;
+			$ = function(a, b)			{ var elements = (window['Sizzle'] || Sizzle)(a, b ? b : document), length = 0; for(i in elements) if(typeof elements[i] == 'object') length ++; elements.each = function(callback) { for(i in elements) if(typeof elements[i] == 'object') callback.call(elements[i]); return elements; }; elements.bind = function(eventName, callback) { for(i in elements) if(typeof elements[i] == 'object') elements[i]['on' + eventName] = callback; return elements; }; elements.last = function() { return elements[elements.length - 1]; }; elements.length = length; return elements; },
+			$s = this,
 
-		staircase.conditions_glob_alert = [];
+			css3 = Supports('textShadow'),
 
-		if(!step)
-		{
-			$('.staircase .condition').hide();
-		}
-		else
-		{
-			$(step).find('.condition').each(function()
+			xhr = function sendRequest(url, callback, postData)
 			{
-				var alert_msg = $(this).html() ? $(this).html().replace(/(\r\n|\r|\n|<br \/>|<br\/>|<br>)/i, '\n') : null,
-				failed_action = $(this).attr('on-failed') ? new Function(['$'], $(this).attr('on-failed')) : null,
-				passed_action = $(this).attr('on-passed') ? new Function(['$'], $(this).attr('on-passed')) : null,
+				// Quirksmode XHR function - http://www.quirksmode.org/js/xmlhttp.html
 
-				test_value = ($($(this).attr('input')).size() > 0 ? $($(this).attr('input'))[0].value : null),
+				var XMLHttpFactories =
+				[
+					function () {return new XMLHttpRequest()},
+					function () {return new ActiveXObject("Msxml2.XMLHTTP")},
+					function () {return new ActiveXObject("Msxml3.XMLHTTP")},
+					function () {return new ActiveXObject("Microsoft.XMLHTTP")}
+				];
 
-				value_is = $(this).attr('value') ? $(this).attr('value') : null,
-				value_not = $(this).attr('value-not') ? $(this).attr('value-not') : null;
-
-				if(test_value != null)
+				function createXMLHTTPObject()
 				{
-					if(value_is == null && value_not == null) value_not = '';
-
-					if(value_is == null)
-					{
-						if(test_value == value_not)
-						{
-							if(failed_action) failed_action.call($($(this).attr('input'))[0], $);
-							if(alert_msg) staircase.conditions_glob_alert.push(alert_msg);
-
-							cont = false;
+					var xmlhttp = false;
+					for (var i=0;i<XMLHttpFactories.length;i++) {
+						try {
+							xmlhttp = XMLHttpFactories[i]();
 						}
+						catch (e) {
+							continue;
+						}
+						break;
+					}
+					return xmlhttp;
+				}
+
+				var req = createXMLHTTPObject();
+				if (!req) return;
+				var method = (postData) ? "POST" : "GET";
+				req.open(method,url,true);
+				if (postData)
+					req.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+				req.onreadystatechange = function () {
+					if (req.readyState != 4) return;
+					if (req.status != 200 && req.status != 304) {
+						return;
+					}
+					callback(req.responseText);
+				}
+				if (req.readyState == 4) return;
+				req.send(postData);
+			},
+
+			FetchAddress = function(postcodeInput, dataPoints)
+			{
+				var street = (dataPoints[0] || null),
+					town = (dataPoints[1] || null),
+					county = (dataPoints[2] || null);
+
+				var postcode = postcodeInput.value,
+					createIfNotExists = function(n)
+					{
+						if(document.getElementsByName(n).length > 0)
+							return $('[name="' + n + '"]')[0];
 						else
 						{
-							if(passed_action) passed_action.call($($(this).attr('input'))[0], $);
+							var target = document.createElement('input');
+							target.name = n;
+							target.value = '';
+							target.type = 'hidden';
+							postcodeInput.parentNode.insertBefore(target, postcodeInput.nextSibling);
+							return target;
 						}
-					}
-					else
+					};
+					if(!postcode || postcode == '') return false;
+					if(!county || county.toLowerCase() == 'false') county = { value: '' }; else if(typeof county == 'string') county = createIfNotExists(county);
+					if(!town || town.toLowerCase() == 'false') town = { value: '' }; else if(typeof town == 'string') town = createIfNotExists(town);
+					if(!street || street.toLowerCase() == 'false') street = { value: '' }; else if(typeof street == 'string') street = createIfNotExists(street);
+
+				this.xhr('http://staircase.virtuosoadvertising.co.uk/bin/address-lookup.php', function(address)
+				{
+					if(address.match(/^({|\[)(.*?)(}|\])$/))
 					{
-						if(test_value != value_is)
+						address = json_decode(address);
+						
+						if(address && address['county'] && address['town'] && address['street'])
 						{
-							if(failed_action) failed_action.call($($(this).attr('input'))[0], $);
-							if(alert_msg) staircase.conditions_glob_alert.push(alert_msg);
-
-							cont = false;
-						}
-						else
-						{
-							if(passed_action) passed_action.call($($(this).attr('input'))[0], $);
+							county.value = address.county;
+							town.value = address.town;
+							street.value = address.street;
 						}
 					}
-				}
-			});
-		}
+				},
+				'postcode=' + postcode);
+			};
 
-		if(staircase.conditions_glob_alert != '')
+		this.patterns =
 		{
-			var alert_msgs = [];
+			email:			/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
+			name:			/^([ A-Za-z\.]+)$/,
+			phone:			[/^(\+([0-9]{1,5})|0)(?!.*(\d)\1{9,})\d{9,}$/, /^(\+([0-9]{1,5})|07)(?!.*(\d)\1{9,})\d{9,}$/],
+			number:			[/^(-)?([0-9]+)$/, /^(-)?([0-9]+)\.([0-9]+)$/],
+			currency:		/^(-)?([^a-zA-Z0-9 ])?([0-9\,]+)(\.([0-9]{2,}))?$/,
+			zipcode:		/^(^\d{5}$)|(^\d{5}-\d{4}$)$/,
+			postcode:		/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) {0,1}[0-9][A-Za-z]{2})$/,
+			time:			[/^([0-9]{2}):([0-9]{2})(:([0-9]{2}))?([\s]+)?(am|pm)?$/i, /^(am|pm)$/i],
+			date:			[/^([0-9]{1,2})(\/|-|\.|,| )([0-9]{1,2})(\/|-|\.|,| )([0-9]{2,4})$/, /^((mon|monday|tue|tues|tuesday|wed|wednesday|thu|thurs|thursday|fri|friday|sat|saturday|sun|sunday)([\s]+))?([0-9]{1,2})(st|nd|rd|th)?([\s]+)?(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)([\s]+)?([0-9]{2,4})$/i],
+			filename:		/^(([^\/\\\?%\*:|"<>]+)?\.([^\/\\\?%\*:|"<>\.]+)|([^\/\\\?%\*:|"<>\.]+))$/,
+			'default':		/^(?!\s*$).+/
+		};
 
-			$.each(staircase.conditions_glob_alert, function(i, el)
-			{
-				if($.inArray(el, alert_msgs) === -1) alert_msgs.push(el);
-			});
+		this.staircases = [];
 
-			alert('Information:\n' + alert_msgs.join('\n'));
-		}
-
-		return cont;
-	},
-
-	update_indicator: function(Staircase, $)
-	{
-		if($(Staircase).find('.indicator').size() <= 0) return;
-
-		$(Staircase).find('.indicator .pips .pip').removeClass('active');
-		
-		for(var i = 0; i < ($(Staircase).find('.step:visible').index() + 1); i ++)
-		{
-			$(Staircase).find('.indicator .pips .pip').eq(i).addClass('active');
-		}
-		
-		$(Staircase).find('.indicator').attr('class', 'indicator step-' + i);
-		
-		$(Staircase).find('.indicator .current-step').html(($(Staircase).find('indicator').attr('step-prefix') ? $(Staircase).find('.indicator').attr('step-prefix') : '') + i);
-		
-		$(Staircase).find('.indicator .pips .pip').each(function()
-		{
-			$(this).css(
-			{
-				left: ($(this).index() / ($(Staircase).find('.indicator .pips .pip').size() - 1) * 100) + '%',
-				margin: '0 0 0 -' + ($(this).width() / 2) + 'px'
-			}).html($(this).closest('.indicator').attr('pip-html') ? $(this).closest('.indicator').attr('pip-html').replace('{s}', $(this).index() + 1) : '');
-		});
-	},
-
-	next: function(count)
-	{
-		for(var i = 0; i < count; i ++)
-			staircase.next_step.call(this, $(this).closest('.staircase'), $, true);
-	},
-	
-	next_step: function(Staircase, $, bypass_validation)
-	{
-		if(!bypass_validation)
-		{
-			$(this).closest('.step').find('[validate]').each(function()
-			{
-				$(this).trigger('change');
-			});
-		}
-		
-		if($(this).closest('.step').find('.error:not([not-required])').size() > 0)
-		{
-			var errorStr = [];
-
-			$(this).closest('.step').find('.error:not([not-required])').each(function()
-			{
-				if($(this).attr('on-failed'))
-				{
-					var newFunc = new Function(['Staircase', '$'], String($(this).attr('on-failed')));
-
-					newFunc.call(this, $(this).closest('.staircase'), $);
-				}
-
-				if($(this).attr('on-failed-alert'))
-				{
-					errorStr.push($(this).attr('on-failed-alert'));
-				}
-				else if(staircase.validation_strings[$(this).attr('validate')])
-				{
-					errorStr.push(staircase.validation_strings[$(this).attr('validate')]);
-				}
-			});
-
-			if(errorStr.length > 0)
-				errorStr = errorStr.join('\n') + '\n';
-			else
-				errorStr = '';
-
-			errorStr += '-\nPlease correct the errors above and try again.';
-
-			alert('Oops! - Validation Error:\n-\n' + errorStr);
-			
-			return false;
-		}
-
-		if(!staircase.parse_conditions($, $(this).closest('.step'))) return false;
-		
-		if($(Staircase).find('.step:visible').attr('onhide'))
-		{
-			var new_func = new Function(['$'], $(Staircase).find('.step:visible').attr('onhide'));
-
-			new_func.call($(Staircase).find('.step:visible')[0], $);
-		}
-
-		$(Staircase).find('.step:visible').hide().next('.step').show().find('input[type="text"], input[type="password"], textarea').first().focus();
-		
-		if($(Staircase).find('.step:visible').attr('onshow'))
-		{
-			var new_func = new Function(['$'], $(Staircase).find('.step:visible').attr('onshow'));
-
-			new_func.call($(Staircase).find('.step:visible')[0], $);
-		}
-
-		staircase.update_indicator(Staircase, $);
-	},
-
-	back: function(count)
-	{
-		for(var i = 0; i < count; i ++)
-			staircase.prev_step.call(this, $(this).closest('.staircase'), $, true);
-	},
-	
-	prev_step: function(Staircase, $, bypass_validation)
-	{
-		if(!bypass_validation)
-		{
-			$(this).closest('.step').find('[validate]').each(function()
-			{
-				$(this).trigger('change');
-			});
-		}
-		
-		$(Staircase).find('.step:visible').hide().prev('.step').show();
-		
-		if($(Staircase).find('.step:visible').size() <= 0) $(Staircase).find('.step').first().show();
-
-		$(Staircase).find('.step:visible').find('input[type="text"], input[type="password"], textarea').first().focus();
-
-		staircase.update_indicator(Staircase, $);
-	},
-
-	skipTo: function(step)
-	{
-		$('.staircase').find('.step:visible').hide();
-		$('.staircase').find('.step').eq(step - 1).show();
-	},
-		
-	init: function($)
-	{
-		function ucfirst(string)
-		{
-			return string.charAt(0).toUpperCase() + string.slice(1);
-		}
-
-		staircase.parse_conditions($);
-		
 		$('.staircase').each(function()
 		{
-			var Staircase = this;
+			var ThisStaircase = this,
+				StepsTotalCount = 0,
+				rootI = 1;
 
-			$(Staircase).find('.step').not($(Staircase).find('.step').first()).hide();
-			
-			$(Staircase).find('.step').each(function()
+			if(!ThisStaircase.staircaseObject)
+				ThisStaircase.staircaseObject = {};
+
+				ThisStaircase.staircaseObject.staircase = $s;
+				ThisStaircase.staircaseObject.steps = [];
+
+			for(i in $s.staircases)
+				if($s.staircases[i] == this) return;
+
+			$s.staircases.push(ThisStaircase);
+
+			$('.step', ThisStaircase).each(function()
 			{
-				$(Staircase).find('.indicator .pips').append('<span class="pip" />');
-			});
-			
-			$(Staircase).find('.step').hide().first().show();
-			
-			staircase.update_indicator(Staircase, $);
-			
-			$(Staircase).find('input.next-button').each(function()
-			{
-				$(this).click(function()
-				{
-					staircase.next_step.call(this, Staircase, $);
-					
-					return false;
-				});
-			});
-			
-			$(Staircase).find('input.prev-button').each(function()
-			{
-				$(this).click(function()
-				{
-					staircase.prev_step.call(this, Staircase, $);
-					
-					return false;
-				});
-			});
-			
-			$(Staircase).find('.result').each(function()
-			{
-				var input_name = $(this).attr('input'),
-				input = $(Staircase).find('[name="' + input_name + '"]');
-				
-				if(!$(input).is('input') && !$(input).is('select') && !$(input).is('textarea')) return;
-				
-				$(input).bind('change', function()
-				{
-					$(Staircase).find('.result[input="' + input_name + '"]').hide().filter('[value="' + $(this)[0].value.replace('"', '\\"') + '"]').show();
-				}).trigger('change');
+				ThisStaircase.staircaseObject.steps.push(this);
+				this.staircaseObject = { stepNumber: rootI };
+
+				rootI ++;
 			});
 
-			$(Staircase).find('input[type="checkbox"][validate="checked"]').each(function()
-			{
-				$(this).bind('change', function()
-				{
-					if(!$(this).is(':checked'))
-					{
-						$(this).addClass('error').closest('label').attr('title', 'Validation Errors: Please ensure you have checked the checkbox to continue.').addClass('error');
-					}
-					else
-					{
-						$(this).removeClass('error').closest('label').removeAttr('title').removeClass('error');
-					}
-				});
-			});
+			StepsTotalCount = rootI - 1;
+			rootI = 0;
 
-			$(Staircase).find('select[validate]').each(function()
-			{
-				$(this).find('option[selected]').removeAttr('selected');
-
-				$(this)
-				.prepend('<option selected="selected">' + staircase.validation.select + '</option>')
-				.bind('change', function()
+			var FirstStep = $('.step', ThisStaircase).each(function()
 				{
-					if($(this).val() == staircase.validation.select)
-					{
-						$(this).attr('title', 'Validation Errors: Please Select an Option').addClass('error');
-					}
-					else
-					{
-						$(this).removeAttr('title').removeClass('error');
-					}
-				});
-			});
+					var ThisStep = this,
+						NextStep = ThisStaircase.staircaseObject.steps[rootI + 1] ? ThisStaircase.staircaseObject.steps[rootI + 1] : null,
+						PrevStep = ThisStaircase.staircaseObject.steps[rootI - 1] ? ThisStaircase.staircaseObject.steps[rootI - 1] : null,
+						InputsSelector = 'input[validate]:not([type="button"]):not([type="submit"]), select[validate], textarea[validate]';
 
-			$(Staircase).find('input[validate], textarea[validate]').bind('change', function()
-			{
-				if(staircase.validation[$(this).attr('validate')])
-				{
-					if(!$(this)[0].value.match(staircase.validation[$(this).attr('validate')]))
+					$(InputsSelector, ThisStep).each(function()
 					{
-						$(this).attr('title', 'Validation Errors: ' + ucfirst($(this).attr('validate'))).addClass('error');
-					}
-					else
-					{
-						$(this).removeAttr('title').removeClass('error');
-					}
-				}
-				else
-				{
-					var valdt = String($(this).attr('validate')).split(':');
+						var tagType = this.tagName.toLowerCase();
+							if(tagType == 'input') tagType = this.getAttribute('type') ? this.getAttribute('type') : 'text';
 
-					if(valdt[0] == 'confirm')
-					{
-						if($(this).val() != $(valdt[1]).val())
+						this.onblur = function()
 						{
-							$(this).attr('title', 'Validation Errors: Please confirm this field.').addClass('error');
-						}
-						else
-						{
-							$(this).removeAttr('title').removeClass('error');
-						}
-					}
-				}
-			});
-			
-			$(Staircase).find('input[type="text"], input[type="password"]').bind('keyup', function(e)
-			{
-				if(e.keyCode == 13)
-				{
-					if($(this).closest('.step').index() == ($(this).closest('.staircase').find('.step').size() - 1))
-					{
-						$(this).closest('.staircase').find('input[type="submit"], button:not([onclick])').last().click();
-					}
-					else
-					{
-						staircase.next_step.call($(Staircase).find('.step:visible').find('input').first(), Staircase, $);
-					}
+							var tagType = this.tagName.toLowerCase(),
+								isValidated = false,
+								validationType = this.getAttribute('validate').toLowerCase() || '',
+								addressLookup = this.getAttribute('address-lookup') ? this.getAttribute('address-lookup') : null;
 
-					return false;
-				}
-			});
+							if(tagType == 'input') tagType = this.getAttribute('type') ? this.getAttribute('type') : 'text';
 
-			$(Staircase).find('input[type="submit"], button:not([onclick])').each(function()
-			{
-				if(($(this).is('button') && !$(this).parent().is('a')) || $(this).is('input[type="submit"]'))
-				{
-					$(this).click(function()
-					{
-						$(this).closest('.staircase').find('[validate]').each(function()
-						{
-							var steps_limit = $(this).closest('.staircase').find('step:visible').index();
-
-							if($(this).closest('.step').index() <= steps_limit) $(this).trigger('change');
-						});
-
-						if($(this).closest('.step').find('.error:not([not-required])').size() > 0)
-						{
-							var errorStr = [];
-
-							$(this).closest('.step').find('.error:not([not-required])').each(function()
+							switch(tagType)
 							{
-								if($(this).attr('on-failed'))
-								{
-									var newFunc = new Function(['Staircase', '$'], String($(this).attr('on-failed')));
+								case 'checkbox': case 'radio':
+									if(validationType == 'unchecked')
+									{
+										if(!this.checked) isValidated = true;
+									}
+									else
+									{
+										if(this.checked) isValidated = true;
+									}
+									break;
 
-									newFunc.call(this, $(this).closest('.staircase'), $);
+								case 'select':
+									var validationOption = 0;
+
+									if(validationType.indexOf('[') > -1 && validationType.indexOf(']') > -1)
+									{
+										validationOption = parseInt(validationType.replace(/^([a-zA-Z0-9-_]+)\[([0-9]+)\]$/, '$2'));
+										validationType = 'select';
+									}
+
+									validationOption = this.getElementsByTagName('option').item(validationOption);
+									validationOption = validationOption.hasAttribute('value') ? validationOption.getAttribute('value') : validationOption.innerHTML;
+									
+									if(validationOption != this.value) isValidated = true;
+
+									break;
+
+								default:
+									if(validationType.indexOf('[') > -1 && validationType.indexOf(']') > -1)
+									{
+										validationType = validationType.replace(/^([a-zA-Z0-9-_]+)\[([0-9]+)\]$/, '$1|$2').split('|');
+										validationType[1] = parseInt(validationType[1]);
+
+										validationType = $s.patterns[validationType[0]] ? $s.patterns[validationType[0]][validationType[1]] : $s.patterns['default'];
+									}
+									else validationType = ($s.patterns[validationType] ? (($s.patterns[validationType].length == undefined) ? $s.patterns[validationType] : $s.patterns[validationType][0]) : $s.patterns['default']);
+
+									if(this.value.match(validationType)) isValidated = true;
+									break;
+							}
+
+							if(isValidated)
+								Unclass(Test(this, 'label > ' + this.tagName) ? Nearest(this, 'label') : this, 'staircase-has-error');
+							else
+								Class(Test(this, 'label > ' + this.tagName) ? Nearest(this, 'label') : this, 'staircase-has-error');
+
+							if(addressLookup) FetchAddress(this, addressLookup.replace(/( ,|, | , )/g, ',').split(','));
+						};
+
+						this.onchange = function() { Fire(this, 'blur'); };
+
+						var classApply = (Test(this, 'label > ' + this.tagName) ? Nearest(this, 'label') : this);
+
+						if(!classApply.getAttribute('error-tooltip'))
+							classApply.setAttribute('error-tooltip', tagType == 'select' ? 'Please select a valid option' : ((tagType == 'checkbox' || tagType == 'radio') ? 'Please select the correct box' : 'Please fill this field correctly!'));
+						
+						if(this.offsetTop)
+							classApply.setAttribute('input-top-pos', this.offsetTop);
+					});
+
+					$('input[type="submit"], input[type="button"].prog, button', ThisStep).bind('click', function()
+					{
+						$(InputsSelector, ThisStep).each(function(){ Fire(this, 'blur'); });
+
+						var errors = $('.staircase-has-error:not([not-required])', ThisStep);
+
+						if(errors.length == 0)
+						{
+							var conditionPassed = false,
+								forceSubmit = false,
+								alertMessages = [],
+								interrupted = false;
+
+							$('if, .condition', ThisStep).each(function()
+							{
+								if(interrupted) return;
+
+								var conditions = (function(a)
+									{
+										var b = {};
+
+										a.each(function()
+										{
+											b[this.getAttribute('input-name')] =
+											{
+												name: this.getAttribute('input-name'),
+												type: ($('[name="' + this.getAttribute('input-name') + '"]' , ThisStep)[0].getAttribute('type') || $('[name="' + this.getAttribute('input-name') + '"]', ThisStep)[0].tagName),
+												findclass: (this.className ? (function(c)
+													{
+														c = c.split(' ');
+														return '.' + c.join('.');
+													})(this.className) : ''),
+												findchecked: (this.getAttribute('checked') ? true : false),
+												findvalue: (this.getAttribute('is') || 'True'),
+												findnegvalue: (this.getAttribute('not') || null)
+											};
+
+											b[this.getAttribute('input-name')].el = $('[name="' + this.getAttribute('input-name') + '"]' + b[this.getAttribute('input-name')].findclass, ThisStep);
+										});
+
+										return b;
+									})($('input', this)),
+
+									statements = (function(a)
+									{
+										var b = {};
+
+										for(c in a)
+											if(a[c].match(/^([\s]+)?<(then|else)(.*?)?>(.*)<\/(then|else)(.*?)?>([\s]+)?$/i))
+												b[a[c].replace(/^([\s]+)?<(then|else)(.*?)?>(.*)<\/(then|else)(.*?)?>([\s]+)?$/i, '$2').toLowerCase()] = a[c].replace(/^([\s]+)?<(then|else)(.*?)?>(.*)<\/(then|else)(.*?)?>([\s]+)?$/i, '$4');
+
+										return b;
+									})(((this.innerHTML.replace(/(\r\n|\r|\n|	)/g, '')).replace(/^([\s]+)?(.*?)([\s]+)?$/, '$2')).replace(/\>([\s]+)?\</g, '>\n<').split('\n'));
+							
+								var passStatementType = 'else';
+
+								for(i in conditions)
+								{
+									var cond = conditions[i];
+
+									if(cond.type == 'radio' || cond.type == 'checkbox')
+									{
+										if(cond.findchecked)
+										{
+											var sv = $('[name="' + i + '"]' + cond.findclass + ':checked', ThisStep)[0].value;
+											if(cond.findnegvalue)
+												passStatementType = (sv != cond.findnegvalue) ? 'then' : 'else';
+											else
+												passStatementType = (sv == cond.findvalue) ? 'then' : 'else';
+										}
+										else
+										{
+											var sv = $('[name="' + i + '"]' + cond.findclass + ':not(:checked)', ThisStep)[0].value;
+											if(cond.findnegvalue)
+												passStatementType = (sv != cond.findnegvalue) ? 'then' : 'else';
+											else
+												passStatementType = (sv == cond.findvalue) ? 'then' : 'else';
+										}
+									}
+									else
+									{
+										var sv = $('[name="' + i + '"]' + cond.findclass, ThisStep)[0].value;
+
+										if(cond.findvalue.match(/^([\s]+)?(<|<=|>|>=)(.*)$/))
+										{
+											var fx = cond.findvalue.replace(/^([\s]+)?(<|<=|>|>=)([\s]+)?(.*)$/, '$2'),
+												fv = parseInt(cond.findvalue.replace(/^([\s]+)?(<|<=|>|>=)([\s]+)?(.*)$/, '$4'), 10);
+
+											passStatementType = 'else';
+											sv = parseInt(sv, 10);
+
+											switch(fx)
+											{
+												case '<': if(sv < fv) passStatementType = 'then'; break;
+												case '<=': if(sv <= fv) passStatementType = 'then'; break;
+												case '>': if(sv > fv) passStatementType = 'then'; break;
+												case '>=': if(sv >= fv) passStatementType = 'then'; break;
+											}
+										}
+										else passStatementType = (sv == cond.findvalue) ? 'then' : 'else';
+									}
 								}
 
-								if($(this).attr('on-failed-alert'))
+								for(i in statements)
 								{
-									errorStr.push($(this).attr('on-failed-alert'));
-								}
-								else if(staircase.validation_strings[$(this).attr('validate')])
-								{
-									errorStr.push(staircase.validation_strings[$(this).attr('validate')]);
+									if(i == passStatementType)
+									{
+										var matchGoTo = statements[i].match(/^(skip to|go to) (last( step)?|first( step)?|(step )?([0-9]+)|start|end)$/i);
+										if(matchGoTo)
+										{
+											var step = parseInt(matchGoTo[2]
+												.replace(/^(step )?([0-9]+)$/i, '$2')
+												.replace(/^(last|first)( step)?$/i, '$1')
+												.replace(/^(last|end)$/i, StepsTotalCount)
+												.replace(/^(first|start)$/i, 1));
+
+											conditionPassed = ThisStaircase.staircaseObject.steps[step - 1];
+											if(passStatementType == 'then') interrupted = true;
+										}
+										var matchToAlert = statements[i].match(/^alert (.*)$/i);
+										if(matchToAlert)
+										{
+											alertMessages.push(matchToAlert[1]);
+										}
+										var matchToSubmit = statements[i].match(/^submit$/i);
+										if(matchToSubmit)
+										{
+											forceSubmit = true;
+										}
+									}
 								}
 							});
 
-							if(errorStr.length > 0)
-								errorStr = errorStr.join('\n') + '\n';
+							if(alertMessages.length > 0)
+							{
+								alert('Error:-\n ' + alertMessages.join('\n '));
+								return false;
+							}
+
+							if(this.hasAttribute('does-submit')) return true;
+
+							CSS(ThisStep, 'display', 'none');
+
+							if(conditionPassed)
+							{
+								CSS(conditionPassed, 'display', 'block');
+
+								return false;
+							}
+
+							var DoStep = this.hasAttribute('does-prev') ? PrevStep : NextStep;
+
+							if(DoStep)
+								CSS(DoStep, 'display', 'block');
 							else
-								errorStr = '';
+								return true;
 
-							errorStr += '-\nPlease correct the errors above and try again.';
+							if(forceSubmit) return true;
+						}
+						else
+						{
+							var errorMessages = [];
 
-							alert('Oops! - Validation Error:\n-\n' + errorStr);
-							
-							return false;
+							errors.each(function()
+							{
+								var error = this,
+									errorMessage = error.getAttribute('error-tooltip');
+
+								if(errorMessage && in_array(errorMessage, errorMessages) <= -1)
+									errorMessages.push(errorMessage);
+
+								Class(error.parentNode.tagName == 'label' ? error.parentNode : error, 'staircase-highlight-error');
+
+								setTimeout(function()
+								{
+									Unclass(error.parentNode.tagName == 'label' ? error.parentNode : error, 'staircase-highlight-error');
+								}, 3000);
+							});
+
+							if(errorMessages.length == 0)
+								errorMessages.push('Please correctly fill all highlighted fields.');
+
+							if(!css3)
+								alert('Error -\n ' + errorMessages.join('\n '));
 						}
 
-						if(!staircase.parse_conditions($, $(this).closest('.step'))) return false;
-
-						return true;
+						return false;
 					});
-				}
-			});
-		});
-	}
-}
 
-// Loads the class when jQuery is ready
-,waitforjquery,dofinaljquery;window.onload=waitforjquery=function(){setTimeout(function(){if(window.jQuery)dofinaljquery(window.jQuery.noConflict());else waitforjquery();},100);};dofinaljquery=function($){staircase.__construct__.call(window,$);};
+					CSS(ThisStep, 'display', 'none');
+
+					rootI ++;
+				})[0];
+
+			CSS(FirstStep, 'display', 'block');
+		});
+
+		return this;
+	});
+	
+	document.title = (function()
+		{
+			var TElem = Sizzle('#page-title, .page-title, [name="page-title"], h1, h2, h3, h4, h5, h6, img[alt]');
+				if(TElem.length <= 0) return window.location.href.replace(/^http(s)?:\/\/(.*)\/?$/, '$2');
+
+			if(TElem[0].tagName.toLowerCase() == 'img' && TElem[0].getAttribute('alt'))
+				return TElem[0].getAttribute('alt');
+
+			if(TElem[0].getAttribute('title'))
+				return TElem[0].getAttribute('title');
+
+			return TElem[0].innerHTML;
+		})();
+};
