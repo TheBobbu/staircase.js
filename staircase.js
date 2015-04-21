@@ -139,6 +139,13 @@
 			}
 		});
 
+		// Adds a regex pattern
+		$staircase.Extend = function(name, pattern)
+		{
+			$staircase.Patterns[name] = pattern;
+			return $staircase;
+		};
+
 		// The validation function - all elements with the [validate] attribute will be passed through this function on their change events and on the form's beforesubmit event.
 		// This function must return either true [!0] (the input has passed validation) or false [!1] (if it fails)
 		$staircase.Validate = function(input)
