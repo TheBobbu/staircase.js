@@ -1,4 +1,4 @@
-/* Staircase | Version 5.0.0 176a | © Zeta Interactive 2013 - 2015 */
+/* Staircase | Version 5.0.0 183a | © Zeta Interactive 2013 - 2015 */
 
 ;(function()
 {
@@ -99,18 +99,18 @@
 		// Regular Expression Store
 		$staircase.Patterns =
 		{
-			email:			/^[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/,
-			name:			/^([ A-Za-z\.]+)$/,
-			phone:			[/^(\+([0-9]{1,5})|0)(?!.*(\d)\1{9,})\d{9,}$/, /^(\+([0-9]{1,5})|07)(?!.*(\d)\1{9,})\d{9,}$/, /^(\+33|0)(?!.*(\d)\1{9,})\d{9,}$/],
-			number:			[/^(-)?([0-9]+)$/, /^(-)?([0-9]+)\.([0-9]+)$/],
 			currency:		/^(-)?([^a-zA-Z0-9 ])?([0-9\,]+)(\.([0-9]{2,}))?$/,
-			zipcode:		/^(^\d{5}$)|(^\d{5}-\d{4}$)$/,
-			postcode:		[/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) {0,1}[0-9][A-Za-z]{2})$/, /^([0-9]+){5}$/],
-			time:			[/^([0-9]{2}):([0-9]{2})(:([0-9]{2}))?([\s]+)?(am|pm)?$/i, /^(am|pm)$/i],
 			date:			[/^([0-9]{1,2})(\/|-|\.|,| )([0-9]{1,2})(\/|-|\.|,| )([0-9]{2,4})$/, /^((mon|monday|tue|tues|tuesday|wed|wednesday|thu|thurs|thursday|fri|friday|sat|saturday|sun|sunday)([\s]+))?([0-9]{1,2})(st|nd|rd|th)?([\s]+)?(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)([\s]+)?([0-9]{2,4})$/i],
 			datepicker:		/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/,
+			'default':		/^(?!\s*$).+/,
+			email:			/^[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/,
 			filename:		/^(([^\/\\\?%\*:|"<>]+)?\.([^\/\\\?%\*:|"<>\.]+)|([^\/\\\?%\*:|"<>\.]+))$/,
-			'default':		/^(?!\s*$).+/
+			name:			/^([ A-Za-z\.]+)$/,
+			number:			[/^(-)?([0-9]+)$/, /^(-)?([0-9]+)\.([0-9]+)$/],
+			phone:			[/^(\+([0-9]{1,5})|0)(?!.*(\d)\1{9,})\d{9,}$/, /^(\+([0-9]{1,5})|07)(?!.*(\d)\1{9,})\d{9,}$/, /^(\+33|0)(?!.*(\d)\1{9,})\d{9,}$/],
+			postcode:		/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) {0,1}[0-9][A-Za-z]{2})$/,
+			time:			/^([0-9]{1,2}):([0-9]{2})(:([0-9]{2}))?([\s]+)?(am|pm)?$/i,
+			zipcode:		/^(^\d{5}$)|(^\d{5}-\d{4}$)$/
 		};
 
 		$staircase.$object = $this; // Store the DOM element
@@ -254,38 +254,44 @@
 		var Step = function()
 		{
 			var $this = $(arguments[0]), // Store the DOM element
-				$index = arguments[1], // Store the step index
 				$step = this, // Create a super
+				$qstate = null; // Cache the quantum state
 				$rules = [], // Create a blank rulebook
 				$inputs = 'input[validate], select[validate], textarea[validate]', // Input selector
 				$buttons = 'input[type="button"].next, input[type="button"].continue, input[type="button"].submit, input[type="submit"], button', // Continue/Submit button selector
 				$backbuttons = 'input[type="button"].prev, input[type="submit"].prev, button.prev, input[type="button"].back, input[type="submit"].back, button.back'; // Back button selector
 
+			$step.$index = arguments[1]; // Store the step index
 			$step.$object = $this; // Store the DOM element
-			$step.Quantum = null; // The quantum state of a step changes once it enters focus, keeps track of whether a step has been viewed yet or not
+
+			// The quantum state of a step changes once it enters focus to keep track of whether a step has been viewed yet or not
+			Object.defineProperty($step, 'Quantum',
+			{
+				set: function(){},
+				get: function(){return $qstate}
+			});
 
 			// `Focus` hides all other steps, shows this step and triggers a focus event on the DOM
-			$step.Focus = function(fire)
+			$step.Focus = function(silent)
 			{
 				for(var i in $staircase.Steps)
-					$staircase.Steps[i].Blur();
+					$staircase.Steps[i].Blur(silent);
 
 				if(!$this.is(':visible'))
 				{
-					$staircase.$current = $index;
+					$staircase.$current = $step.$index;
 
-					if(!$step.Quantum)
-						$step.Quantum = new Date();
+					if(!$qstate) $qstate = new Date();
 
-					if(fire) $this.trigger('focus');
+					if(!silent) $this.trigger('focus');
 					$this.show();
 
-					var hash = '#!/' + $options.ID + '/' + $index;
+					var hash = '#!/' + $options.ID + '/' + $step.$index;
 
-					if($index > 0 && window.location.hash != hash)
-						history.pushState({}, 'step ' + $index, hash);
+					if($step.$index > 0 && window.location.hash != hash)
+						history.pushState({}, 'step ' + $step.$index, hash);
 
-					else if($index == 0)
+					else if($step.$index == 0)
 						location.hash = '!/';
 				}
 
@@ -293,11 +299,11 @@
 			};
 
 			// `Blur` hides the step and triggers a blur event on the DOM
-			$step.Blur = function(fire)
+			$step.Blur = function(silent)
 			{
 				if($this.is(':visible'))
 				{
-					if(fire) $this.trigger('blur');
+					if(!silent) $this.trigger('blur');
 					$this.hide();
 				}
 
@@ -353,6 +359,36 @@
 				return true;
 			};
 
+			// Add a condition to the rulebook
+			$step.Condition = function(code)
+			{
+				if(typeof code != 'function' && typeof code != 'string')
+					return $step;
+
+				var args = ['Staircase', 'Step', '$'],
+					inputs = {};
+
+				$this.find('input[name], textarea[name], select[name]').each(function()
+				{
+					var name = $(this).attr('name');
+
+					if(inputs[name])
+					{
+						inputs[name] = [inputs[name]];
+						inputs[name].push(this);
+					}
+					else
+					{
+						args.push(name);
+						inputs[name] = this;
+					}
+				});
+
+				$rules.push({ callback: (typeof code == 'function') ? code : new Function(args, code), inputs: inputs });
+
+				return $step;
+			};
+
 			// Bind each validatable input field within this step to the validate function
 			$this.find($inputs).bind('change blur validate', function()
 			{
@@ -361,8 +397,8 @@
 
 			$this.find($backbuttons).not($buttons).bind('click', function()
 			{
-				if($index > 0)
-					$staircase.Steps[$index - 1].Focus();
+				if($step.$index > 0)
+					$staircase.Steps[$step.$index - 1].Focus();
 
 				return !1;
 			});
@@ -379,7 +415,7 @@
 				for(var i in $rules)
 				{
 					// Prepare the Staircase and Step arguments as sandboxed functions with limited access to Staircase
-					var args = [sandbox($staircase), sandbox($step)];
+					var args = [sandbox($staircase), sandbox($step), window.jQuery];
 
 					// Loop through the inputs that were present when the rule was set up (to prevent any hacking or muddling)
 					for(var j in $rules[i].inputs)
@@ -407,8 +443,8 @@
 				if(!ruleresult) return !1;
 
 				// If this is NOT the last step, focus the next step and cancel the submit event
-				if($staircase.Steps.length > ($index + 1))
-					return $staircase.Steps[$index + 1].Focus(), !1;
+				if($staircase.Steps.length > ($step.$index + 1))
+					return $staircase.Steps[$step.$index + 1].Focus(), !1;
 
 				// If there is no form, default to debug
 				if(!$this.closest('form').length && window.console)
@@ -432,28 +468,9 @@
 				}
 			});
 
-			$this.find('script[type="staircase/rule"]').each(function()
+			$this.find('script[type="staircase/condition"]').each(function()
 			{
-				var args = ['Staircase', 'Step'],
-					inputs = {};
-
-				$this.find('input[name], textarea[name], select[name]').each(function()
-				{
-					var name = $(this).attr('name');
-
-					if(inputs[name])
-					{
-						inputs[name] = [inputs[name]];
-						inputs[name].push(this);
-					}
-					else
-					{
-						args.push(name);
-						inputs[name] = this;
-					}
-				});
-
-				$rules.push({ callback: new Function(args, $(this).html()), inputs: inputs });
+				$step.Condition($(this).html());
 			}).remove();
 
 			return $step; // Supply the resulting step object
@@ -462,11 +479,11 @@
 		// Find each step within this Staircase and assign it a Step object
 		$this.find($steps).each(function()
 		{
-			$staircase.Steps.push(new Step(this, arguments[0]).Blur(!1)); // Save the step to the list
+			$staircase.Steps.push(new Step(this, arguments[0]).Blur(!0)); // Save the step to the list
 		});
 
 		// Show the first step without triggering an event
-		$staircase.Steps[0].Focus(!1);
+		$staircase.Steps[0].Focus(!0);
 
 		// Add this instance to the global list
 		window.Staircases[$options.ID] = $staircase;
