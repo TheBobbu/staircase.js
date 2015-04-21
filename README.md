@@ -170,5 +170,3 @@ Method | Arguments | Action
 `Condition` | `code` | Creates a new condition (see **Conditions**) and adds it to the Step's rulebook. `code` can either be a `String` or a `function`.
 `Focus` | `silent` | Bring the Step into focus and hide all other steps in the Staircase instance. Triggers a `focus` event on the Step's DOM Element unless `silent` is supplied.
 `Validate` | `input` | Performs `Staircase.Validate()` on `input` and applies the `staircase-has-error` and `staircase-highlight-error` classes to the `input` and any applicable `<label>` elements upon failure. `staircase-highlight-error` will be removed after a delay (see **Javascript API &raquo; Options**). Returns `true` or `false` depending on whether validation has passed or not.
-
-###Options
