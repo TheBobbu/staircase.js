@@ -150,7 +150,7 @@ Property | Meaning
 
 Method | Arguments | Action
 :---:|:---:| ---
-`Extend` | - | Add a validation rule to the rulebook (see **Validation Rules**).
+`Extend` | `name`, `pattern` | Add `pattern` as `name` to the validation rules list (see **Validation Rules**).
 `Locate` | `postcode`, `callback` | Find the Street, City and County of an address by Postcode and supply `address` as an object to the `callback` function.
 `Next` | - | Perform validation on the current Step and attempt to skip forward to the next step
 `Prev` | - | Skip back to the last step
