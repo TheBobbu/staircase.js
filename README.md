@@ -130,7 +130,7 @@ Each Staircase instance can be customized with a set of options presented as an 
 
 Option | Type | Effect
 :---:|:---:| ---
-`history` | `Boolean`
+`history` | `Boolean` | Allows Staircase to modify the `location.hash`, which allows the user to click 'Back' and return to a previous step on the form. Having multiple instances of Staircase with history enabled may behave badly.
 `ID` | `String` | A unique ID string for the Staircase instance. Shows in the URL is `history` is enabled.
 `notifyDelay` | `Int` | Number of seconds (or milliseconds if the value is larger than 30) to wait before removing the `staircase-highlight-error` class from erroneous inputs.
 `stepBlur` | `function` | Additional callback function that is triggered when a step gets sent to the background
