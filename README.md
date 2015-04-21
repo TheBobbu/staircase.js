@@ -116,13 +116,13 @@ Staircase comes with a nifty little script that scans the document for any `inpu
 ##Javascript API
 
 ###Javascript Objects
-`window.Staircases` - An array of Staircase objects available in the current window
+`window.Staircases` - An array of Staircase objects available in the current window<br />
 `window.location.params` - A named array of HTTP Query parameters in the current URL
 
-`Staircase( DOMElement element[, Object options] )`
+`Staircase( DOMElement element[, Object options] )`<br />
 Initialise a new Staircase instance, attach it to `element` and provide `options` if it has been specified.
 
-`Step( DOMElement element, Int index )`
+`Step( DOMElement element, Int index )`<br />
 Create a new Step object at `index` and attach it to `element`.
 
 ###Options
