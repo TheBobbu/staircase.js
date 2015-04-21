@@ -1,4 +1,4 @@
-/* Staircase | Version 5.0.0 172a | © Zeta Interactive 2013 - 2015 */
+/* Staircase | Version 5.0.0 176a | © Zeta Interactive 2013 - 2015 */
 
 ;(function()
 {
@@ -75,6 +75,7 @@
 			$options = // Populate the default options object
 			{
 				ID: ''.hash(8), // An optional ID string for the URL
+				steps: '.step', // Selector for steps
 				validate: null, // Extra function to call during validation
 				history: false, // Enable URL hash modifications
 				notifyDelay: 3, // Seconds to wait before removing the `staircase-highlight-error` class from an invalid input
@@ -458,8 +459,8 @@
 			return $step; // Supply the resulting step object
 		};
 
-		// Find each '.step' element within this Staircase and assign it a Step object
-		$this.find('.step').each(function()
+		// Find each step within this Staircase and assign it a Step object
+		$this.find($steps).each(function()
 		{
 			$staircase.Steps.push(new Step(this, arguments[0]).Blur(!1)); // Save the step to the list
 		});
