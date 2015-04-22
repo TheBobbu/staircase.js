@@ -1,4 +1,4 @@
-/* Staircase | Version 5.0.0 415a | © Zeta Interactive 2013 - 2015 */
+/* Staircase | Version 5.0.0 519a | © Zeta Interactive 2013 - 2015 */
 
 ;(function()
 {
@@ -86,6 +86,7 @@
 		var $ = window.jQuery, // Capture jQuery
 			$this = $(dom), // Store the DOM element
 			$staircase = this, // Create a super
+			$scrollTop = 0, // Store the window's scrollTop
 			$options = // Populate the default options object
 			{
 				checkboxGroups: false, // Enable checkbox group scanning
@@ -152,6 +153,9 @@
 					// Focus the step if it exists and has been visited before
 					window.Staircases[ID].Steps[step].Focus();
 			}
+
+			// Scroll the form back into view
+			$(window).scrollTop($scrollTop);
 		});
 
 		// Adds a regex pattern
@@ -196,8 +200,7 @@
 				{
 					// If the validator is looking for a checkbox
 					if((validate == 'checked' || validate == 'unchecked') && (input.attr('type') == 'checkbox' || input.attr('type') == 'radio'))
-						if((validate == 'checked' && !input.is(':checked')) || (validate == 'unchecked' && input.is(':checked')))
-							return !1;
+						return !((validate == 'checked' && !input.is(':checked')) || (validate == 'unchecked' && input.is(':checked')));
 
 					// Find the element's corresponding regular expression
 					var exp = $staircase.Patterns,
@@ -308,23 +311,34 @@
 			// `Focus` hides all other steps, shows this step and triggers a focus event on the DOM
 			$step.Focus = function(silent)
 			{
+				// Blur all the other Steps
 				for(var i in $staircase.Steps)
 					$staircase.Steps[i].Blur(silent);
 
+				// If this Step isn't already in focus
 				if(!$this.is(':visible'))
 				{
+					// Set the current index
 					$staircase.$current = $step.$index;
 
+					// Observe the Step's quantum state
 					if(!$qstate) $qstate = new Date();
 
+					// Try to trigger a focus event
 					if(!silent) $this.trigger('focus');
+
+					// Show the Step
 					$this.show();
 
+					// Create the URL string
 					var hash = '#!/' + $options.ID + '/' + $step.$index;
 
+					// Keep the current scroll position
+					$scrollTop = $(window).scrollTop();
+
+					// Update the URL
 					if($step.$index > 0 && window.location.hash != hash)
 						history.pushState({}, 'step ' + $step.$index, hash);
-
 					else if($step.$index == 0)
 						location.hash = '!/';
 				}
@@ -335,9 +349,13 @@
 			// `Blur` hides the step and triggers a blur event on the DOM
 			$step.Blur = function(silent)
 			{
+				// If this Step isn't already hidden
 				if($this.is(':visible'))
 				{
+					// Try to trigger a blur event
 					if(!silent) $this.trigger('blur');
+
+					// Hide the Step
 					$this.hide();
 				}
 
