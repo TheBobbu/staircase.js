@@ -47,6 +47,8 @@ new Staircase(document.getElementById('form'),
 
 The `options` parameter is optional and allows the modification of various settings and behaviours (see **Javascript API &raquo; Options**).
 
+***Note:*** *If a Staircase instance cannot find a usable `form` element, it will display all input data as a table in the developer console once the final button has been clicked.*
+
 ##Attributes
 
 Once initialised, Staircase scans the DOM for compatible elements.
