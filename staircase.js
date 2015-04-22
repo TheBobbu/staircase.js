@@ -1,4 +1,4 @@
-/* Staircase | Version 5.0.0 533a | © Zeta Interactive 2013 - 2015 */
+/* Staircase | Version 5.0.0 536a | © Zeta Interactive 2013 - 2015 */
 
 ;(function()
 {
@@ -6,8 +6,16 @@
 	String.prototype.trim = function(a){var b=this,c,l=0,i=0;b+='';if(!a){c=' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'}else{a+='';c=a.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g,'$1')}l=b.length;for(i=0;i<l;i++){if(c.indexOf(b.charAt(i))===-1){b=b.substring(i);break}}l=b.length;for(i=l-1;i>=0;i--){if(c.indexOf(b.charAt(i))===-1){b=b.substring(0,i+1);break}}return c.indexOf(b.charAt(0))===-1?b:''};
 	String.prototype.hash = function(c){var a='',b='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>!:;,.$';c=c?c:8;for(var i=0;i<c;i++)a+=b.charAt(Math.floor(Math.random()*b.length));return a};
 	Number.prototype.toDate = function date(k){var d,a,h="Sun Mon Tues Wednes Thurs Fri Satur January February March April May June July August September October November December".split(" "),f=/\\?(.?)/gi,g=function(b,c){return a[b]?a[b]():c},e=function(b,a){for(b=String(b);b.length<a;)b="0"+b;return b};a={d:function(){return e(a.j(),2)},D:function(){return a.l().slice(0,3)},j:function(){return d.getDate()},l:function(){return h[a.w()]+"day"},N:function(){return a.w()||7},S:function(){var b=a.j(),c=b%10;3>=c&&1==parseInt(b%100/10,10)&&(c=0);return["st","nd","rd"][c-1]||"th"},w:function(){return d.getDay()},z:function(){var b=new Date(a.Y(),a.n()-1,a.j()),c=new Date(a.Y(),0,1);return Math.round((b-c)/864E5)},W:function(){var b=new Date(a.Y(),a.n()-1,a.j()-a.N()+3),c=new Date(b.getFullYear(),0,4);return e(1+Math.round((b-c)/864E5/7),2)},F:function(){return h[6+a.n()]},m:function(){return e(a.n(),2)},M:function(){return a.F().slice(0,3)},n:function(){return d.getMonth()+1},t:function(){return(new Date(a.Y(),a.n(),0)).getDate()},L:function(){var b=a.Y();return 0===b%4&0!==b%100|0===b%400},o:function(){var b=a.n(),c=a.W();return a.Y()+(12===b&&9>c?1:1===b&&9<c?-1:0)},Y:function(){return d.getFullYear()},y:function(){return a.Y().toString().slice(-2)},a:function(){return 11<d.getHours()?"pm":"am"},A:function(){return a.a().toUpperCase()},B:function(){var a=3600*d.getUTCHours(),c=60*d.getUTCMinutes(),f=d.getUTCSeconds();return e(Math.floor((a+c+f+3600)/86.4)%1E3,3)},g:function(){return a.G()%12||12},G:function(){return d.getHours()},h:function(){return e(a.g(),2)},H:function(){return e(a.G(),2)},i:function(){return e(d.getMinutes(),2)},s:function(){return e(d.getSeconds(),2)},u:function(){return e(1E3*d.getMilliseconds(),6)},e:function(){throw"Not supported (see source code of date() for timezone on how to add support)";},I:function(){var b=new Date(a.Y(),0),c=Date.UTC(a.Y(),0),d=new Date(a.Y(),6),e=Date.UTC(a.Y(),6);return b-c!==d-e?1:0},O:function(){var a=d.getTimezoneOffset(),c=Math.abs(a);return(0<a?"-":"+")+e(100*Math.floor(c/60)+c%60,4)},P:function(){var b=a.O();return b.substr(0,3)+":"+b.substr(3,2)},T:function(){return"UTC"},Z:function(){return 60*-d.getTimezoneOffset()},c:function(){return"Y-m-d\\TH:i:sP".replace(f,g)},r:function(){return"D, d M Y H:i:s O".replace(f,g)},U:function(){return d/1E3|0}};return function(a,c){d=void 0===c?new Date:c instanceof Date?new Date(c):new Date(1E3*c);return a.replace(f,g)}(k,this)};
-	window.location.param = function(n,u){if(!u)var u=window.location.search;var a=RegExp('[?&](?:amp;)?'+(n.replace(/(\[|\]|\{|\}|\?|\/|\\|\||\(|\))/g,'\\$1'))+'=([^&]*)').exec(u);return a&&decodeURIComponent(a[1].replace(/\+/g,' '))};
-	Object.defineProperty(window.location,'params',{set:function(){},get:function(){var a={},b=window.location.search.substr(1).split('&');if(b)for(var i in b){b[i]=b[i].replace(/^(?:amp;)?([^=]+)=(.*)?$/,'$1\n$2').split('\n');if(a[b[i][0]]){a[b[i][0]]=[a[b[i][0]]];a[b[i][0]].push(b[i][1])}else a[b[i][0]]=b[i][1]}return a}});
+	
+	try
+	{
+		window.location.param = function(n,u){if(!u)var u=window.location.search;var a=RegExp('[?&](?:amp;)?'+(n.replace(/(\[|\]|\{|\}|\?|\/|\\|\||\(|\))/g,'\\$1'))+'=([^&]*)').exec(u);return a&&decodeURIComponent(a[1].replace(/\+/g,' '))};
+		Object.defineProperty(window.location,'params',{set:function(){},get:function(){var a={},b=window.location.search.substr(1).split('&');if(b)for(var i in b){b[i]=b[i].replace(/^(?:amp;)?([^=]+)=(.*)?$/,'$1\n$2').split('\n');if(a[b[i][0]]){a[b[i][0]]=[a[b[i][0]]];a[b[i][0]].push(b[i][1])}else a[b[i][0]]=b[i][1]}return a}});
+	}
+	catch(e)
+	{
+		if(window.console) console.error('Your browser does not support changes to window.location.', e);
+	}
 
 	// Set up the jQuery extension
 	window.jQuery.fn.staircase = function(options)
