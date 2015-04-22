@@ -182,6 +182,7 @@ Property | Meaning
 :---:| ---
 `$index` | The Step's numeric index (Note that this is an **Array Index**, meaning index **0** is actually the **first** item in the array)
 `$object` | The DOM Element bound to the Step object
+`$rules` | A list of conditions for this Step (see **Conditions**).
 `Quantum` | Changes once the Step has been focussed. Cannot be changed manually.
 
 Method | Arguments | Action

@@ -1,4 +1,4 @@
-/* Staircase | Version 5.0.0 394a | © Zeta Interactive 2013 - 2015 */
+/* Staircase | Version 5.0.0 407a | © Zeta Interactive 2013 - 2015 */
 
 ;(function()
 {
@@ -290,13 +290,13 @@
 			var $this = $(arguments[0]), // Store the DOM element
 				$step = this, // Create a super
 				$qstate = null; // Cache the quantum state
-				$rules = [], // Create a blank rulebook
 				$inputs = 'input[validate], select[validate], textarea[validate]', // Input selector
 				$buttons = 'input[type="button"].next, input[type="button"].continue, input[type="button"].submit, input[type="submit"], button', // Continue/Submit button selector
 				$backbuttons = 'input[type="button"].prev, input[type="submit"].prev, button.prev, input[type="button"].back, input[type="submit"].back, button.back'; // Back button selector
 
 			$step.$index = arguments[1]; // Store the step index
 			$step.$object = $this; // Store the DOM element
+			$step.$rules = []; // Create a blank rulebook
 
 			// The quantum state of a step changes once it enters focus to keep track of whether a step has been viewed yet or not
 			Object.defineProperty($step, 'Quantum',
@@ -418,7 +418,7 @@
 					}
 				});
 
-				$rules.push({ callback: (typeof code == 'function') ? code : new Function(args, code), inputs: inputs });
+				$step.$rules.push({ callback: (typeof code == 'function') ? code : new Function(args, code), inputs: inputs });
 
 				return $step;
 			};
@@ -472,16 +472,16 @@
 					return !1; // If there are any errors, cancel the submit event
 
 				// Process any hard-coded rules
-				var ruleresult = true;
-				for(var i in $rules)
+				var ruleresult = !0;
+				for(var i in $step.$rules)
 				{
 					// Prepare the Staircase and Step arguments as sandboxed functions with limited access to Staircase
 					var args = [sandbox($staircase), sandbox($step), window.jQuery];
 
 					// Loop through the inputs that were present when the rule was set up (to prevent any hacking or muddling)
-					for(var j in $rules[i].inputs)
+					for(var j in $step.$rules[i].inputs)
 					{
-						var input = $($rules[i].inputs[j]);
+						var input = $($step.$rules[i].inputs[j]);
 
 						// Check for checkboxes or radio boxes
 						if(input.length > 1) input = input.filter(function()
@@ -494,8 +494,8 @@
 					}
 
 					// Execute the rule
-					if($rules[i].callback.apply(window, args) === false)
-						ruleresult = false;
+					if($step.$rules[i].callback.apply(window, args) === false)
+						ruleresult = !1;
 				}
 				if(!ruleresult) return !1;
 
