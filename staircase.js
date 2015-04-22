@@ -1,4 +1,4 @@
-/* Staircase | Version 5.0.0 536a | © Zeta Interactive 2013 - 2015 */
+/* Staircase | Version 5.0.0 538a | © Zeta Interactive 2013 - 2015 */
 
 ;(function()
 {
@@ -340,14 +340,14 @@
 					$this.show();
 
 					// Create the URL string
-					var hash = '#!/' + $options.ID + '/' + $step.$index;
+					var hash = '!/' + $options.ID + '/' + $step.$index;
 
 					// Keep the current scroll position
 					$scrollTop = $(window).scrollTop();
 
 					// Update the URL
-					if($step.$index > 0 && window.location.hash != hash)
-						history.pushState({}, 'step ' + $step.$index, hash);
+					if($step.$index > 0 && window.location.hash != '#' + hash)
+						location.hash = hash;
 					else if($step.$index == 0)
 						location.hash = '!/';
 				}
