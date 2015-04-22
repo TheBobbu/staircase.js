@@ -105,6 +105,8 @@ Have a look at the following example that takes place inside a `Step`: (see **Ja
 </script>
 ```
 
+***Note:*** *Checkboxes and Radio boxes will only hold a value if they are checked. If more than one box is checked, the values will be in an array.*
+
 ##Checkbox Groups
 If the `checkboxGroups` option (see **Options**) is enabled, an extra validation step is added to any Step within the instance whose input elements are all checkboxes. At least one checkbox must be checked for validation to pass.
 
@@ -128,7 +130,7 @@ The scanner searches using the following process:
 2. Find the first `<img>` element with an alt tag and use its alt tag text content
 3. Find the first `<p>` element and use the first four words
 4. Find the first available text node and use the first four words
-5. Use a clean version of the document's URL (e.g. some-website.com/a-page.html &raquo; Some Website | A Page)
+5. Use a clean version of the document's URL (e.g. some-website.com &raquo; Some Website)
 
 ##Javascript API
 
@@ -154,7 +156,6 @@ Option | Type | Default | Effect
 `stepBlur` | `function` | `undefined` | Additional callback function that is triggered when a step gets sent to the background
 `stepFocus` | `function` | `undefined` | Additional callback function that is triggered when a step enters the foreground
 `steps` | `String` | `.step` | CSS selector used to search for Steps within the instance's DOM Element.
-`titleScan` | `Boolean` | `true` | Enable the title scanner (see **Title Scanner**).
 `validate` | `function` | `undefined` | Additional function to check against during validation. `this` represents the current `input` element and the first argument represents the Staircase instance. Be sure to return `false` if your custom validation fails.
 
 ###Properties & Methods

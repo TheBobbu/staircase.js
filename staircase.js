@@ -1,4 +1,4 @@
-/* Staircase | Version 5.0.0 376a | © Zeta Interactive 2013 - 2015 */
+/* Staircase | Version 5.0.0 394a | © Zeta Interactive 2013 - 2015 */
 
 ;(function()
 {
@@ -63,6 +63,20 @@
 		$(this).removeAttr('staircase-value').val(fillstr);
 	});
 
+	// Title Scanner
+	if(!document.title || $('head title').length == 0)
+	{
+		var title = $('h1, h2, h3, h4, h5, h6').first().text();
+
+		if(!title) title = $('img[alt]').first().attr('alt');
+		if(!title) title = ($('p').first().text().trim() || '').split(' ').slice(0, 4).join(' ');
+		if(!title) title = ($('body').text().trim() || '').split(' ').slice(0, 4).join(' ');
+		if(!title) title = window.location.href.replace(/^(?:f|ht)tps?:\/\/(.*?)\.((com?|org|net|gov|edu)(\.uk)?|info)(\/(.*)?)?$/i, '$1').replace(/(-|\.|)/g, ' ').replace(/(^| )([a-z])/g, function(m,a,b){return a+(b.toUpperCase())});
+		if(!title) title = window.location.pathname.substr(1);
+
+		document.title = title;
+	}
+
 	// Create an empty global list of staircase instances
 	window.Staircases = {};
 
@@ -81,7 +95,6 @@
 				steps: '.step', // Selector for steps
 				stepBlur: null, // Extra function to call when a step is hidden from view
 				stepFocus: null, // Extra function to call when a step enters the view
-				titleScane: true, // Enable the title scanner
 				validate: null // Extra function to call during validation
 			},
 
@@ -470,18 +483,14 @@
 					{
 						var input = $($rules[i].inputs[j]);
 
-						// Textareas don't like `.val()`
-						if(input.is('textarea'))
-							args.push(input[0].value);
-
-						else
+						// Check for checkboxes or radio boxes
+						if(input.length > 1) input = input.filter(function()
 						{
-							// Check for checkboxes or radio boxes
-							if(input.length > 1) input = input.filter(':checked');
+							return (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && !$(this).is(':checked')) ? !1 : !0;
+						});
 
-							// Add the input's value to the rule arguments
-							args.push((input.length > 0) ? input.val() : undefined);
-						}
+						// Add the input's value to the rule arguments
+						args.push((input.length > 0) ? (input.length > 1 ? (function(a, b){ a.each(function(){ b.push($(this)[0].value) }); return b })(input, []) : input[0].value) : undefined);
 					}
 
 					// Execute the rule
