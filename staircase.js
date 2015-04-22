@@ -484,7 +484,7 @@
 		};
 
 		// Find each step within this Staircase and assign it a Step object
-		$this.find($steps).each(function()
+		$this.find($options.steps).each(function()
 		{
 			$staircase.Steps.push(new Step(this, arguments[0]).Blur(!0)); // Save the step to the list
 		});
