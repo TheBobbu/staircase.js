@@ -1,4 +1,4 @@
-/* Staircase | Version 5.0.0 531a | © Zeta Interactive 2013 - 2015 */
+/* Staircase | Version 5.0.0 533a | © Zeta Interactive 2013 - 2015 */
 
 ;(function()
 {
@@ -293,7 +293,8 @@
 			var $this = $(arguments[0]), // Store the DOM element
 				$step = this, // Create a super
 				$qstate = null; // Cache the quantum state
-				$inputs = 'input[validate], select[validate], textarea[validate]', // Input selector
+				$allinputs = 'input:not([type="button"], [type="submit"], [type="image"])[name], select[name], textarea[name]', // All form data inputs
+				$inputs = 'input:not([type="button"], [type="submit"], [type="image"])[validate], select[validate], textarea[validate]', // Input selector
 				$buttons = 'input[type="button"].next, input[type="button"].continue, input[type="button"].submit, input[type="submit"], button', // Continue/Submit button selector
 				$backbuttons = 'input[type="button"].prev, input[type="submit"].prev, button.prev, input[type="button"].back, input[type="submit"].back, button.back'; // Back button selector
 
@@ -539,7 +540,7 @@
 
 					var table = [];
 
-					$($inputs).each(function()
+					$($allinputs).each(function()
 					{
 						table.push({ Field: $(this).attr('name'), Value: this.value });
 					});
