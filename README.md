@@ -63,6 +63,7 @@ Below is a list of predefined rules and what they ask for from a value. You can 
 Rule | Criteria
 :---:| ---
 `currency` | An amount of money
+`checked` | Checkbox or Radio button must be checked
 `date` | `[0]` - A short date string, accepting American and standard formats (e.g. 21/04/15)<br />`[1]` - A long date string (e.g. Monday 21st April 2015)
 `datepicker` | The default format for jQuery's datepicker
 `default` | A non-empty string
@@ -72,7 +73,9 @@ Rule | Criteria
 `number` | `[0]` - Any integer (negatives allowed)<br />`[1]` - Any float (negatives allowed)
 `phone` | `[0]` - A valid UK landline number<br />`[1]` - A valid UK mobile number<br />`[2]` - A valid US phone number
 `postcode` | A valid UK postcode
+`selected` | Select input must have a valid (non-empty) option selected
 `time` | A time string (e.g. 15:06:30, 12:00 am, 3:06pm)
+`unchecked` | Checkbox or Radio button must **not** be checked
 `zipcode` | A valid US zipcode
 
 ##Conditions
@@ -102,6 +105,9 @@ Have a look at the following example that takes place inside a `Step`: (see **Ja
 </script>
 ```
 
+##Checkbox Groups
+If the `checkboxGroups` option (see **Options**) is enabled, an extra validation step is added to any Step within the instance whose input elements are all checkboxes. At least one checkbox must be checked for validation to pass.
+
 ##Prefiller
 Staircase comes with a nifty little script that scans the document for any `input` elements with a `staircase-value` attribute and fills it with data by passing the attribute value through a filter. Have a look at the following examples:
 
@@ -112,6 +118,17 @@ Staircase comes with a nifty little script that scans the document for any `inpu
 ```
 
 `#{...}` is a filter tag. The contents between `{` and `}` are searched for in the `window` object and placed in the output if they are found.
+
+##Title Scanner
+If the `document.title` is left blank or looks like a filename, or there is no `<title>` tag in the document, Staircase will attempt to auto-fill the document's title by searching for the first piece of relevant text within the page.
+
+The scanner searches using the following process:
+
+1. Find the first `<h1>`, `<h2>`, `<h3>`, `<h4>`, `<h5>` or `<h6>` element and use its text content
+2. Find the first `<img>` element with an alt tag and use its alt tag text content
+3. Find the first `<p>` element and use the first four words
+4. Find the first available text node and use the first four words
+5. Use a clean version of the document's URL (e.g. some-website.com/a-page.html &raquo; Some Website | A Page)
 
 ##Javascript API
 
@@ -128,15 +145,17 @@ Create a new Step object at `index` and attach it to `element`.
 ###Options
 Each Staircase instance can be customized with a set of options presented as an `Object`.
 
-Option | Type | Effect
-:---:|:---:| ---
-`history` | `Boolean` | Allows Staircase to modify the `location.hash`, which allows the user to click 'Back' and return to a previous step on the form. Having multiple instances of Staircase with history enabled may behave badly.
-`ID` | `String` | A unique ID string for the Staircase instance. Shows in the URL if `history` is enabled.
-`notifyDelay` | `Int` | Number of seconds (or milliseconds if the value is larger than 30) to wait before removing the `staircase-highlight-error` class from erroneous inputs.
-`stepBlur` | `function` | Additional callback function that is triggered when a step gets sent to the background
-`stepFocus` | `function` | Additional callback function that is triggered when a step enters the foreground
-`steps` | `String` | CSS selector used to search for Steps within the instance's DOM Element.
-`validate` | `function` | Additional function to check against during validation. `this` represents the current `input` element and the first argument represents the Staircase instance. Be sure to return `false` if your custom validation fails.
+Option | Type | Default | Effect
+:---:|:---:|:---:| ---
+`checkboxGroups` | `Boolean` | `false` | Enable checkbox groups (see **Checkbox Groups**).
+`history` | `Boolean` | `false` | Allows Staircase to modify the `location.hash`, which allows the user to click 'Back' and return to a previous step on the form. Having multiple instances of Staircase with history enabled may behave badly.
+`ID` | `String` | `undefined` | A unique ID string for the Staircase instance. Shows in the URL if `history` is enabled. If left undefined, a random 8-character string is generated.
+`notifyDelay` | `Int` | `3` | Number of seconds (or milliseconds if the value is larger than 30) to wait before removing the `staircase-highlight-error` class from erroneous inputs.
+`stepBlur` | `function` | `undefined` | Additional callback function that is triggered when a step gets sent to the background
+`stepFocus` | `function` | `undefined` | Additional callback function that is triggered when a step enters the foreground
+`steps` | `String` | `.step` | CSS selector used to search for Steps within the instance's DOM Element.
+`titleScan` | `Boolean` | `true` | Enable the title scanner (see **Title Scanner**).
+`validate` | `function` | `undefined` | Additional function to check against during validation. `this` represents the current `input` element and the first argument represents the Staircase instance. Be sure to return `false` if your custom validation fails.
 
 ###Properties & Methods
 

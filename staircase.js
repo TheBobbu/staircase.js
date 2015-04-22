@@ -1,4 +1,4 @@
-/* Staircase | Version 5.0.0 211a | © Zeta Interactive 2013 - 2015 */
+/* Staircase | Version 5.0.0 376a | © Zeta Interactive 2013 - 2015 */
 
 ;(function()
 {
@@ -74,13 +74,15 @@
 			$staircase = this, // Create a super
 			$options = // Populate the default options object
 			{
-				ID: ''.hash(8), // An optional ID string for the URL
-				steps: '.step', // Selector for steps
-				validate: null, // Extra function to call during validation
+				checkboxGroups: false, // Enable checkbox group scanning
 				history: false, // Enable URL hash modifications
+				ID: ''.hash(8), // An optional ID string for the URL
 				notifyDelay: 3, // Seconds to wait before removing the `staircase-highlight-error` class from an invalid input
+				steps: '.step', // Selector for steps
+				stepBlur: null, // Extra function to call when a step is hidden from view
 				stepFocus: null, // Extra function to call when a step enters the view
-				stepBlur: null // Extra function to call when a step is hidden from view
+				titleScane: true, // Enable the title scanner
+				validate: null // Extra function to call during validation
 			},
 
 		// Sandbox function (for the string-to-code rule parser)
@@ -150,9 +152,12 @@
 		// This function must return either true [!0] (the input has passed validation) or false [!1] (if it fails)
 		$staircase.Validate = function(input)
 		{
-			if(input.attr('validate'))
+			// Store the validation type
+			var validate = input.attr('validate');
+
+			if(validate)
 				// If we're dealing with a select element
-				if(input.attr('validate') == 'select')
+				if((validate == 'select' || validate == 'selected') && input.is('select'))
 				{
 					var myval = input.val(),
 						// Find the first <option> in the <select> and store its value to check against
@@ -176,30 +181,39 @@
 
 				else
 				{
+					// If the validator is looking for a checkbox
+					if((validate == 'checked' || validate == 'unchecked') && (input.attr('type') == 'checkbox' || input.attr('type') == 'radio'))
+						if((validate == 'checked' && !input.is(':checked')) || (validate == 'unchecked' && input.is(':checked')))
+							return !1;
+
 					// Find the element's corresponding regular expression
 					var exp = $staircase.Patterns,
-						key = (input.attr('validate').indexOf('[') > -1) ? input.attr('validate').replace(/\[([0-9]+)\]/g, '\n$1').split('\n') : [input.attr('validate')];
+						key = (validate.indexOf('[') > -1) ? validate.replace(/\[([0-9]+)\]/g, '\n$1').split('\n') : [validate];
 
-					// Climb the attibute's key list (e.g. phone[0], date[1][2][3], etc.)
-					if(key.length > 1)
+					// If the validation expression exists
+					if(exp)
 					{
-						for(var i = 0; i < key.length; i ++)
-							if(exp[key[i]])
-								exp = exp[key[i]];
-							else break;
-					}
+						// Climb the attibute's key list (e.g. phone[0], date[1][2][3], etc.)
+						if(key.length > 1)
+						{
+							for(var i = 0; i < key.length; i ++)
+								if(exp[key[i]])
+									exp = exp[key[i]];
+								else break;
+						}
 
-					else
-					{
-						if(typeof exp[key[0]] == 'object' && !(exp[key[0]] instanceof RegExp))
-							exp = exp[key[0]][0];
 						else
-							exp = exp[key[0]];
-					}
+						{
+							if(typeof exp[key[0]] == 'object' && !(exp[key[0]] instanceof RegExp))
+								exp = exp[key[0]][0];
+							else
+								exp = exp[key[0]];
+						}
 
-					if(exp && exp instanceof RegExp)
-						// Use `[0].value` rather than `.val()` to accommodate for <textbox>es
-						return !!input[0].value.match(exp);
+						if(exp && exp instanceof RegExp)
+							// Use `[0].value` rather than `.val()` to accommodate for <textbox>es
+							return !!input[0].value.match(exp);
+					}
 				}
 
 			if($options.validate && typeof $options.validate == 'function')
@@ -322,12 +336,12 @@
 			{
 				if(!input)
 				{
-					var result = true;
+					var result = !0;
 
 					$this.find($inputs).each(function()
 					{
 						if(!$step.Validate(this))
-							result = false;
+							result = !1;
 					});
 
 					return result;
@@ -350,7 +364,7 @@
 						// If the delay is larger than 30, interpret it as milliseconds. Otherwise, interpret as seconds and adjust
 						$options.notifyDelay > 30 ? $options.notifyDelay : ($options.notifyDelay * 1000)));
 
-					return false;
+					return !1;
 				}
 
 				else
@@ -363,7 +377,7 @@
 						window.clearTimeout(apply.data('notify-timeout'));
 				}
 
-				return true;
+				return !0;
 			};
 
 			// Add a condition to the rulebook
@@ -412,10 +426,37 @@
 
 			$this.find($buttons).not($backbuttons).bind('click', function()
 			{
+				// trigger validation on each input
 				$this.find($inputs).trigger('validate');
 
-				if($this.find('.staircase-has-error').length > 0)
-					return !1; // If there are any validation errors, cancel the submit event
+				// If validation has passed (or been ignored) check for checkbox groups
+				if($options.checkboxGroups && $this.find('input, select, textbox').length == $this.find('input[type="checkbox"]').length)
+					// If no checkboxes within the Step are checked
+					if($this.find('input[type="checkbox"]:checked').length == 0)
+					{
+						// Apply the error classes
+						$this.addClass('staircase-has-error staircase-highlight-error');
+
+						// Remove the error notification class
+						$this.data('notify-timeout', setTimeout(function(){ $this.removeClass('staircase-highlight-error'); },
+
+							// If the delay is larger than 30, interpret it as milliseconds. Otherwise, interpret as seconds and adjust
+							$options.notifyDelay > 30 ? $options.notifyDelay : ($options.notifyDelay * 1000)));
+					}
+
+					// Otherwise, remove the error classes
+					else
+					{
+						// Remove the error classes
+						$this.removeClass('staircase-has-error staircase-highlight-error');
+
+						// Clear the notification class timer so that no classes are unintentionally removed in the near future
+						if($this.data('notify-timeout'))
+							window.clearTimeout($this.data('notify-timeout'));
+					}
+
+				if($this.hasClass('staircase-has-error') || $this.find('.staircase-has-error').length > 0)
+					return !1; // If there are any errors, cancel the submit event
 
 				// Process any hard-coded rules
 				var ruleresult = true;
