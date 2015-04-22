@@ -1,4 +1,4 @@
-/* Staircase | Version 5.0.0 407a | © Zeta Interactive 2013 - 2015 */
+/* Staircase | Version 5.0.0 415a | © Zeta Interactive 2013 - 2015 */
 
 ;(function()
 {
@@ -120,7 +120,7 @@
 			'default':		/^(?!\s*$).+/,
 			email:			/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
 			filename:		/^(([^\/\\\?%\*:|"<>]+)?\.([^\/\\\?%\*:|"<>\.]+)|([^\/\\\?%\*:|"<>\.]+))$/,
-			name:			/^([ A-Za-z\.]+)$/,
+			name:			/^([ A-Za-z\.']+)$/,
 			number:			[/^(-)?([0-9]+)$/, /^(-)?([0-9]+)\.([0-9]+)$/],
 			phone:			[/^(\+([0-9]{1,5})|0)(?!.*(\d)\1{9,})\d{9,}$/, /^(\+([0-9]{1,5})|07)(?!.*(\d)\1{9,})\d{9,}$/, /^(\+33|0)(?!.*(\d)\1{9,})\d{9,}$/],
 			postcode:		/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) {0,1}[0-9][A-Za-z]{2})$/,
@@ -402,7 +402,7 @@
 				var args = ['Staircase', 'Step', '$'],
 					inputs = {};
 
-				$this.find('input[name], textarea[name], select[name]').each(function()
+				$this.find('input:not([type="button"], [type="submit"], [type="image"])[name], textarea[name], select[name]').each(function()
 				{
 					var name = $(this).attr('name');
 
@@ -443,7 +443,7 @@
 				$this.find($inputs).trigger('validate');
 
 				// If validation has passed (or been ignored) check for checkbox groups
-				if($options.checkboxGroups && $this.find('input, select, textbox').length == $this.find('input[type="checkbox"]').length)
+				if($options.checkboxGroups && $this.find('input:not([type="button"], [type="submit"], [type="image"]), select, textbox').length == $this.find('input[type="checkbox"]').length)
 					// If no checkboxes within the Step are checked
 					if($this.find('input[type="checkbox"]:checked').length == 0)
 					{
