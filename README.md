@@ -149,7 +149,7 @@ Each Staircase instance can be customized with a set of options presented as an 
 
 Option | Type | Default | Effect
 :---:|:---:|:---:| ---
-`checkboxGroups` | `Boolean` | `false` | Enable checkbox groups (see **Checkbox Groups**).
+`checkboxGroups` | `Boolean` or `String` | `false` | Enable checkbox groups (see **Checkbox Groups**). You can specify a CSS selector to only apply checkbox group validation to a specific element within the Step. If set to `true`, the default selector is `.checkbox-group` and falls back to the entire Step.
 `history` | `Boolean` | `false` | Allows Staircase to modify the `location.hash`, which allows the user to click 'Back' and return to a previous step on the form. Having multiple instances of Staircase with history enabled may behave badly.
 `ID` | `String` | `undefined` | A unique ID string for the Staircase instance. Shows in the URL if `history` is enabled. If left undefined, a random 8-character string is generated.
 `notifyDelay` | `Int` | `3` | Number of seconds (or milliseconds if the value is larger than 30) to wait before removing the `staircase-highlight-error` class from erroneous inputs.

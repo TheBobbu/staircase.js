@@ -1,4 +1,4 @@
-/* Staircase | Version 5.0.0 519a | © Zeta Interactive 2013 - 2015 */
+/* Staircase | Version 5.0.0 531a | © Zeta Interactive 2013 - 2015 */
 
 ;(function()
 {
@@ -461,30 +461,39 @@
 				$this.find($inputs).trigger('validate');
 
 				// If validation has passed (or been ignored) check for checkbox groups
-				if($options.checkboxGroups && $this.find('input:not([type="button"], [type="submit"], [type="image"]), select, textbox').length == $this.find('input[type="checkbox"]').length)
-					// If no checkboxes within the Step are checked
-					if($this.find('input[type="checkbox"]:checked').length == 0)
+				if($options.checkboxGroups)
+				{
+					// If a selector has been specified, search for it. Fallback to `.checkbox-group`, then to the Step's DOM Element.
+					var group = (typeof $options.checkboxGroups == 'string') ? $this.find($options.checkboxGroups) : (($this.find('.checkbox-group').length) > 0 ? $this.find('.checkbox-group') : $this);
+
+					// If the group does not contain any other type of input, we can continue with the validation
+					if(group.find('input:not([type="button"], [type="submit"], [type="image"]), select, textbox').length == group.find('input[type="checkbox"]').length)
 					{
-						// Apply the error classes
-						$this.addClass('staircase-has-error staircase-highlight-error');
+						// If no checkboxes within the group are checked
+						if(group.find('input[type="checkbox"]:checked').length == 0)
+						{
+							// Apply the error classes
+							group.addClass('staircase-has-error staircase-highlight-error');
 
-						// Remove the error notification class
-						$this.data('notify-timeout', setTimeout(function(){ $this.removeClass('staircase-highlight-error'); },
+							// Remove the error notification class
+							group.data('notify-timeout', setTimeout(function(){ group.removeClass('staircase-highlight-error'); },
 
-							// If the delay is larger than 30, interpret it as milliseconds. Otherwise, interpret as seconds and adjust
-							$options.notifyDelay > 30 ? $options.notifyDelay : ($options.notifyDelay * 1000)));
+								// If the delay is larger than 30, interpret it as milliseconds. Otherwise, interpret as seconds and adjust
+								$options.notifyDelay > 30 ? $options.notifyDelay : ($options.notifyDelay * 1000)));
+						}
+
+						// Otherwise, remove the error classes
+						else
+						{
+							// Remove the error classes
+							group.removeClass('staircase-has-error staircase-highlight-error');
+
+							// Clear the notification class timer so that no classes are unintentionally removed in the near future
+							if(group.data('notify-timeout'))
+								window.clearTimeout(group.data('notify-timeout'));
+						}
 					}
-
-					// Otherwise, remove the error classes
-					else
-					{
-						// Remove the error classes
-						$this.removeClass('staircase-has-error staircase-highlight-error');
-
-						// Clear the notification class timer so that no classes are unintentionally removed in the near future
-						if($this.data('notify-timeout'))
-							window.clearTimeout($this.data('notify-timeout'));
-					}
+				}
 
 				if($this.hasClass('staircase-has-error') || $this.find('.staircase-has-error').length > 0)
 					return !1; // If there are any errors, cancel the submit event
