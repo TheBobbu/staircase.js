@@ -3,7 +3,7 @@
 ;(function()
 {
 	// Save the version number for reference
-	window.$staircase = '5.0.0 548a';
+	window.$staircase = '5.0.1';
 
 	// Some helpful polyfills (that won't interfere with any other scripts)
 	String.prototype.trim = function(a){var b=this,c,l=0,i=0;b+='';if(!a){c=' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'}else{a+='';c=a.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g,'$1')}l=b.length;for(i=0;i<l;i++){if(c.indexOf(b.charAt(i))===-1){b=b.substring(i);break}}l=b.length;for(i=l-1;i>=0;i--){if(c.indexOf(b.charAt(i))===-1){b=b.substring(0,i+1);break}}return c.indexOf(b.charAt(0))===-1?b:''};
@@ -12,6 +12,7 @@
 
 	try
 	{
+		// Supply the window with an array of parameters (?param1=value&param2=value)
 		window.location.param = function(n,u){if(!u)var u=window.location.search;var a=RegExp('[?&](?:amp;)?'+(n.replace(/(\[|\]|\{|\}|\?|\/|\\|\||\(|\))/g,'\\$1'))+'=([^&]*)').exec(u);return a&&decodeURIComponent(a[1].replace(/\+/g,' '))};
 		Object.defineProperty(window.location,'params',{set:function(){},get:function(){var a={},b=window.location.search.substr(1).split('&');if(b)for(var i in b){b[i]=b[i].replace(/^(?:amp;)?([^=]+)=(.*)?$/,'$1\n$2').split('\n');if(a[b[i][0]]){a[b[i][0]]=[a[b[i][0]]];a[b[i][0]].push(b[i][1])}else a[b[i][0]]=b[i][1]}return a}});
 	}
@@ -31,7 +32,8 @@
 		else
 			return $(this).each(function()
 			{
-				$(this).data('staircase', new Staircase(this, options ? options : {}));
+				if(!$(this).data('staircase'))
+					$(this).data('staircase', new Staircase(this, options ? options : {}));
 			});
 	};
 
@@ -138,6 +140,14 @@
 			postcode:		/^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) {0,1}[0-9][A-Za-z]{2})$/,
 			time:			/^([0-9]{1,2}):([0-9]{2})(:([0-9]{2}))?([\s]+)?(am|pm)?$/i,
 			zipcode:		/^(^\d{5}$)|(^\d{5}-\d{4}$)$/
+		};
+
+		// Constraints Store
+		$staircase.Constraints =
+		{
+			number:			/^([0-9])$/,
+			letter:			/^([a-zA-Z])$/,
+			symbol:			/^([^0-9a-zA-Z])$/
 		};
 
 		$staircase.$object = $this; // Store the DOM element
@@ -304,6 +314,7 @@
 			var $this = $(arguments[0]), // Store the DOM element
 				$step = this, // Create a super
 				$qstate = null; // Cache the quantum state
+				$toconstrain = 'input:not([type="button"], [type="submit"], [type="image"])[constrain], textarea[constrain]', // Inputs to apply constraints to
 				$allinputs = 'input:not([type="button"], [type="submit"], [type="image"])[name], select[name], textarea[name]', // All form data inputs
 				$inputs = 'input:not([type="button"], [type="submit"], [type="image"])[validate], select[validate], textarea[validate]', // Input selector
 				$buttons = 'input[type="button"].next, input[type="button"].continue, input[type="button"].submit, input[type="submit"], button', // Continue/Submit button selector
@@ -451,6 +462,16 @@
 
 				return $step;
 			};
+
+			// Bind constraints
+			$this.find($toconstrain).bind('keydown', function(e)
+			{
+				var constraint = $(this).attr('constrain');
+					constraint = $staircase.Constraints[constraint] ? $staircase.Constraints[constraint] : null;
+
+				if(constraint && !String.fromCharCode(e.keyCode).match(constraint))
+					return !1;
+			});
 
 			// Bind each validatable input field within this step to the validate function
 			$this.find($inputs).bind('change blur validate', function()
