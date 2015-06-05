@@ -469,7 +469,8 @@
 				var constraint = $(this).attr('constrain');
 					constraint = $staircase.Constraints[constraint] ? $staircase.Constraints[constraint] : null;
 
-				if(constraint && !String.fromCharCode(e.keyCode).match(constraint))
+				// Convert the pressed key to its character. If the key pressed is on the keypad, convert it to a number key
+				if(constraint && !String.fromCharCode(e.keyCode >= 96 && e.keyCode <= 105 ? (e.keyCode - 48) : e.keyCode).match(constraint))
 					return !1;
 			});
 
