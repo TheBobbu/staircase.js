@@ -145,9 +145,9 @@
 		// Constraints Store
 		$staircase.Constraints =
 		{
-			number:			/^([0-9])$/,
-			letter:			/^([a-zA-Z])$/,
-			symbol:			/^([^0-9a-zA-Z])$/
+			numbers:		/^([^a-zA-Z])$/,
+			letters:		/^([^0-9])$/,
+			symbols:		/^([^0-9a-zA-Z])$/
 		};
 
 		$staircase.$object = $this; // Store the DOM element
