@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<script style="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<script style="text/javascript" src="http://staircase.virtuosoadvertising.co.uk/5.1.1/staircase.min.js"></script>
+		<script style="text/javascript">
+		jQuery(function($)
+		{
+			/* Initialise Staircase
+			 */
+			$('.staircase').staircase(
+			{
+				history: true,
+				checkboxGroups: true
+			});
+		});
+		</script>
+	</head>
+	<body>
+		<section class="staircase">
+			<div class="step">
+				<!-- Always apply "autofocus" to the first input field -->
+				<label>Which of these subjects are you interested in studying?
+				<select name="qxxxx" validate="select" autofocus>
+					<option value="">-- Select One --</option>
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+				</select></label>
+
+				<!-- Conditional statement to skip steps or alert -->
+				<script type="staircase/condition">
+					if(qxxxx == '3')
+					{
+						return Staircase.To(2), false;
+					}
+					else if(qxxxx == '2')
+					{
+						return alert('This is an alert popup for an invalid response'), false;
+					}
+				</script>
+
+				<input type="button" class="continue" value="NEXT" />
+			</div>
+			<div class="step">
+				<fieldset class="checkbox-group" error-tooltip="Please select at least one subject">
+					<h4>What new skills interest you?</h4>
+					<label><input type="checkbox" class="checkbox-group-input" checked="checked" value="1" name="qaaa">1</label>
+					<label><input type="checkbox" class="checkbox-group-input" value="2" name="qaaa">2</label>
+					<label><input type="checkbox" class="checkbox-group-input" value="3" name="qaaa">3</label>
+					<label><input type="checkbox" class="checkbox-group-input" value="4" name="qaaa">4</label>
+					<label><input type="checkbox" class="checkbox-group-input" value="5" name="qaaa">5</label>
+				</fieldset>
+				<input type="button" class="continue" value="NEXT" />
+			</div>
+			<div class="step">
+				<div class="radio">
+					When would you like to start your studies?
+					<label><input type="radio" value="1" checked="checked" name="qyyyy" /> 1</label>
+					<label><input type="radio" value="2" name="qyyyy" /> 2</label>
+				</div>
+
+				<!-- Conditional statement to give alert or go to next step -->
+				<script type="staircase/condition">
+					if(qyyyy == '1')
+					{
+						return alert('This is an alert popup for an invalid response'), false;
+					}
+				</script>
+
+				<input type="button" class="continue" value="NEXT" />
+			</div>
+			<div class="step">
+				<!-- jQuery UI slider example implementation -->
+				<label>Your approximate total debt:
+					<input pattern="[0-9]*" type="number" id="slider" value="0" size="25" name="qxxx" validate="number" />
+				</label>
+
+				<!-- Conditional statement to give alert or submit, with "less than" conditional -->
+				<script type="staircase/condition">
+					if(parseFloat(qxxx) < 1000)
+					{
+						return alert('Sorry, your total debt must be at least £1,000.'), false;
+					}
+				</script>
+
+				<input type="button" class="continue" value="NEXT" />
+			</div>
+			<div class="step">
+				<!-- Standard AMP data points for basic user data, illustrating various validation requirements -->
+				<label class="first">Title
+				<select name="q22" class="title" validate="select" autocomplete="honorific-prefix">
+					<option value="">-- Select One-- </option>
+					<option value="Mr">Mr</option>
+					<option value="Mrs">Mrs</option>
+					<option value="Miss">Miss</option>
+					<option value="Ms">Ms</option>
+					<option value="Other">Other</option>
+				</select></label>
+
+				<label>Full Name
+				<input type="text" class="name" value="" size="25" name="q2" validate="name" autocomplete="name" bypass_validation="1" /></label>
+
+				<label>Last Name
+				<input type="text" class="surname" value="" size="25" name="q3" validate="name" autocomplete="family-name" bypass_validation="1" /></label>
+
+				<label error-tooltip="Please Enter a Valid Email Address">Email Address
+				<input type="email" class="email" value="" name="q1" validate="email" autocomplete="email"></label>
+
+				<label error-tooltip="Please Enter a Valid Phone Number">Telephone Number
+				<input type="tel" class="phone" value="" name="q10173" maxlength="11" validate="phone[0]"pattern="[0-9]*" autocomplete="tel-national" bypass_validation="1" /></label>
+
+				<label error-tooltip="Please Enter a Valid Mobile Number">Mobile Number
+				<input type="tel" class="mphone" value="" name="q10174" maxlength="11" validate="phone[1]"pattern="[0-9]*" autocomplete="tel-national" bypass_validation="1" /></label>
+
+				<label error-tooltip="Please enter your day of birth in the correct format" >Date of Birth: <span>Day (DD)</span><input type="number" class="day" value="" name="q12" maxlength="2" id="dobdate" validate="number[0]" pattern="[0-9]*" min="0" max="31" autocomplete="bday" placeholder="DD" error-tooltip="Please enter a valid date of birth"></label>
+				<label error-tooltip="Please enter your month of birth in the correct format" ><span>Month (MM)</span><input type="number" class="month" value="" name="q11" maxlength="2" validate="number[0]" pattern="[0-9]*" min="0" max="12" autocomplete="bday" placeholder="MM" id="dobmonth"></label>
+				<label error-tooltip="Please enter your year of birth in the correct format" ><span>Year (YYYY)</span><input type="number" class="year" value="" name="q13" maxlength="4" validate="number[0]" pattern="[0-9]*" min="1900" max="2000" autocomplete="bday" placeholder="YYYY" id="dobyear"></label>
+
+				<label>Postcode
+				<input type="text" class="postcode" name="q8" value="" validate="postcode" address-lookup="q4, q6, q10" autocomplete="postal-code" bypass_validation="1" /></label>
+
+				<label>Address 1
+				<input type="text" class="address1" name="q4" value="" validate="default" autocomplete="address-line1" bypass_validation="1" /></label>
+
+				<label not-required="true">Address 2 (optional)
+				<input type="text" class="address2" name="q5" value="" validate="default" autocomplete="address-line2" bypass_validation="1" /></label>
+
+				<label>City
+				<input type="text" class="city" name="q6" value="" validate="default" autocomplete="locality city" bypass_validation="1" /></label>
+
+				<label>County
+				<input type="text" class="county" name="q10180" value="" validate="default" autocomplete="state province region" bypass_validation="1" /></label>
+
+				<label>Country
+				<input type="text" class="country" name="q10" value="" validate="default" autocomplete="country-name" bypass_validation="1" /></label>
+
+				<input type="submit" value="NEXT" />
+			</div>
+		</section><!-- end .staircase -->
+	</body>
+</html>
