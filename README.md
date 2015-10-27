@@ -1,27 +1,29 @@
-#Staircase 5.0.0
+#Staircase 5.1.1
 
 Staircase is a lightweight framework for online form validation and auto population.
-Requires jQuery 1.11.1 or later.
+Requires jQuery 1.8 or later.
 
 
 ##Preparing the DOM
 Staircase was written with ease of use in mind. Setting up a form is simple. Any element type can be used for the main form, however each step of the form must match the `step selector` (see **Javascript API &raquo; Options**).
 
-To add validation to an input, give it a `validate` attribute (see **Attributes**). The validation is run when any `input[type="submit"]` or `.continue` element is clicked.
+To add validation to an input, give it a `validate` attribute (see **Attributes**).  
+To add a character constraint to an input, give it a `constrain` attribute (see **Constraints**).
 
 ```html
 <form id="staircase" action="submit.php" method="post" enctype="multipart/form-data">
 	<div class="step">
-		<input type="text" name="first-name" validate="name" placeholder="First Name..." />
-		<input type="text" name="last-name" validate="name" placeholder="Last Name..." />
-		<input type="email" name="email" validate="email" placeholder="Email Address..." />
+		<input type="text" name="first-name" validate="name" /> First Name
+		<input type="text" name="last-name" validate="name" /> Last Name
+		<input type="email" name="email" validate="email" /> Email Address
+		<input type="text" name="house-number" validate="number[0]" constrain="numbers" /> House Number
 		<button>Continue</button>
 	</div>
 	<div class="step">
-		<p>Do you agree to the <a href="terms.html">terms and conditions</a>?</p>
+		<p>Do you agree to the terms and conditions?</p>
 		<label><input type="radio" name="agree" value="yes" /> I Agree</label>
 		<label><input type="radio" name="agree" value="no" /> I Do Not Agree</label>
-		<button>Continue</button>
+		<button>Submit</button>
 	</div>
 </form>
 ```
@@ -47,38 +49,59 @@ new Staircase(document.getElementById('form'),
 
 The `options` parameter is optional and allows the modification of various settings and behaviours (see **Javascript API &raquo; Options**).
 
-***Note:*** *If a Staircase instance cannot find a usable `form` element, it will display all input data as a table in the developer console once the final button has been clicked.*
+***Note:*** *If Staircase cannot find a usable `<form>` element, it will display all input data as a table in the developer console when the submit button is clicked.*
 
 ##Attributes
 
-Once initialised, Staircase scans the DOM for compatible elements.
+Once initialised, Staircase scans the DOM for the following attribute modifiers. These modifiers are optional.
 
 Attribute | Effect
-:---:| ---
+:---: | ---
+`bv-score` | The field name for the element's BriteVerify (see **Third Party APIs &raquo; BriteVerify**) result
+`constrain` | Constrains user input to a specific set of characters (see **Constraints**)
+`staircase-value` | Fills the input with data harvested from the `window` (see **Javascript API &raquo; Prefiller**)
 `validate` | Applies a validation rule to the element (see **Validation Rules**)
-`staircase-value` | Fills the input with specifiable data harvested from the `window` (see **Javascript API &raquo; Prefiller**)
 
 ##Validation Rules
 
 Below is a list of predefined rules and what they ask for from a value. You can add your own values via `Staircase.Extend()` (see **Javascript API &raquo; Methods**)
 
 Rule | Criteria
-:---:| ---
+--- | ---
 `currency` | An amount of money
 `checked` | Checkbox or Radio button must be checked
-`date` | `[0]` - A short date string, accepting American and standard formats (e.g. 21/04/15)<br />`[1]` - A long date string (e.g. Monday 21st April 2015)
+`date` `[0]` | A short date string, accepting American and standard formats (e.g. 21/04/15)
+`date` `[1]` | A long date string (e.g. Monday 21st April 2015)
+`date` `[2]` | A short year (e.g. 15)
+`date` `[3]` | A long year (e.g. 2015)
 `datepicker` | The default format for jQuery's datepicker
 `default` | A non-empty string
 `email` | RFC 2822 formatted email addresses
 `filename` | A valid filename
 `name` | A non-empty string containing no numbers or non-unicode characters
-`number` | `[0]` - Any integer (negatives allowed)<br />`[1]` - Any float (negatives allowed)
-`phone` | `[0]` - A valid UK landline number<br />`[1]` - A valid UK mobile number<br />`[2]` - A valid US phone number
+`number` `[0]` | Any integer (negatives allowed)
+`number` `[1]` | Any float (negatives allowed)
+`number` `[2]` | Any non-negative integer
+`number` `[3]` | Any non-negative float
+`number` `[4]` | Any integer or float, negative or non-negative
+`phone` `[0]` | A valid UK landline number
+`phone` `[1]` | A valid UK mobile number
+`phone` `[2]` | A valid US phone number
 `postcode` | A valid UK postcode
 `selected` | Select input must have a valid (non-empty) option selected
 `time` | A time string (e.g. 15:06:30, 12:00 am, 3:06pm)
 `unchecked` | Checkbox or Radio button must **not** be checked
 `zipcode` | A valid US zipcode
+
+##Constraints
+
+Below is a list of constraints that will allow the user to only enter certain characters in an input
+
+Constraint | Effect
+--- | ---
+`numbers` | Only allows the user to enter numbers (0-9)
+`letters` | Only allows the user to enter letters (A-Z)
+`symbols` | Prevents the user from entering numbers or letters (0-9, A-Z)
 
 ##Conditions
 
@@ -151,14 +174,15 @@ Each Staircase instance can be customized with a set of options presented as an 
 
 Option | Type | Default | Effect
 :---:|:---:|:---:| ---
+`APIs` | `Object` | `{}` | API configuration object (see **Third Party APIs**)
 `checkboxGroups` | `Boolean` or `String` | `false` | Enable checkbox groups (see **Checkbox Groups**). You can specify a CSS selector to only apply checkbox group validation to a specific element within the Step. If set to `true`, the default selector is `.checkbox-group` and falls back to the entire Step.
 `history` | `Boolean` | `false` | Allows Staircase to modify the `location.hash`, which allows the user to click 'Back' and return to a previous step on the form. Having multiple instances of Staircase with history enabled may behave badly.
-`ID` | `String` | `undefined` | A unique ID string for the Staircase instance. Shows in the URL if `history` is enabled. If left undefined, a random 8-character string is generated.
-`notifyDelay` | `Int` | `3` | Number of seconds (or milliseconds if the value is larger than 30) to wait before removing the `staircase-highlight-error` class from erroneous inputs.
-`stepBlur` | `function` | `undefined` | Additional callback function that is triggered when a step gets sent to the background
-`stepFocus` | `function` | `undefined` | Additional callback function that is triggered when a step enters the foreground
+`ID` | `String` | random | A unique ID string for the Staircase instance. Shows in the URL if `history` is enabled. If left undefined, a random 8-character string is generated.
+`notifyDelay` | `Int` | `3` | Number of seconds (or milliseconds if the value is larger than 300) to wait before removing the `staircase-highlight-error` class from erroneous inputs.
 `steps` | `String` | `.step` | CSS selector used to search for Steps within the instance's DOM Element.
-`validate` | `function` | `undefined` | Additional function to check against during validation. `this` represents the current `input` element and the first argument represents the Staircase instance. Be sure to return `false` if your custom validation fails.
+`stepBlur` | `Function` | none | Additional callback function that is triggered when a step gets sent to the background
+`stepFocus` | `Function` | none | Additional callback function that is triggered when a step enters the foreground
+`validate` | `Function` | none | Additional function to check against during validation. `this` represents the current `input` element and the first argument represents the Staircase instance. Be sure to return `false` if your custom validation fails.
 
 ###Properties & Methods
 
@@ -185,7 +209,7 @@ Property | Meaning
 `$index` | The Step's numeric index (Note that this is an **Array Index**, meaning index **0** is actually the **first** item in the array)
 `$object` | The DOM Element bound to the Step object
 `$rules` | A list of conditions for this Step (see **Conditions**).
-`Quantum` | Changes once the Step has been focussed. Cannot be changed manually.
+`Visited` | Becomes a `Date` once the Step has been focussed. Cannot be changed manually.
 
 Method | Arguments | Action
 :---:|:---:| ---
@@ -193,3 +217,61 @@ Method | Arguments | Action
 `Condition` | `code` | Creates a new condition (see **Conditions**) and adds it to the Step's rulebook. `code` can either be a `String` or a `function`.
 `Focus` | `silent` | Bring the Step into focus and hide all other steps in the Staircase instance. Triggers a `focus` event on the Step's DOM Element unless `silent` is supplied.
 `Validate` | `input` | Performs `Staircase.Validate()` on `input` and applies the `staircase-has-error` and `staircase-highlight-error` classes to the `input` and any applicable `<label>` elements upon failure. `staircase-highlight-error` will be removed after a delay (see **Javascript API &raquo; Options**). Returns `true` or `false` depending on whether validation has passed or not.
+
+
+##Third Party APIs
+
+The `APIs` options object contains data pertaining to third party API integration.  
+The default `APIs` object is as follows:
+
+```json
+{
+    "briteverify":
+    {
+        "APIKey": null
+    }
+}
+```
+
+
+###BriteVerify
+
+[BriteVerify](http://www.briteverify.com) is an email verification service.  
+You can enable BriteVerify by providing your API Key as part of the `options` object (see **Initialising Staircase**)
+
+The BriteVerify options object accepts the following values:
+
+| Option | Type | Default | Effect |
+| --- | --- | --- | --- |
+| `APIKey` | `String` | `null` | Links the BriteVerify instance to your account and enables the service |
+| `fields` | `String` or `Array` | `[validate="email"]` | Tells Staircase which elements need to be verified |
+| `scoreFieldName` | `String` | `null` | The field name for the generated score input - if left blank will default to the main input's name plus `scoreFieldSuffix` |
+| `scoreFieldSuffix` | `String` | `_bvscore` | The name suffix for the generated score input |
+
+*Note that you can also provide a `scoreFieldName` per element via the `bv-score` attribute (see* ***Attributes****)*
+
+Here is an example of a simple setup with BriteVerify:
+
+```js
+$('#form').staircase(
+{
+    APIs:
+    {
+        briteverify:
+        {
+            APIKey:         "abc12345-6789-0def-ghij-k12345lmn678",
+            fields:         "input[name='email']",
+            scoreFieldName: "email_verify_status"
+        }
+    }
+});
+```
+
+`<input type="text" name="email" placeholder="Email Address..." />`
+
+Once the user has entered their email, the following field is generated and placed underneath the `email` field:
+
+`<input type="hidden" tabindex="-1" name="email_verify_status" value="valid" />`
+
+You can read about the value that is populated over in [BriteVerify's API Documentation](http://docs.briteverify.com/status-key).  
+Staircase retrieves the **Primary Statuses** column only.
