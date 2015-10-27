@@ -136,7 +136,7 @@
 	});
 
 	// Title Scanner
-	if(!document.title || $('head title').length == 0)
+	if(!document.title || document.title.match(/\.(html?|php)$/i) || $('head title').length == 0)
 	{
 		var title = $('h1, h2, h3, h4, h5, h6').first().text();
 
