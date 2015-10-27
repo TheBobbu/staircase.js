@@ -753,7 +753,7 @@
 					});
 				}
 
-				$step.Validate(input[0]);
+				$step.Validate(this);
 			});
 
 			$this.find($backbuttons).not($buttons).on('click', function()
