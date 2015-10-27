@@ -10,7 +10,7 @@ To embed Staircase in your document, simply add the following script tag below j
 
 If you want to live on the bleeding edge (we advise against this as Staircase is always evolving and features may change), you can instead use the following:
 
-`<script type="text/javascript" src="http://staircase.tech/latest/staircase.min.js"></script>`
+`<script type="text/javascript" src="http://staircase.tech/edge/staircase.min.js"></script>`
 
 
 ##Preparing the DOM
