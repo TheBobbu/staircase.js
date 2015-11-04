@@ -3,7 +3,7 @@
 ;(function()
 {
 	// Save the version number for reference
-	window.$staircase = '5.1.1';
+	window.$staircase = '5.1.2';
 
 	// Some helpful polyfills
 	String.prototype.trim = function(a){var b=this,c,l=0,i=0;b+='';if(!a){c=' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'}else{a+='';c=a.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g,'$1')}l=b.length;for(i=0;i<l;i++){if(c.indexOf(b.charAt(i))===-1){b=b.substring(i);break}}l=b.length;for(i=l-1;i>=0;i--){if(c.indexOf(b.charAt(i))===-1){b=b.substring(0,i+1);break}}return c.indexOf(b.charAt(0))===-1?b:''};
@@ -136,7 +136,7 @@
 	});
 
 	// Title Scanner
-	if(!document.title || document.title.match(/\.(html?|php)$/i) || $('head title').length == 0)
+	if(!document.title || document.title.match(/\.(html?|php)$/i) || $('title').length == 0)
 	{
 		var title = $('h1, h2, h3, h4, h5, h6').first().text();
 
@@ -600,7 +600,14 @@
 
 					$this.find($inputs).each(function()
 					{
-						if(!$step.Validate(this))
+						if($(this).attr('optional'))
+						{
+							if($(this).val() && !$step.Validate(this))
+							{
+								result = false;
+							}
+						}
+						else if(!$step.Validate(this))
 						{
 							result = false;
 						}
@@ -611,7 +618,7 @@
 
 				input = $(input);
 
-				var valid = !!$staircase.Validate(input), // Convert the validation result to a boolean
+				var valid = input.attr('optional') ? (!input.val() || !!$staircase.Validate(input)) : !!$staircase.Validate(input), // Convert the validation result to a boolean
 					label = input.closest('label').length ? input.closest('label') : ((input.attr('id') && $('label[for="' + input.attr('id') + '"]').length) ? $('label[for="' + input.attr('id') + '"]') : false), // Find this input's label
 					apply = $(label ? label.add(input) : input);
 
