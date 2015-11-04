@@ -1,4 +1,4 @@
-#Staircase 5.1.1
+#Staircase 5.1.2
 
 Staircase is a lightweight framework for online form validation and auto population.
 Requires jQuery 1.8 or later.
@@ -64,12 +64,13 @@ The `options` parameter is optional and allows the modification of various setti
 
 Once initialised, Staircase scans the DOM for the following attribute modifiers. These modifiers are optional.
 
-Attribute | Effect
-:---: | ---
-`bv-score` | The field name for the element's BriteVerify (see **Third Party APIs &raquo; BriteVerify**) result
-`constrain` | Constrains user input to a specific set of characters (see **Constraints**)
-`staircase-value` | Fills the input with data harvested from the `window` (see **Javascript API &raquo; Prefiller**)
-`validate` | Applies a validation rule to the element (see **Validation Rules**)
+Attribute | Value | Effect
+:---: | --- | ---
+`bv-score` | see **Third Party APIs &raquo; BriteVerify** | The field name for the element's BriteVerify result
+`constrain` | see **Constraints** | Constrains user input to a specific set of characters
+`optional` | `anything` | Only validates the field if it contains data
+`staircase-value` | see **Javascript API &raquo; Prefiller** | Fills the input with data harvested from the `window`
+`validate` | see **Validation Rules** | Applies a validation rule to the element
 
 ##Validation Rules
 
@@ -79,23 +80,23 @@ Rule | Criteria
 --- | ---
 `currency` | An amount of money
 `checked` | Checkbox or Radio button must be checked
-`date` `[0]` | A short date string, accepting American and standard formats (e.g. 21/04/15)
-`date` `[1]` | A long date string (e.g. Monday 21st April 2015)
-`date` `[2]` | A short year (e.g. 15)
-`date` `[3]` | A long year (e.g. 2015)
+`date[0]` | A short date string, accepting American and standard formats (e.g. 21/04/15)
+`date[1]` | A long date string (e.g. Monday 21st April 2015)
+`date[2]` | A short year (e.g. 15)
+`date[3]` | A long year (e.g. 2015)
 `datepicker` | The default format for jQuery's datepicker
 `default` | A non-empty string
 `email` | RFC 2822 formatted email addresses
 `filename` | A valid filename
 `name` | A non-empty string containing no numbers or non-unicode characters
-`number` `[0]` | Any integer (negatives allowed)
-`number` `[1]` | Any float (negatives allowed)
-`number` `[2]` | Any non-negative integer
-`number` `[3]` | Any non-negative float
-`number` `[4]` | Any integer or float, negative or non-negative
-`phone` `[0]` | A valid UK landline number
-`phone` `[1]` | A valid UK mobile number
-`phone` `[2]` | A valid US phone number
+`number[0]` | Any integer (negatives allowed)
+`number[1]` | Any float (negatives allowed)
+`number[2]` | Any non-negative integer
+`number[3]` | Any non-negative float
+`number[4]` | Any integer or float, negative or non-negative
+`phone[0]` | A valid UK landline number
+`phone[1]` | A valid UK mobile number
+`phone[2]` | A valid US phone number
 `postcode` | A valid UK postcode
 `selected` | Select input must have a valid (non-empty) option selected
 `time` | A time string (e.g. 15:06:30, 12:00 am, 3:06pm)
