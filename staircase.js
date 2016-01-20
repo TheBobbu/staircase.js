@@ -3,7 +3,7 @@
 ;(function()
 {
 	// Save the version number for reference
-	window.$staircase = '5.1.2';
+	window.$staircase = '5.1.3';
 
 	// Some helpful polyfills
 	String.prototype.trim = function(a){var b=this,c,l=0,i=0;b+='';if(!a){c=' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'}else{a+='';c=a.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g,'$1')}l=b.length;for(i=0;i<l;i++){if(c.indexOf(b.charAt(i))===-1){b=b.substring(i);break}}l=b.length;for(i=l-1;i>=0;i--){if(c.indexOf(b.charAt(i))===-1){b=b.substring(0,i+1);break}}return c.indexOf(b.charAt(0))===-1?b:''};
@@ -168,6 +168,92 @@
 		document.title = title;
 	}
 
+	// Data8 is a third party information verification service
+	window.Data8 = function(APIKey)
+	{
+		var $this = this,
+			$authed = false;
+
+		$this.APIKey = APIKey;
+		$this.DefaultCountry = 'GB';
+
+		$this.Verify = function(value, type, callback)
+		{
+			if(!callback && type && typeof type == 'function')
+			{
+				callback = type;
+				type = 'email';
+			}
+
+			var success = function(result)
+			{
+				var valid = !!result.Status.Success;
+
+				callback.call(result, valid);
+			};
+
+			switch(String(type).trim().toLowerCase())
+			{
+				case 'postcode':
+					var caller = new data8.addresscapture();
+						caller.validatepostcode('FreeTrial', value, null, success);
+					break;
+
+				case 'telephone': case 'phone':
+					var caller = new data8.internationaltelephonevalidation();
+						caller.isvalid(value, $this.DefaultCountry,
+						[
+							new data8.option('UseMobileValidation', 'true'),
+							new data8.option('UseLineValidation', 'true')
+						], success);
+					break;
+
+				default:
+					var caller = new data8.emailvalidation();
+						caller.isvalid(value, 'Address', null, success);
+					break;
+			}
+
+			return $this;
+		};
+
+		$this.Authenticate = function(callback)
+		{
+			if($authed)
+			{
+				return $this;
+			}
+
+			$authed = true;
+
+			var scr = $(document.createElement('script')).appendTo('head')[0],
+				checkready = function()
+				{
+					if(data8 && data8.emailvalidation)
+					{
+						callback.call($this);
+					}
+					else
+					{
+						setTimeout(checkready, 50);
+					}
+				};
+
+			scr.onload = function()
+			{
+				data8.load('AddressCapture');
+				data8.load('EmailValidation');
+				data8.load('InternationalTelephoneValidation');
+
+				checkready();
+			};
+
+			scr.src = 'http://webservices.data-8.co.uk/javascript/loader.ashx?key=' + $this.APIKey;
+
+			return $this;
+		};
+	};
+
 	// BriteVerify is a third party email address verification service
 	window.BriteVerify = function(APIKey)
 	{
@@ -233,6 +319,10 @@
 						fields: '[validate="email"]', // Specify which fields to verify
 						scoreFieldName: null, // The generated score field name (leave blank to default to the main field name plus scoreFieldSuffix)
 						scoreFieldSuffix: '_bvscore' // The field name suffix for the verification results
+					},
+					data8: // Data-8 Information Validation
+					{
+						APIKey: null // API Key for the service (service is disabled if this is left blank)
 					}
 				}
 			},
@@ -592,7 +682,7 @@
 			};
 
 			// Perform validation
-			$step.Validate = function(input)
+			$step.Validate = function(input, forcevalid)
 			{
 				if(!input)
 				{
@@ -618,7 +708,7 @@
 
 				input = $(input);
 
-				var valid = input.attr('optional') ? (!input.val() || !!$staircase.Validate(input)) : !!$staircase.Validate(input), // Convert the validation result to a boolean
+				var valid = (forcevalid !== undefined) ? (!!forcevalid) : (input.attr('optional') ? (!input.val() || !!$staircase.Validate(input)) : !!$staircase.Validate(input)), // Convert the validation result to a boolean
 					label = input.closest('label').length ? input.closest('label') : ((input.attr('id') && $('label[for="' + input.attr('id') + '"]').length) ? $('label[for="' + input.attr('id') + '"]') : false), // Find this input's label
 					apply = $(label ? label.add(input) : input);
 
@@ -757,6 +847,22 @@
 					new BriteVerify($options.APIs.briteverify.APIKey).Verify(input[0].value, function(score)
 					{
 						scoreField.val(score);
+					});
+				}
+
+				if($(this).attr('d8') && $options.APIs.data8 && $options.APIs.data8.APIKey)
+				{
+					if(!$staircase.Data8)
+					{
+						$staircase.Data8 = new Data8($options.APIs.data8.APIKey);
+					}
+
+					$staircase.Data8.Authenticate(function()
+					{
+						$staircase.Data8.Verify(this.value, $(this).attr('d8'), function(valid)
+						{
+							$step.Validate(this, (valid.Result == 'Invalid') ? false : undefined);
+						});
 					});
 				}
 
