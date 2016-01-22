@@ -3,7 +3,7 @@
 ;(function()
 {
 	// Save the version number for reference
-	window.$staircase = '5.1.3';
+	window.$staircase = '5.2';
 
 	// Some helpful polyfills
 	String.prototype.trim = function(a){var b=this,c,l=0,i=0;b+='';if(!a){c=' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'}else{a+='';c=a.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g,'$1')}l=b.length;for(i=0;i<l;i++){if(c.indexOf(b.charAt(i))===-1){b=b.substring(i);break}}l=b.length;for(i=l-1;i>=0;i--){if(c.indexOf(b.charAt(i))===-1){b=b.substring(0,i+1);break}}return c.indexOf(b.charAt(0))===-1?b:''};
@@ -169,12 +169,14 @@
 	}
 
 	// Data8 is a third party information verification service
-	window.Data8 = function(APIKey)
+	window.Data8API = function(APIKey)
 	{
 		var $this = this,
 			$authed = false;
 
 		$this.APIKey = APIKey;
+
+		$this.Cache = {};
 		$this.DefaultCountry = 'GB';
 
 		$this.Verify = function(value, type, callback)
@@ -185,32 +187,58 @@
 				type = 'email';
 			}
 
-			var success = function(result)
+			if(!callback || typeof callback != 'function')
 			{
-				var valid = !!result.Status.Success;
+				return $this;
+			}
 
-				callback.call(result, valid);
+			if($this.Cache[type] && $this.Cache[type][value])
+			{
+				callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid);
+
+				return $this;
+			}
+
+			var success = function(result, valid)
+			{
+				$this.Cache[type][value] = result;
+				$this.Cache[type][value].IsValid = !!valid;
+
+				callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid);
 			};
+
+			if(!$this.Cache[type])
+			{
+				$this.Cache[type] = {};
+			}
+
+			if($this.Cache[type][value] !== undefined)
+			{
+				return $this;
+			}
+
+			$this.Cache[type][value] = 'loading';
 
 			switch(String(type).trim().toLowerCase())
 			{
-				case 'postcode':
-					var caller = new data8.addresscapture();
-						caller.validatepostcode('FreeTrial', value, null, success);
-					break;
-
 				case 'telephone': case 'phone':
 					var caller = new data8.internationaltelephonevalidation();
 						caller.isvalid(value, $this.DefaultCountry,
 						[
 							new data8.option('UseMobileValidation', 'true'),
 							new data8.option('UseLineValidation', 'true')
-						], success);
+						], function(result)
+						{
+							success.call(this, result, result.Result.ValidationResult == 'Valid');
+						});
 					break;
 
 				default:
 					var caller = new data8.emailvalidation();
-						caller.isvalid(value, 'Address', null, success);
+						caller.isvalid(value, 'Address', null, function(result)
+						{
+							success.call(this, result, result.Result == 'Valid');
+						});
 					break;
 			}
 
@@ -219,34 +247,38 @@
 
 		$this.Authenticate = function(callback)
 		{
-			if($authed)
+			if(!callback || typeof callback != 'function')
 			{
 				return $this;
 			}
 
+			var checkready = function()
+			{
+				if(window['data8'] && window['data8'].emailvalidation && window['data8'].internationaltelephonevalidation)
+				{
+					callback.call($this);
+				}
+				else
+				{
+					setTimeout(checkready, 50);
+				}
+			};
+
+			if($authed)
+			{
+				return checkready(), $this;
+			}
+
 			$authed = true;
 
-			var scr = $(document.createElement('script')).appendTo('head')[0],
-				checkready = function()
+			var scr = $(document.createElement('script')).appendTo('head')[0];
+				scr.onload = function()
 				{
-					if(data8 && data8.emailvalidation)
-					{
-						callback.call($this);
-					}
-					else
-					{
-						setTimeout(checkready, 50);
-					}
+					data8.load('EmailValidation');
+					data8.load('InternationalTelephoneValidation');
+
+					checkready();
 				};
-
-			scr.onload = function()
-			{
-				data8.load('AddressCapture');
-				data8.load('EmailValidation');
-				data8.load('InternationalTelephoneValidation');
-
-				checkready();
-			};
 
 			scr.src = 'http://webservices.data-8.co.uk/javascript/loader.ashx?key=' + $this.APIKey;
 
@@ -595,9 +627,9 @@
 			var $this = $(arguments[0]), // Store the DOM element
 				$step = this, // Create a super
 				$visited = null; // Cache the `Visited` state
-				$toconstrain = 'input:not([type="button"], [type="submit"], [type="image"])[constrain], textarea[constrain]', // Inputs to apply constraints to
+				$toconstrain = 'input:not([type="button"], [type="submit"], [type="image"])[constrain]:not(.bypass), textarea[constrain]:not(.bypass)', // Inputs to apply constraints to
 				$allinputs = 'input:not([type="button"], [type="submit"], [type="image"])[name], select[name], textarea[name]', // All form data inputs
-				$inputs = 'input:not([type="button"], [type="submit"], [type="image"])[validate], select[validate], textarea[validate]', // Input selector
+				$inputs = 'input:not([type="button"], [type="submit"], [type="image"])[validate]:not(.bypass), select[validate]:not(.bypass), textarea[validate]:not(.bypass)', // Input selector
 				$buttons = 'input[type="button"].next, input[type="button"].continue, input[type="button"].submit, input[type="submit"], button', // Continue/Submit button selector
 				$backbuttons = 'input[type="button"].prev, input[type="submit"].prev, button.prev, input[type="button"].back, input[type="submit"].back, button.back'; // Back button selector
 
@@ -796,7 +828,9 @@
 			// Bind each validatable input field within this step to the validate function
 			$this.find($inputs).on('change blur validate', function()
 			{
-				if($options.APIs.briteverify.APIKey && $(this).filter(function()
+				var input = $(this);
+
+				if($options.APIs.briteverify.APIKey && input.filter(function()
 				{
 					var fields = $options.APIs.briteverify.fields,
 						valid = false;
@@ -819,17 +853,14 @@
 					{
 						if(fields[i].trim())
 						{
-							valid = valid ? true : $(this).is(fields[i].trim());
+							valid = valid ? true : input.is(fields[i].trim());
 						}
 					}
 
 					return valid;
-
-					return $(this).is($options.APIs.briteverify.fields);
-				}).length && $staircase.Validate(this, 'email'))
+				}).length && $staircase.Validate(input[0], 'email'))
 				{
-					var input = $(this),
-						scoreFieldName = input.attr('bv-score') ? input.attr('bv-score') : ($options.APIs.briteverify.scoreFieldName ? $options.APIs.briteverify.scoreFieldName : input.attr('name') + $options.APIs.briteverify.scoreFieldSuffix),
+					var scoreFieldName = input.attr('bv-score') ? input.attr('bv-score') : ($options.APIs.briteverify.scoreFieldName ? $options.APIs.briteverify.scoreFieldName : input.attr('name') + $options.APIs.briteverify.scoreFieldSuffix),
 						scoreField = ($('input[name="' + scoreFieldName + '"]').length > 0) ? $('input[name="' + scoreFieldName + '"]') : input.data('briteverify-scorefield');
 
 					if(!scoreField)
@@ -850,23 +881,66 @@
 					});
 				}
 
-				if($(this).attr('d8') && $options.APIs.data8 && $options.APIs.data8.APIKey)
+				// If the input requires Data8 validation
+				if(input.attr('d8') && input[0].value && $options.APIs.data8 && $options.APIs.data8.APIKey)
 				{
-					if(!$staircase.Data8)
+					// If the input passes primary validation
+					if($staircase.Validate(input[0]))
 					{
-						$staircase.Data8 = new Data8($options.APIs.data8.APIKey);
-					}
-
-					$staircase.Data8.Authenticate(function()
-					{
-						$staircase.Data8.Verify(this.value, $(this).attr('d8'), function(valid)
+						// If Data8 has not yet been initialised
+						if(!$staircase.Data8)
 						{
-							$step.Validate(this, (valid.Result == 'Invalid') ? false : undefined);
-						});
-					});
-				}
+							// Create a Data8 instance
+							$staircase.Data8 = new Data8API($options.APIs.data8.APIKey);
+						}
 
-				$step.Validate(this);
+						// Authenticate the Data8 API if it has not been already
+						$staircase.Data8.Authenticate(function()
+						{
+							// When a response is received from Data8
+							$staircase.Data8.Verify(input.val().trim(), input.attr('d8'), function(valid)
+							{
+								// If the response object contains a solid verifiable boolean
+								if(typeof this == 'object' && this.IsValid === undefined)
+								{
+									return;
+								}
+
+								// If the input value is valid
+								if(valid)
+								{
+									// Remove the error classes
+									input.removeClass('bypass staircase-has-error staircase-highlight-error');
+
+									// Run staircase validation with a forced value to tell the step if it can continue or not
+									$step.Validate(input[0], true);
+								}
+								else
+								{
+									// Apply the error classes
+									input.addClass('bypass staircase-has-error staircase-highlight-error');
+
+									// Remove the error notification class after a delay
+									input.data('notify-timeout', setTimeout(function()
+									{
+										input.removeClass('staircase-highlight-error');
+									},
+
+									// If the delay is larger than 300 (5 minutes), interpret it as milliseconds. Otherwise, interpret as seconds and adjust
+									$options.notifyDelay > 300 ? $options.notifyDelay : ($options.notifyDelay * 1000)));
+
+									// Run staircase validation with a forced value to tell the step if it can continue or not
+									$step.Validate(input[0], false);
+								}
+							});
+						});
+					}
+				}
+				else
+				{
+					// Run staircase validation to tell the step if it can continue or not
+					$step.Validate(this);
+				}
 			});
 
 			$this.find($backbuttons).not($buttons).on('click', function()

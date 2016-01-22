@@ -3,8 +3,14 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
+		<style type="text/css">
+			.staircase-has-error
+			{
+				border-color: red;
+			}
+		</style>
 		<script style="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-		<script style="text/javascript" src="staircase.js"></script>
+		<script style="text/javascript">document.write('<script style="text/javascript" src="staircase.js?_=' + Math.round(new Date() / 1000) + '"><' + '/script>')</script>
 		<script style="text/javascript">
 		jQuery(function($)
 		{
@@ -13,7 +19,15 @@
 			$('.staircase').staircase(
 			{
 				history: true,
-				checkboxGroups: true
+				checkboxGroups: true,
+				APIs:
+				{
+					data8:
+					{
+						APIKey: 'K9KlI2-pOM-R4doj3WBCUZe8RHUjffjJ8XtV72wM7zqo5vEMTYHS-w',
+						Licence: 'FreeTrial'
+					}
+				}
 			});
 		});
 		</script>
@@ -21,7 +35,9 @@
 	<body>
 		<section class="staircase">
 			<div class="step">
-				<!-- Always apply "autofocus" to the first input field -->
+				<input type="text" d8="email" name="email" validate="email" placeholder="Email" />
+				<input type="text" d8="phone" name="phone" validate="phone" placeholder="Phone" maxlength="11" />
+				<!-- Always apply "autofocus" to the first input field - ->
 				<label>Which of these subjects are you interested in studying?
 				<select name="qxxxx" validate="select" autofocus>
 					<option value="">-- Select One --</option>
@@ -30,7 +46,7 @@
 					<option value="3">3</option>
 				</select></label>
 
-				<!-- Conditional statement to skip steps or alert -->
+				<!-- Conditional statement to skip steps or alert - ->
 				<script type="staircase/condition">
 					if(qxxxx == '3')
 					{
@@ -42,6 +58,7 @@
 					}
 				</script>
 
+				<!--Next button-->
 				<input type="button" class="continue" value="NEXT" />
 			</div>
 			<div class="step">
