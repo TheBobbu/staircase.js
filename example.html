@@ -16,7 +16,7 @@
 		{
 			/* Initialise Staircase
 			 */
-			$('.staircase').staircase(
+			var sc = $('.staircase').staircase(
 			{
 				history: true,
 				checkboxGroups: true,
@@ -28,6 +28,16 @@
 						Licence: 'FreeTrial'
 					}
 				}
+			});
+
+			sc.on('submitfailed', function()
+			{
+				console.log('Submit Failed', this, arguments);
+			});
+
+			sc.on('submit', function()
+			{
+				console.log('Submit', this, arguments);
 			});
 		});
 		</script>

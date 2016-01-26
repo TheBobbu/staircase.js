@@ -3,7 +3,7 @@
 ;(function()
 {
 	// Save the version number for reference
-	window.$staircase = '5.2';
+	window.$staircase = '5.2.1';
 
 	// Some helpful polyfills
 	String.prototype.trim = function(a){var b=this,c,l=0,i=0;b+='';if(!a){c=' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'}else{a+='';c=a.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g,'$1')}l=b.length;for(i=0;i<l;i++){if(c.indexOf(b.charAt(i))===-1){b=b.substring(i);break}}l=b.length;for(i=l-1;i>=0;i--){if(c.indexOf(b.charAt(i))===-1){b=b.substring(0,i+1);break}}return c.indexOf(b.charAt(0))===-1?b:''};
@@ -67,9 +67,16 @@
 	{
 		var $ = window.jQuery;
 
-		if($(this).length == 1 && $(this).data('staircase'))
+		if($(this).length == 1)
 		{
-			return $(this).data('staircase');
+			var sc = $(this).data('staircase');
+
+			if(!sc)
+			{
+				$(this).data('staircase', sc = new Staircase(this, options ? options : {}));
+			}
+
+			return sc;
 		}
 		else
 		{
@@ -197,6 +204,11 @@
 				callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid);
 
 				return $this;
+			}
+
+			for(var i in window.Staircases)
+			{
+				window.Staircases[i].trigger('data8', [$this, window.Staircases[i]]);
 			}
 
 			var success = function(result, valid)
@@ -331,6 +343,7 @@
 	{
 		var $ = window.jQuery, // Capture jQuery
 			$this = $(dom), // Store the DOM element
+			$events = {}, // Events API
 			$staircase = this, // Create a scoped global
 			$scrollTop = 0, // Store the window's scrollTop
 			$options = // Populate the default options object
@@ -389,6 +402,102 @@
 			$options = pop_options($options, options);
 		}
 
+		// Events API binding
+		$staircase.on = function(ev, callback)
+		{
+			if(ev.trim().indexOf(' ') > -1)
+			{
+				ev = ev.trim().split(' ');
+
+				for(var i in ev)
+				{
+					$staircase.on(ev[i], callback);
+				}
+
+				return $staircase;
+			}
+
+			ev = ev.trim();
+
+			if(!$events[ev])
+			{
+				$events[ev] = [];
+			}
+
+			$events[ev].push(callback);
+
+			return $staircase;
+		};
+
+		// Events API unbinding
+		$staircase.off = function(ev, callback)
+		{
+			if(ev.trim().indexOf(' ') > -1)
+			{
+				ev = ev.trim().split(' ');
+
+				for(var i in ev)
+				{
+					$staircase.off(ev[i], callback);
+				}
+
+				return $staircase;
+			}
+
+			ev = ev.trim();
+
+			if($events[ev] && $events[ev].length > 0)
+			{
+				$newevents = [];
+
+				if(callback !== undeefined)
+				{
+					for(var i in $events[ev])
+					{
+						if($events[ev][i] != callback)
+						{
+							$newevents.push($events[ev][i]);
+						}
+					}
+				}
+
+				$events[ev] = $newevents;
+			}
+
+			return $staircase;
+		};
+
+		// Events API triggering
+		$staircase.trigger = function(ev, data)
+		{
+			if(ev.trim().indexOf(' ') > -1)
+			{
+				ev = ev.trim().split(' ');
+
+				for(var i in ev)
+				{
+					$staircase.trigger(ev[i], data);
+				}
+
+				return $staircase;
+			}
+
+			ev = ev.trim();
+
+			if($events[ev] && $events[ev].length > 0)
+			{
+				for(var i in $events[ev])
+				{
+					if($events[ev][i].apply($staircase, data ? data : []) === false)
+					{
+						return false;
+					}
+				}
+			}
+
+			return $staircase;
+		};
+
 		// Regular Expression Store
 		$staircase.Patterns =
 		{
@@ -428,6 +537,11 @@
 			{
 				for(var i in window.Staircases)
 				{
+					if(window.Staircases[i].trigger('hashchange popstate') === false)
+					{
+						return false;
+					}
+
 					window.Staircases[i].Steps[0].Focus();
 				}
 			}
@@ -440,6 +554,11 @@
 
 				if(window.Staircases[ID] && window.Staircases[ID].Steps[step] && window.Staircases[ID].Steps[step].Visited)
 				{
+					if(window.Staircases[ID].trigger('hashchange popstate', [ID, step]) === false)
+					{
+						return false;
+					}
+
 					// Focus the step if it exists and has been visited before
 					window.Staircases[ID].Steps[step].Focus();
 				}
@@ -453,6 +572,7 @@
 		$staircase.Extend = function(name, pattern)
 		{
 			$staircase.Patterns[name] = pattern;
+
 			return $staircase;
 		};
 
@@ -476,6 +596,12 @@
 
 			if(validate)
 			{
+				// Trigger the beforevalidate event
+				if($staircase.trigger('beforevalidate', [input]) === false)
+				{
+					return false;
+				}
+
 				// If we're dealing with a select element
 				if((validate == 'select' || validate == 'selected') && input.is('select'))
 				{
@@ -499,8 +625,14 @@
 					// Otherwise just a simple string comparison
 					if(myval == placeholderval)
 					{
+						// Trigger the validate events
+						$staircase.trigger('aftervalidate validate', [false]);
+
 						return false;
 					}
+
+					// Trigger the validate events
+					$staircase.trigger('aftervalidate validate', [true]);
 
 					return true;
 				}
@@ -510,7 +642,13 @@
 					// If the validator is looking for a checkbox
 					if((validate == 'checked' || validate == 'unchecked') && (input.attr('type') == 'checkbox' || input.attr('type') == 'radio'))
 					{
-						return !((validate == 'checked' && !input.is(':checked')) || (validate == 'unchecked' && input.is(':checked')));
+						var // Valid if the checkbox is in the same state as the validation requirement (checked or unchecked)
+							valid = !((validate == 'checked' && !input.is(':checked')) || (validate == 'unchecked' && input.is(':checked')));
+
+						// Trigger the validate events
+						$staircase.trigger('aftervalidate validate', [valid]);
+
+						return valid;
 					}
 
 					// Find the element's corresponding regular expression
@@ -550,8 +688,14 @@
 
 						if(exp && exp instanceof RegExp)
 						{
+							var // Valid if the expression matches the value
+								valid = !!input[0].value.match(exp);
+
+							// Trigger the validate events
+							$staircase.trigger('aftervalidate validate', [valid]);
+
 							// Use `[0].value` rather than `.val()` to accommodate for <textbox>
-							return !!input[0].value.match(exp);
+							return valid;
 						}
 					}
 				}
@@ -559,8 +703,13 @@
 
 			if($options.validate && typeof $options.validate == 'function')
 			{
-				// If all else fails, call the optional user defined function
-				return !!$options.validate.call(input[0], $staircase);
+				var // If all else fails, call the optional user defined function
+					valid = !!$options.validate.call(input[0], $staircase);
+
+				// Trigger the validate events
+				$staircase.trigger('aftervalidate validate', [valid]);
+
+				return valid;
 			}
 
 			return false;
@@ -569,6 +718,12 @@
 		// Address lookup function
 		$staircase.Locate = function(postcode, callback)
 		{
+			// Trigger the before address validation events
+			if($staircase.trigger('beforeaddresslookup beforepostcodelookup beforeaddressvalidate beforepostcodevalidate', [postcode, callback]) === false)
+			{
+				return false;
+			}
+
 			return $.ajax(
 			{
 				url: 'http://staircase.virtuosoadvertising.co.uk/bin/address-lookup.php',
@@ -579,8 +734,14 @@
 				{
 					if(callback && address && typeof address == 'object' && address.county && address.town && address.street)
 					{
+						// Resupply the postcode
 						address.postcode = postcode;
-						callback(address);
+
+						var // Get the user callback response
+							response = callback(address);
+
+						// Trigger the address validation events
+						$staircase.trigger('addresslookup postcodelookup addressvalidate postcodevalidate', [address, response]);
 					}
 				}
 			}), $staircase;
@@ -589,6 +750,9 @@
 		// Step switching functions
 		$staircase.To = function(index)
 		{
+			// Trigger the switch event
+			$staircase.trigger('switch', [index]);
+
 			if(index < $staircase.$current)
 			{
 				$staircase.Steps[index].Focus();
@@ -603,6 +767,9 @@
 
 		$staircase.Next = function()
 		{
+			// Trigger the next event
+			$staircase.trigger('switch next', [$staircase.$current + 1]);
+
 			if($staircase.Steps[$staircase.$current + 1] && $staircase.Steps[$staircase.$current].Validate())
 			{
 				$staircase.Steps[$staircase.$current + 1].Focus();
@@ -613,6 +780,9 @@
 
 		$staircase.Prev = function()
 		{
+			// Trigger the previous event
+			$staircase.trigger('switch prev previous', [$staircase.$current - 1]);
+
 			if($staircase.Steps[$staircase.$current - 1])
 			{
 				$staircase.Steps[$staircase.$current - 1].Focus();
@@ -689,6 +859,9 @@
 					{
 						location.hash = '!/';
 					}
+
+					// Trigger the stepfocus event
+					$staircase.trigger('stepfocus', [$step]);
 				}
 
 				return $step;
@@ -708,6 +881,9 @@
 
 					// Hide the Step
 					$this.hide();
+
+					// Trigger the stepblur event
+					$staircase.trigger('stepblur', [$step]);
 				}
 
 				return $step;
@@ -740,6 +916,12 @@
 
 				input = $(input);
 
+				// Trigger the beforestepvalidate event
+				if($staircase.trigger('beforestepvalidate', [input]) === false)
+				{
+					return false;
+				}
+
 				var valid = (forcevalid !== undefined) ? (!!forcevalid) : (input.attr('optional') ? (!input.val() || !!$staircase.Validate(input)) : !!$staircase.Validate(input)), // Convert the validation result to a boolean
 					label = input.closest('label').length ? input.closest('label') : ((input.attr('id') && $('label[for="' + input.attr('id') + '"]').length) ? $('label[for="' + input.attr('id') + '"]') : false), // Find this input's label
 					apply = $(label ? label.add(input) : input);
@@ -758,20 +940,23 @@
 					// If the delay is larger than 300 (5 minutes), interpret it as milliseconds. Otherwise, interpret as seconds and adjust
 					$options.notifyDelay > 300 ? $options.notifyDelay : ($options.notifyDelay * 1000)));
 
+					// Trigger the stepvalidate event
+					$staircase.trigger('stepvalidate', [false]);
+
 					return false;
 				}
 
-				else
-				{
-					// Remove the error classes
-					apply.removeClass('staircase-has-error staircase-highlight-error');
+				// Remove the error classes
+				apply.removeClass('staircase-has-error staircase-highlight-error');
 
-					// Clear the notification class timer so that no classes are unintentionally removed in the near future
-					if(apply.data('notify-timeout'))
-					{
-						window.clearTimeout(apply.data('notify-timeout'));
-					}
+				// Clear the notification class timer so that no classes are unintentionally removed in the near future
+				if(apply.data('notify-timeout'))
+				{
+					window.clearTimeout(apply.data('notify-timeout'));
 				}
+
+				// Trigger the stepvalidate event
+				$staircase.trigger('stepvalidate', [true]);
 
 				return true;
 			};
@@ -803,11 +988,14 @@
 					}
 				});
 
-				$step.$rules.push(
+				var ridx = $step.$rules.push(
 				{
 					callback: (typeof code == 'function') ? code : new Function(args, code),
 					inputs: inputs
 				});
+
+				// Trigger the addcondition event
+				$staircase.trigger('addcondition', [$step.$rules[ridx - 1]]);
 
 				return $step;
 			};
@@ -821,6 +1009,9 @@
 				// Convert the pressed key to its character. If the key pressed is on the keypad, convert it to a number key
 				if(constraint && !String.fromCharCode(e.keyCode >= 96 && e.keyCode <= 105 ? (e.keyCode - 48) : e.keyCode).match(constraint))
 				{
+					// Trigger the constrained event
+					$staircase.trigger('constrained', [this, constraint]);
+
 					return false;
 				}
 			});
@@ -860,6 +1051,12 @@
 					return valid;
 				}).length && $staircase.Validate(input[0], 'email'))
 				{
+					// Trigger the beforebriteverify event
+					if($staircase.trigger('beforebriteverify', [input]) === false)
+					{
+						return false;
+					}
+
 					var scoreFieldName = input.attr('bv-score') ? input.attr('bv-score') : ($options.APIs.briteverify.scoreFieldName ? $options.APIs.briteverify.scoreFieldName : input.attr('name') + $options.APIs.briteverify.scoreFieldSuffix),
 						scoreField = ($('input[name="' + scoreFieldName + '"]').length > 0) ? $('input[name="' + scoreFieldName + '"]') : input.data('briteverify-scorefield');
 
@@ -877,6 +1074,9 @@
 
 					new BriteVerify($options.APIs.briteverify.APIKey).Verify(input[0].value, function(score)
 					{
+						// Trigger the briteverify event
+						$staircase.trigger('briteverify', [input, score]);
+
 						scoreField.val(score);
 					});
 				}
@@ -887,6 +1087,12 @@
 					// If the input passes primary validation
 					if($staircase.Validate(input[0]))
 					{
+						// Trigger the beforedata8 event
+						if($staircase.trigger('beforedata8', [input]) === false)
+						{
+							return false;
+						}
+
 						// If Data8 has not yet been initialised
 						if(!$staircase.Data8)
 						{
@@ -932,6 +1138,9 @@
 									// Run staircase validation with a forced value to tell the step if it can continue or not
 									$step.Validate(input[0], false);
 								}
+
+								// Trigger the data8 event
+								$staircase.trigger('data8', [input, valid]);
 							});
 						});
 					}
@@ -945,6 +1154,9 @@
 
 			$this.find($backbuttons).not($buttons).on('click', function()
 			{
+				// Trigger the back event
+				$staircase.trigger('back', [$step, $(this)]);
+
 				if($step.$index > 0)
 				{
 					$staircase.Steps[$step.$index - 1].Focus();
@@ -955,6 +1167,12 @@
 
 			$this.find($buttons).not($backbuttons).on('click', function()
 			{
+				// Trigger the beforesubmit event
+				if($staircase.trigger('beforesubmit', [$step, $(this)]) === false)
+				{
+					return false;
+				}
+
 				// trigger validation on each input
 				$this.find($inputs).trigger('validate');
 
@@ -1000,6 +1218,9 @@
 
 				if($this.hasClass('staircase-has-error') || $this.find('.staircase-has-error').length > 0)
 				{
+					// Trigger the submitfailed event
+					$staircase.trigger('submitfailed', [$step, $this.find('.staircase-has-error')]);
+
 					// If there are any errors, cancel the submit event
 					return false;
 				}
@@ -1036,12 +1257,18 @@
 
 				if(!ruleresult)
 				{
+					// Trigger the submitfailed event
+					$staircase.trigger('submitfailed', [$step]);
+
 					return false;
 				}
 
 				// If this is NOT the last step, focus the next step and cancel the submit event
 				if($staircase.Steps.length > ($step.$index + 1))
 				{
+					// Trigger the next events
+					$staircase.trigger('next continue', [$step.$index + 1]);
+
 					return $staircase.Steps[$step.$index + 1].Focus(), false;
 				}
 
@@ -1072,7 +1299,13 @@
 					{
 						console.log(table);
 					}
+
+					// Trigger the debug event
+					$staircase.trigger('debug', [$staircase, $step]);
 				}
+
+				// Trigger the submit event
+				$staircase.trigger('submit', [$staircase]);
 			});
 
 			$this.find('script[type="staircase/condition"]').each(function()
