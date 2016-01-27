@@ -537,7 +537,7 @@
 			{
 				for(var i in window.Staircases)
 				{
-					if(window.Staircases[i].trigger('hashchange popstate') === false)
+					if(window.Staircases[i].trigger('hashchange popstate', [window.Staircases[$staircase.$current], window.location.hash]) === false)
 					{
 						return false;
 					}
@@ -626,13 +626,19 @@
 					if(myval == placeholderval)
 					{
 						// Trigger the validate events
-						$staircase.trigger('aftervalidate validate', [false]);
+						if($staircase.trigger('aftervalidate validate', [input, false]) === true)
+						{
+							return true;
+						}
 
 						return false;
 					}
 
 					// Trigger the validate events
-					$staircase.trigger('aftervalidate validate', [true]);
+					if($staircase.trigger('aftervalidate validate', [input, true]) === false)
+					{
+						return false;
+					}
 
 					return true;
 				}
@@ -643,10 +649,14 @@
 					if((validate == 'checked' || validate == 'unchecked') && (input.attr('type') == 'checkbox' || input.attr('type') == 'radio'))
 					{
 						var // Valid if the checkbox is in the same state as the validation requirement (checked or unchecked)
-							valid = !((validate == 'checked' && !input.is(':checked')) || (validate == 'unchecked' && input.is(':checked')));
+							valid = !((validate == 'checked' && !input.is(':checked')) || (validate == 'unchecked' && input.is(':checked'))),
+							// Trigger the validate events
+							trigresponse = $staircase.trigger('aftervalidate validate', [input, valid]);
 
-						// Trigger the validate events
-						$staircase.trigger('aftervalidate validate', [valid]);
+						if(trigresponse === true || trigresponse === false)
+						{
+							return trigresponse;
+						}
 
 						return valid;
 					}
@@ -689,10 +699,14 @@
 						if(exp && exp instanceof RegExp)
 						{
 							var // Valid if the expression matches the value
-								valid = !!input[0].value.match(exp);
+								valid = !!input[0].value.match(exp),
+								// Trigger the validate events
+								trigresponse = $staircase.trigger('aftervalidate validate', [input, valid]);
 
-							// Trigger the validate events
-							$staircase.trigger('aftervalidate validate', [valid]);
+							if(trigresponse === true || trigresponse === false)
+							{
+								return trigresponse;
+							}
 
 							// Use `[0].value` rather than `.val()` to accommodate for <textbox>
 							return valid;
@@ -707,7 +721,7 @@
 					valid = !!$options.validate.call(input[0], $staircase);
 
 				// Trigger the validate events
-				$staircase.trigger('aftervalidate validate', [valid]);
+				$staircase.trigger('aftervalidate validate', [input, valid]);
 
 				return valid;
 			}
@@ -917,7 +931,7 @@
 				input = $(input);
 
 				// Trigger the beforestepvalidate event
-				if($staircase.trigger('beforestepvalidate', [input]) === false)
+				if($staircase.trigger('beforestepvalidate', [$step, input]) === false)
 				{
 					return false;
 				}
@@ -941,7 +955,7 @@
 					$options.notifyDelay > 300 ? $options.notifyDelay : ($options.notifyDelay * 1000)));
 
 					// Trigger the stepvalidate event
-					$staircase.trigger('stepvalidate', [false]);
+					$staircase.trigger('stepvalidate', [$step, false]);
 
 					return false;
 				}
@@ -956,7 +970,7 @@
 				}
 
 				// Trigger the stepvalidate event
-				$staircase.trigger('stepvalidate', [true]);
+				$staircase.trigger('stepvalidate', [$step, true]);
 
 				return true;
 			};
@@ -995,7 +1009,7 @@
 				});
 
 				// Trigger the addcondition event
-				$staircase.trigger('addcondition', [$step.$rules[ridx - 1]]);
+				$staircase.trigger('addcondition', [$step, $step.$rules[ridx - 1]]);
 
 				return $step;
 			};
@@ -1003,14 +1017,15 @@
 			// Bind constraints
 			$this.find($toconstrain).on('keydown', function(e)
 			{
-				var constraint = $(this).attr('constrain');
+				var input = $(this),
+					constraint = input.attr('constrain');
 					constraint = $staircase.Constraints[constraint] ? $staircase.Constraints[constraint] : null;
 
 				// Convert the pressed key to its character. If the key pressed is on the keypad, convert it to a number key
 				if(constraint && !String.fromCharCode(e.keyCode >= 96 && e.keyCode <= 105 ? (e.keyCode - 48) : e.keyCode).match(constraint))
 				{
 					// Trigger the constrained event
-					$staircase.trigger('constrained', [this, constraint]);
+					$staircase.trigger('constrained', [input, constraint]);
 
 					return false;
 				}
@@ -1155,7 +1170,10 @@
 			$this.find($backbuttons).not($buttons).on('click', function()
 			{
 				// Trigger the back event
-				$staircase.trigger('back', [$step, $(this)]);
+				if($staircase.trigger('back', [$step, $(this)]) === false)
+				{
+					return false;
+				}
 
 				if($step.$index > 0)
 				{
@@ -1219,7 +1237,7 @@
 				if($this.hasClass('staircase-has-error') || $this.find('.staircase-has-error').length > 0)
 				{
 					// Trigger the submitfailed event
-					$staircase.trigger('submitfailed', [$step, $this.find('.staircase-has-error')]);
+					$staircase.trigger($step.$object.is('.step:last') ? 'submitfailed' : 'nextfailed continuefailed', [$step, $this.find('.staircase-has-error')]);
 
 					// If there are any errors, cancel the submit event
 					return false;
@@ -1258,7 +1276,7 @@
 				if(!ruleresult)
 				{
 					// Trigger the submitfailed event
-					$staircase.trigger('submitfailed', [$step]);
+					$staircase.trigger($step.$object.is('.step:last') ? 'submitfailed' : 'nextfailed continuefailed', [$step]);
 
 					return false;
 				}
@@ -1267,7 +1285,10 @@
 				if($staircase.Steps.length > ($step.$index + 1))
 				{
 					// Trigger the next events
-					$staircase.trigger('next continue', [$step.$index + 1]);
+					if($staircase.trigger('next continue', [$step, $staircase.Steps[$step.$index + 1]]) === false)
+					{
+						return false;
+					}
 
 					return $staircase.Steps[$step.$index + 1].Focus(), false;
 				}
@@ -1305,7 +1326,10 @@
 				}
 
 				// Trigger the submit event
-				$staircase.trigger('submit', [$staircase]);
+				if($staircase.trigger('submit', [$staircase]) === false)
+				{
+					return false;
+				}
 			});
 
 			$this.find('script[type="staircase/condition"]').each(function()

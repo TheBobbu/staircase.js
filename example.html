@@ -30,24 +30,33 @@
 				}
 			});
 
-			sc.on('submitfailed', function()
-			{
-				console.log('Submit Failed', this, arguments);
-			});
+			sc.on('hashchange', function(){ console.log('hashchange', this, arguments); });
+			sc.on('beforevalidate', function(){ console.log('beforevalidate', this, arguments); });
+			sc.on('stepblur', function(){ console.log('stepblur', this, arguments); });
+			sc.on('beforestepvalidate', function(){ console.log('beforestepvalidate', this, arguments); });
+			sc.on('stepvalidate', function(){ console.log('stepvalidate', this, arguments); });
+			sc.on('addcondition', function(){ console.log('addcondition', this, arguments); });
+			sc.on('constrained', function(){ console.log('constrained', this, arguments); });
+			sc.on('beforebriteverify', function(){ console.log('beforebriteverify', this, arguments); });
+			sc.on('briteverify', function(){ console.log('briteverify', this, arguments); });
+			sc.on('beforedata8', function(){ console.log('beforedata8', this, arguments); });
+			sc.on('data8', function(){ console.log('data8', this, arguments); });
+			sc.on('back', function(){ console.log('back', this, arguments); });
+			sc.on('beforesubmit', function(){ console.log('beforesubmit', this, arguments); });
+			sc.on('validate', function(){ console.log('validate', this, arguments); });
+			sc.on('submitfailed', function(){ console.log('submitfailed', this, arguments); });
+			sc.on('continuefailed', function(){ console.log('continuefailed', this, arguments); });
+			sc.on('continue', function(){ console.log('continue', this, arguments); });
+			sc.on('debug', function(){ console.log('debug', this, arguments); });
+			sc.on('submit', function(){ console.log('submit', this, arguments); });
 
-			sc.on('submit', function()
-			{
-				console.log('Submit', this, arguments);
-			});
 		});
 		</script>
 	</head>
 	<body>
 		<section class="staircase">
 			<div class="step">
-				<input type="text" d8="email" name="email" validate="email" placeholder="Email" />
-				<input type="text" d8="phone" name="phone" validate="phone" placeholder="Phone" maxlength="11" />
-				<!-- Always apply "autofocus" to the first input field - ->
+				<!-- Always apply "autofocus" to the first input field -->
 				<label>Which of these subjects are you interested in studying?
 				<select name="qxxxx" validate="select" autofocus>
 					<option value="">-- Select One --</option>
@@ -56,7 +65,7 @@
 					<option value="3">3</option>
 				</select></label>
 
-				<!-- Conditional statement to skip steps or alert - ->
+				<!-- Conditional statement to skip steps or alert -->
 				<script type="staircase/condition">
 					if(qxxxx == '3')
 					{

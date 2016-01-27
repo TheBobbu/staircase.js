@@ -1,19 +1,19 @@
-#Staircase 5.1.2
+# Staircase 5.2.1
 
 Staircase is a lightweight framework for online form validation and auto population.
 Requires jQuery 1.8 or later.
 
 To embed Staircase in your document, simply add the following script tag below jQuery:  
 
-`<script type="text/javascript" src="http://staircase.tech/5.1.1/staircase.min.js"></script>`
+`<script type="text/javascript" src="http://staircase.tech/5.2.1/staircase.min.js"></script>`
 
 
 If you want to live on the bleeding edge (we advise against this as Staircase is always evolving and features may change), you can instead use the following:
 
-`<script type="text/javascript" src="http://staircase.tech/edge/staircase.min.js"></script>`
+`<script type="text/javascript" src="http://staircase.tech/latest/staircase.min.js"></script>`
 
 
-##Preparing the DOM
+## Preparing the DOM
 Staircase was written with ease of use in mind. Setting up a form is simple. Any element type can be used for the main form, however each step of the form must match the `step selector` (see **Javascript API &raquo; Options**).
 
 To add validation to an input, give it a `validate` attribute (see **Attributes**).  
@@ -37,7 +37,7 @@ To add a character constraint to an input, give it a `constrain` attribute (see 
 </form>
 ```
 
-##Initialising Staircase
+## Initialising Staircase
 A window can contain as many instances of Staircase as are needed. Initialising an instance is easy and straightforward and can be done using either the built-in jQuery extension or with plain Javascript:
 
 ```javascript
@@ -60,7 +60,7 @@ The `options` parameter is optional and allows the modification of various setti
 
 ***Note:*** *If Staircase cannot find a usable `<form>` element, it will display all input data as a table in the developer console when the submit button is clicked.*
 
-##Attributes
+## Attributes
 
 Once initialised, Staircase scans the DOM for the following attribute modifiers. These modifiers are optional.
 
@@ -72,7 +72,7 @@ Attribute | Value | Effect
 `staircase-value` | see **Javascript API &raquo; Prefiller** | Fills the input with data harvested from the `window`
 `validate` | see **Validation Rules** | Applies a validation rule to the element
 
-##Validation Rules
+## Validation Rules
 
 Below is a list of predefined rules and what they ask for from a value. You can add your own values via `Staircase.Extend()` (see **Javascript API &raquo; Methods**)
 
@@ -103,7 +103,7 @@ Rule | Criteria
 `unchecked` | Checkbox or Radio button must **not** be checked
 `zipcode` | A valid US zipcode
 
-##Constraints
+## Constraints
 
 Below is a list of constraints that will allow the user to only enter certain characters in an input
 
@@ -113,7 +113,7 @@ Constraint | Effect
 `letters` | Only allows the user to enter letters (A-Z)
 `symbols` | Prevents the user from entering numbers or letters (0-9, A-Z)
 
-##Conditions
+## Conditions
 
 You can define your own conditional code that runs after validation but before the 'Next' or 'Submit' buttons are clicked. This opens up the ability to switch to a certain step depending on an input's value, send the user an alert box if they've typed something wrong, or do something else. *The only limit is your imagination.*
 
@@ -142,10 +142,10 @@ Have a look at the following example that takes place inside a `Step`: (see **Ja
 
 ***Note:*** *Checkboxes and Radio boxes will only hold a value if they are checked. If more than one box is checked, the values will be in an array.*
 
-##Checkbox Groups
+## Checkbox Groups
 If the `checkboxGroups` option (see **Options**) is enabled, an extra validation step is added to any Step within the instance whose input elements are all checkboxes. At least one checkbox must be checked for validation to pass.
 
-##Prefiller
+## Prefiller
 Staircase comes with a nifty little script that scans the document for any `input` elements with a `staircase-value` attribute and fills it with data by passing the attribute value through a filter. Have a look at the following examples:
 
 ```html
@@ -156,7 +156,7 @@ Staircase comes with a nifty little script that scans the document for any `inpu
 
 `#{...}` is a filter tag. The contents between `{` and `}` are searched for in the `window` object and placed in the output if they are found.
 
-##Title Scanner
+## Title Scanner
 If the `document.title` is left blank or looks like a filename, or there is no `<title>` tag in the document, Staircase will attempt to auto-fill the document's title by searching for the first piece of relevant text within the page.
 
 The scanner searches using the following process:
@@ -167,9 +167,9 @@ The scanner searches using the following process:
 4. Find the first available text node and use the first four words
 5. Use a clean version of the document's URL (e.g. some-website.com &raquo; Some Website)
 
-##Javascript API
+## Javascript API
 
-###Javascript Objects
+### Javascript Objects
 `window.Staircases` - An array of Staircase objects available in the current window<br />
 `window.location.params` - A named array of HTTP Query parameters in the current URL
 
@@ -179,7 +179,7 @@ Initialise a new Staircase instance, attach it to `element` and provide `options
 `Step( DOMElement element, Int index )`<br />
 Create a new Step object at `index` and attach it to `element`.
 
-###Options
+### Options
 Each Staircase instance can be customized with a set of options presented as an `Object`.
 
 Option | Type | Default | Effect
@@ -194,9 +194,31 @@ Option | Type | Default | Effect
 `stepFocus` | `Function` | none | Additional callback function that is triggered when a step enters the foreground
 `validate` | `Function` | none | Additional function to check against during validation. `this` represents the current `input` element and the first argument represents the Staircase instance. Be sure to return `false` if your custom validation fails.
 
-###Properties & Methods
+### Events
+Staircase triggers a number of events that can be tapped into using `.on()` and `.toggle()` (see **Properties & Methods**)  
+These events are supplied with `arguments` and some can be cancelled by returning `false`.  
+`this` refers to the Staircase instance.
 
-####`Staircase`
+Event | Cancelable | Arguments | Called
+--- |:---:| --- | ---
+`addcondition` | *no* | `step`, `condition` | After a `condition` has been added to the `step`
+`back` | *yes* | `step`, `button` | After the back `button` was pressed but before the `step` changes
+`beforestepvalidate` | *yes* | `step`, `input(s)` | Before the `step` validates its contents
+`beforesubmit` | *yes* | `step`, `button` | Before the main form is submitted
+`beforevalidate` | *yes* | `input` | Before an input is validated
+`constrained` | *no* | `input`, `constraint` | When a constraint is preventing user input
+`continue` | *yes* | `step`, `nextstep` | Before the successfully validated `step` proceeds to the `nextstep`
+`continuefailed` | *no* | `step`, `inputs` | The `step` has failed validation because of the marked `inputs`
+`hashchange` | *yes* | `step`, `hash` | Before the detected URL `hash` alteration causes the current `step` to change
+`stepblur` | *no* | `step` | After the step loses focus
+`stepvalidate` | *no* | `step`, `valid` | After the `step` performs validation on itself
+`submit` | *yes* | `staircase` | After the `staircase` form is submitted but before the window location changes
+`submitfailed` | *no* | `step` | When the final `step` fails validation
+`validate` | *yes* | `input`, `valid` | After an `input` is validated by staircase. Can be 'cancelled' by returning `true` (to pass validation) or `false` (to fail)
+
+### Properties & Methods
+
+#### `Staircase`
 Property | Meaning
 :---:| ---
 `$current` | The index of the currently focussed Step (Note that this is an **Array Index**, meaning index **0** is actually the **first** item in the array)
@@ -212,8 +234,11 @@ Method | Arguments | Action
 `Prev` | - | Skip back to the last step
 `To` | `index` | Attempt to skip to the Step at `index` (Note that this is an **Array Index**, meaning index **0** is actually the **first** item in the array). This function **cannot** skip through validation errors.
 `Validate` | `input` | Process validation on `input` (can be a CSS selector, DOM Element or jQuery Object). Returns `true` or `false` depending on whether validation has passed or not.
+`on` | `event`, `callback` | Bind a `callback` function to an `event`
+`off` | `event`[, `callback`] | Remove an `event` handler (with optional `callback` filter)
+`trigger` | `event`[, `data`] | Trigger all event handlers for `event` to fire (with optional `data` array)
 
-####`Step`
+#### `Step`
 Property | Meaning
 :---:| ---
 `$index` | The Step's numeric index (Note that this is an **Array Index**, meaning index **0** is actually the **first** item in the array)
@@ -229,7 +254,7 @@ Method | Arguments | Action
 `Validate` | `input` | Performs `Staircase.Validate()` on `input` and applies the `staircase-has-error` and `staircase-highlight-error` classes to the `input` and any applicable `<label>` elements upon failure. `staircase-highlight-error` will be removed after a delay (see **Javascript API &raquo; Options**). Returns `true` or `false` depending on whether validation has passed or not.
 
 
-##Third Party APIs
+## Third Party APIs
 
 The `APIs` options object contains data pertaining to third party API integration.  
 The default `APIs` object is as follows:
@@ -244,7 +269,7 @@ The default `APIs` object is as follows:
 ```
 
 
-###BriteVerify
+### BriteVerify
 
 [BriteVerify](http://www.briteverify.com) is an email verification service.  
 You can enable BriteVerify by providing your API Key as part of the `options` object (see **Initialising Staircase**)
