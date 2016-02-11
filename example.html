@@ -25,7 +25,7 @@
 					data8:
 					{
 						APIKey: 'K9KlI2-pOM-R4doj3WBCUZe8RHUjffjJ8XtV72wM7zqo5vEMTYHS-w',
-						Licence: 'FreeTrial'
+						License: 'FreeTrial'
 					}
 				}
 			});
@@ -41,6 +41,8 @@
 			sc.on('briteverify', function(){ console.log('briteverify', this, arguments); });
 			sc.on('beforedata8', function(){ console.log('beforedata8', this, arguments); });
 			sc.on('data8', function(){ console.log('data8', this, arguments); });
+			sc.on('beforedata8lookup', function(){ console.log('beforedata8lookup', this, arguments); });
+			sc.on('data8lookup', function(){ console.log('data8lookup', this, arguments); });
 			sc.on('back', function(){ console.log('back', this, arguments); });
 			sc.on('beforesubmit', function(){ console.log('beforesubmit', this, arguments); });
 			sc.on('validate', function(){ console.log('validate', this, arguments); });
@@ -55,6 +57,15 @@
 	</head>
 	<body>
 		<section class="staircase">
+			<div class="step">
+				<input type="text" name="postcode" placeholder="Postcode" validate="default"
+					d8-lookup-street="street1"
+					d8-lookup-city="city1" />
+				<input type="text" name="street1" placeholder="Street Address" validate="default" />
+
+				<!--Next button-->
+				<input type="button" class="continue" value="NEXT" />
+			</div>
 			<div class="step">
 				<!-- Always apply "autofocus" to the first input field -->
 				<label>Which of these subjects are you interested in studying?
