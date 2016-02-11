@@ -233,7 +233,7 @@
 					var caller = new data8.emailvalidation();
 						caller.isvalid(value, 'Address', null, function(result)
 						{
-							success.call(this, result, result.Result == 'Valid');
+							success.call(this, result, result.Result.trim().match(/^valid$/i));
 						});
 					break;
 
@@ -241,7 +241,7 @@
 					var caller = new data8.mobilevalidation();
 						caller.isvalid(value, null, function(result)
 						{
-							success.call(this, result, result.Result == 'Success');
+							success.call(this, result, result.Result.trim().match(/^success$/i));
 						});
 					break;
 
@@ -249,7 +249,7 @@
 					var caller = new data8.telephonelinevalidation();
 						caller.isvalid(value, null, function(result)
 						{
-							success.call(this, result, result.Result == 'Success');
+							success.call(this, result, result.Result.trim().match(/^valid$/i));
 						});
 					break;
 
@@ -1295,47 +1295,68 @@
 									// Staircase no longer needs to wait for this input
 									label.removeClass('awaiting-validation');
 
-									var // A list of attributes to carry over from the target to its selectbox counterpart
-										attrs = ['class', 'id', 'name', 'style'];
-
 									// Iterate through possible multiple targets
 									lookuptarget.each(function()
 									{
 										var // Keep the current target
 											curr = $(this),
-											sel = curr;
+											autocomplete = curr.data('autocomplete-box');
 
-										// If the current target has not yet been converted to a select box
-										if(!curr.is('select'))
-										{
-											sel = $('<select validate="selected"></select>').on('change', function()
+										curr
+											.on('click', function()
 											{
-												var option = $(this).find('option[value="' + this.value + '"]');
+												return curr.focus(), false;
+											})
+											.on('focus', function()
+											{
+												var off = $(this).offset();
 
-												if(lookupcity)
+												autocomplete.css(
 												{
-													lookupcity.val(option.attr('city'));
-												}
+													top: off.top + $(this).outerHeight(),
+													left: off.left
+												}).show();
 											});
 
-											for(var i in attrs)
+										$(document)
+											.on('click blur', function()
 											{
-												if(curr.is('[' + attrs[i] + ']'))
-												{
-													sel.attr(attrs[i], curr.attr(attrs[i]));
-												}
-											}
+												autocomplete.hide();
+											});
 
-											sel.insertAfter(curr).data('original', curr);
-											curr.detach();
+										// If the current target has not yet been converted to a select box
+										if(!autocomplete)
+										{
+											autocomplete = $('<ul class="staircase-autocomplete-box" style="display: none;"></ul>')
+												.hide()
+												.appendTo('body')
+												.data('targets', [lookuptarget, lookupcity]);
+
+											autocomplete
+												.on('click', 'li', function()
+												{
+													var t = autocomplete.data('targets');
+
+													t[0].val($(this).data('value'));
+
+													if(t[1])
+													{
+														t[1].val($(this).data('raw-value')[3]);
+													}
+
+													autocomplete.hide();
+
+													return false;
+												});
+
+											curr.data('autocomplete-box', autocomplete);
 										}
 
-										sel.html('<option value="">Please Select Your Address...</option>');
+										autocomplete.html('');
 
 										for(var i in address.Results)
 										{
-											var addr = [],
-												trueaddr = [];
+											var addr = [];
 
 											for(var j = 0; j < (address.Results[i].Address.Lines.length - 1); j ++)
 											{
@@ -1345,17 +1366,17 @@
 												{
 													addr.push(ln);
 												}
-
-												trueaddr.push(ln);
 											}
 
 											addr = addr.join(', ');
 
-											sel.append('<option value="' + addr + '" city="' + trueaddr[3] + '">' + addr + '</option>');
+											$('<li>')
+												.html(addr)
+												.data('value', addr)
+												.data('raw-value', address.Results[i].Address.Lines)
+												.appendTo(autocomplete);
 										}
 									});
-
-									console.log(address);
 
 									// Trigger the data8lookup event
 									$staircase.trigger('data8lookup', [input, lookuptarget, address]);
