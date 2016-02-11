@@ -30,33 +30,41 @@
 				}
 			});
 
-			sc.on('hashchange', function(){ console.log('hashchange', this, arguments); });
-			sc.on('beforevalidate', function(){ console.log('beforevalidate', this, arguments); });
-			sc.on('stepblur', function(){ console.log('stepblur', this, arguments); });
-			sc.on('beforestepvalidate', function(){ console.log('beforestepvalidate', this, arguments); });
-			sc.on('stepvalidate', function(){ console.log('stepvalidate', this, arguments); });
-			sc.on('addcondition', function(){ console.log('addcondition', this, arguments); });
-			sc.on('constrained', function(){ console.log('constrained', this, arguments); });
-			sc.on('beforebriteverify', function(){ console.log('beforebriteverify', this, arguments); });
-			sc.on('briteverify', function(){ console.log('briteverify', this, arguments); });
-			sc.on('beforedata8', function(){ console.log('beforedata8', this, arguments); });
-			sc.on('data8', function(){ console.log('data8', this, arguments); });
-			sc.on('beforedata8lookup', function(){ console.log('beforedata8lookup', this, arguments); });
-			sc.on('data8lookup', function(){ console.log('data8lookup', this, arguments); });
-			sc.on('back', function(){ console.log('back', this, arguments); });
-			sc.on('beforesubmit', function(){ console.log('beforesubmit', this, arguments); });
-			sc.on('validate', function(){ console.log('validate', this, arguments); });
-			sc.on('submitfailed', function(){ console.log('submitfailed', this, arguments); });
-			sc.on('continuefailed', function(){ console.log('continuefailed', this, arguments); });
-			sc.on('continue', function(){ console.log('continue', this, arguments); });
-			sc.on('debug', function(){ console.log('debug', this, arguments); });
-			sc.on('submit', function(){ console.log('submit', this, arguments); });
+			sc.on('hashchange', function(){ console.log('hashchange', arguments); });
+			sc.on('beforevalidate', function(){ console.log('beforevalidate', arguments); });
+			sc.on('stepblur', function(){ console.log('stepblur', arguments); });
+			sc.on('beforestepvalidate', function(){ console.log('beforestepvalidate', arguments); });
+			sc.on('stepvalidate', function(){ console.log('stepvalidate', arguments); });
+			sc.on('addcondition', function(){ console.log('addcondition', arguments); });
+			sc.on('constrained', function(){ console.log('constrained', arguments); });
+			sc.on('beforebriteverify', function(){ console.log('beforebriteverify', arguments); });
+			sc.on('briteverify', function(){ console.log('briteverify', arguments); });
+			sc.on('beforedata8', function(){ console.log('beforedata8', arguments); });
+			sc.on('data8', function(){ console.log('data8', arguments); });
+			sc.on('beforedata8lookup', function(){ console.log('beforedata8lookup', arguments); });
+			sc.on('data8lookup', function(){ console.log('data8lookup', arguments); });
+			sc.on('data8lookupcityappended', function(){ console.log('data8lookupcityappended', arguments); });
+			sc.on('back', function(){ console.log('back', arguments); });
+			sc.on('beforesubmit', function(){ console.log('beforesubmit', arguments); });
+			sc.on('validate', function(){ console.log('validate', arguments); });
+			sc.on('submitfailed', function(){ console.log('submitfailed', arguments); });
+			sc.on('continuefailed', function(){ console.log('continuefailed', arguments); });
+			sc.on('continue', function(){ console.log('continue', arguments); });
+			sc.on('debug', function(){ console.log('debug', arguments); });
+			sc.on('submit', function(){ console.log('submit', arguments); });
 
 		});
 		</script>
 	</head>
 	<body>
 		<section class="staircase">
+			<div class="step">
+				<input type="text" name="mobile" placeholder="Mobile" validate="mobile" d8="mobile" />
+				<input type="text" name="telephone" placeholder="Telephone" validate="telephone" d8="telephone" />
+
+				<!--Next button-->
+				<input type="button" class="continue" value="NEXT" />
+			</div>
 			<div class="step">
 				<input type="text" name="postcode" placeholder="Postcode" validate="default"
 					d8-lookup-street="street1"

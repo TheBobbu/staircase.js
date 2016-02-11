@@ -3,7 +3,7 @@
 ;(function()
 {
 	// Save the version number for reference
-	window.$staircase = '5.2.2';
+	window.$staircase = '5.2.3';
 
 	// Some helpful polyfills
 	String.prototype.trim = function(a){var b=this,c,l=0,i=0;b+='';if(!a){c=' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'}else{a+='';c=a.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g,'$1')}l=b.length;for(i=0;i<l;i++){if(c.indexOf(b.charAt(i))===-1){b=b.substring(i);break}}l=b.length;for(i=l-1;i>=0;i--){if(c.indexOf(b.charAt(i))===-1){b=b.substring(0,i+1);break}}return c.indexOf(b.charAt(0))===-1?b:''};
@@ -229,24 +229,32 @@
 
 			switch(String(type).trim().toLowerCase())
 			{
-				case 'telephone': case 'phone':
-					var caller = new data8.internationaltelephonevalidation();
-						caller.isvalid(value, $this.DefaultCountry,
-						[
-							new data8.option('UseMobileValidation', 'true'),
-							new data8.option('UseLineValidation', 'true')
-						], function(result)
-						{
-							success.call(this, result, result.Result.ValidationResult == 'Valid');
-						});
-					break;
-
-				default:
+				case 'email':
 					var caller = new data8.emailvalidation();
 						caller.isvalid(value, 'Address', null, function(result)
 						{
 							success.call(this, result, result.Result == 'Valid');
 						});
+					break;
+
+				case 'mobile':
+					var caller = new data8.mobilevalidation();
+						caller.isvalid(value, null, function(result)
+						{
+							success.call(this, result, result.Result == 'Success');
+						});
+					break;
+
+				case 'landline': case 'telephone': case 'phone':
+					var caller = new data8.telephonelinevalidation();
+						caller.isvalid(value, null, function(result)
+						{
+							success.call(this, result, result.Result == 'Success');
+						});
+					break;
+
+				default:
+					$this.Cache[type][value] = undefined;
 					break;
 			}
 
@@ -309,7 +317,7 @@
 
 			var checkready = function()
 			{
-				if(window['data8'] && window['data8'].addresscapture && window['data8'].emailvalidation && window['data8'].internationaltelephonevalidation)
+				if(window['data8'] && window['data8'].addresscapture && window['data8'].emailvalidation && window['data8'].mobilevalidation && window['data8'].telephonelinevalidation)
 				{
 					callback.call($this);
 				}
@@ -331,7 +339,8 @@
 				{
 					data8.load('AddressCapture');
 					data8.load('EmailValidation');
-					data8.load('InternationalTelephoneValidation');
+					data8.load('MobileValidation');
+					data8.load('TelephoneLineValidation');
 
 					checkready();
 				};
@@ -596,13 +605,18 @@
 			'default':		/^(?!\s*$).+/,
 			'email':		/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
 			'filename':		/^(([^\/\\\?%\*:|"<>]+)?\.([^\/\\\?%\*:|"<>\.]+)|([^\/\\\?%\*:|"<>\.]+))$/,
-			'name':			/^([ A-Za-z\.']+)$/,
+			'name':			/^([ A-Za-z\.\-']+)$/,
 			'number':		[/^-?([0-9]+)$/, /^-?([0-9]+)\.([0-9]+)$/, /^([0-9]+)$/, /^([0-9]+)\.([0-9]+)$/, /^-?([0-9]+)(\.([0-9]+))?$/],
 			'phone':		[/^(\+([0-9]{1,5})|0)(?!.*(\d)\1{9,})\d{9,}$/, /^(\+([0-9]{1,5})|07)(?!.*(\d)\1{9,})\d{9,}$/, /^(\+33|0)(?!.*(\d)\1{9,})\d{9,}$/],
 			'postcode':		/^(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))$/,
 			'time':			/^([0-9]{1,2}):([0-9]{2})(:([0-9]{2}))?([\s]+)?(am|pm)?$/i,
 			'zipcode':		/^(^\d{5}$)|(^\d{5}-\d{4}$)$/
 		};
+
+		// Prevent code inflation by copying objects
+		$staircase.Patterns.mobile = $staircase.Patterns.phone[1];
+		$staircase.Patterns.landline =
+		$staircase.Patterns.telephone = $staircase.Patterns.phone;
 
 		// Constraints Store
 		$staircase.Constraints =
@@ -868,9 +882,9 @@
 			var $this = $(arguments[0]), // Store the DOM element
 				$step = this, // Create a super
 				$visited = null; // Cache the `Visited` state
-				$toconstrain = 'input:not([type="button"], [type="submit"], [type="image"])[constrain]:not(.bypass), textarea[constrain]:not(.bypass)', // Inputs to apply constraints to
+				$toconstrain = 'input:not([type="button"], [type="submit"], [type="image"])[constrain], textarea[constrain]', // Inputs to apply constraints to
 				$allinputs = 'input:not([type="button"], [type="submit"], [type="image"])[name], select[name], textarea[name]', // All form data inputs
-				$inputs = 'input:not([type="button"], [type="submit"], [type="image"])[validate]:not(.bypass), select[validate]:not(.bypass), textarea[validate]:not(.bypass)', // Input selector
+				$inputs = 'input:not([type="button"], [type="submit"], [type="image"])[validate], select[validate], textarea[validate]', // Input selector
 				$buttons = 'input[type="button"].next, input[type="button"].continue, input[type="button"].submit, input[type="submit"], button', // Continue/Submit button selector
 				$backbuttons = 'input[type="button"].prev, input[type="submit"].prev, button.prev, input[type="button"].back, input[type="submit"].back, button.back'; // Back button selector
 
@@ -1091,7 +1105,13 @@
 			// Bind each validatable input field within this step to the validate function
 			$this.on('change validate', $inputs, function()
 			{
-				var input = $(this);
+				var input = $(this),
+					label = input.closest('label');
+
+				if(label.length == 0)
+				{
+					label = input;
+				}
 
 				if($options.APIs.briteverify.APIKey && input.filter(function()
 				{
@@ -1162,10 +1182,14 @@
 						// If the input passes primary validation
 						if($step.Validate(input[0]))
 						{
+							// Tell staircase to wait for this input to validate
+							label.addClass('awaiting-validation');
+
 							// Trigger the beforedata8 event
 							if($staircase.trigger('beforedata8', [input]) === false)
 							{
-								return false;
+								// Cancel the await request
+								return label.removeClass('awaiting-validation'), false;
 							}
 
 							// If Data8 has not yet been initialised
@@ -1181,6 +1205,9 @@
 								// When a response is received from Data8
 								$staircase.Data8.Verify(input.val().trim(), input.attr('d8'), function(valid)
 								{
+									// Staircase no longer needs to wait for this input
+									label.removeClass('awaiting-validation');
+
 									// If the response object contains a solid verifiable boolean
 									if(typeof this == 'object' && this.IsValid === undefined)
 									{
@@ -1191,7 +1218,7 @@
 									if(valid)
 									{
 										// Remove the error classes
-										input.removeClass('bypass staircase-has-error staircase-highlight-error');
+										input.removeClass('staircase-has-error staircase-highlight-error');
 
 										// Run staircase validation with a forced value to tell the step if it can continue or not
 										$step.Validate(input[0], true);
@@ -1199,7 +1226,7 @@
 									else
 									{
 										// Apply the error classes
-										input.addClass('bypass staircase-has-error staircase-highlight-error');
+										input.addClass('staircase-has-error staircase-highlight-error');
 
 										// Remove the error notification class after a delay
 										input.data('notify-timeout', setTimeout(function()
@@ -1233,17 +1260,23 @@
 
 							if(lookupcity.length == 0)
 							{
-								lookupcity = $('<input type="hidden" name="' + input.attr('d8-lookup-city') + '" bypass_validation="1" />').insertAfter(lookuptarget);
+								lookupcity = $('<input type="hidden" name="' + input.attr('d8-lookup-city') + '" />').insertAfter(lookuptarget);
+
+								$staircase.trigger('data8lookupcityappended', [lookupcity])
 							}
 						}
 
 						// If the input passes validation
 						if($step.Validate(input[0]))
 						{
+							// Tell staircase to wait for this input to validate
+							label.addClass('awaiting-validation');
+
 							// Trigger the beforedata8lookup event
 							if($staircase.trigger('beforedata8lookup', [input, lookuptarget]) === false)
 							{
-								return false;
+								// Cancel the await request
+								return label.removeClass('awaiting-validation'), false;
 							}
 
 							// If Data8 has not yet been initialised
@@ -1259,6 +1292,9 @@
 								// When a response is received from Data8
 								$staircase.Data8.Lookup(input[0].value, function(address)
 								{
+									// Staircase no longer needs to wait for this input
+									label.removeClass('awaiting-validation');
+
 									var // A list of attributes to carry over from the target to its selectbox counterpart
 										attrs = ['class', 'id', 'name', 'style'];
 
@@ -1411,13 +1447,13 @@
 						});
 					}
 
-					if($this.hasClass('staircase-has-error') || $this.find('.staircase-has-error').length > 0)
+					if($this.is('.staircase-has-error, .awaiting-validation') || $this.find('.staircase-has-error, .awaiting-validation').length > 0)
 					{
 						// Trigger the submitfailed event
-						$staircase.trigger($step.$object.is('.step:last') ? 'submitfailed' : 'nextfailed continuefailed', [$step, $this.find('.staircase-has-error')]);
+						$staircase.trigger($step.$object.is('.step:last') ? 'submitfailed' : 'nextfailed continuefailed', [$step, $this.find('.staircase-has-error, .awaiting-validation')]);
 
 						// Scroll to the first error
-						$staircase.scroll($('.staircase-has-error').first());
+						$staircase.scroll($('.staircase-has-error, .awaiting-validation').first());
 
 						// If there are any errors, cancel the submit event
 						return false;
@@ -1459,7 +1495,7 @@
 						$staircase.trigger($step.$object.is('.step:last') ? 'submitfailed' : 'nextfailed continuefailed', [$step]);
 
 						// Scroll to the first error
-						$staircase.scroll($('.staircase-has-error').first());
+						$staircase.scroll($('.staircase-has-error, .awaiting-validation').first());
 
 						return false;
 					}

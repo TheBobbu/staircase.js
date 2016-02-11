@@ -1,11 +1,11 @@
-# Staircase 5.2.2
+# Staircase 5.2.3
 
 Staircase is a lightweight framework for online form validation and auto population.
 Requires jQuery 1.8 or later.
 
 To embed Staircase in your document, simply add the following script tag below jQuery:  
 
-`<script type="text/javascript" src="http://staircase.tech/5.2.2/staircase.min.js"></script>`
+`<script type="text/javascript" src="http://staircase.tech/5.2.3/staircase.min.js"></script>`
 
 
 If you want to live on the bleeding edge (we advise against this as Staircase is always evolving and features may change), you can instead use the following:
@@ -330,8 +330,16 @@ The Data8 options object accepts the following values:
 
 Data8 fields require attributes to function correctly. Below is a list of acceptable attributes:
 
-| Argument | Value | Effect |
-| --- | --- | --- |
-| `d8` | `"telephone"`, `"phone"` or `"email"` | Enables telephone or email verification on the input, which fires when the input's value is changed |
-| `d8-lookup-street` | `String` | Provide an input's `name` attribute as this attribute's value to convert the element to a `select` box filled with all available street addresses for the entered postcode. |
-| `d8-lookup-city` | `String` | Provide a `name` to create a hidden 'city' field containing the city of the selected address. Must be applied in conjunction with `d8-lookup-city`. |
+| Argument | Effect |
+| --- | --- |
+| `d8` | Enables telephone or email verification on the input, which fires when the input's value is changed |
+| `d8-lookup-street` | Provide an input's `name` attribute as this attribute's value to convert the element to a `select` box filled with all available street addresses for the entered postcode. |
+| `d8-lookup-city` | Provide a `name` to create a hidden 'city' field containing the city of the selected address. Must be applied in conjunction with `d8-lookup-city`. |
+
+And here is a list of acceptable values for the `d8` attribute:
+
+| Value | Effect |
+| --- | --- |
+| `"email"` | Verifies the input using a server pinging service to determine whether the email address is reachable |
+| `"mobile"` | Verifies the input against a list of live mobile phone numbers |
+| `"landline"`, `"telephone"` or `"phone"` | Verifies the input against a list of live landline phone numbers |
