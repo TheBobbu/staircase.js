@@ -1,4 +1,4 @@
-# Staircase 5.2.1
+# Staircase 5.2.2
 
 Staircase is a lightweight framework for online form validation and auto population.
 Requires jQuery 1.8 or later.
@@ -109,8 +109,8 @@ Below is a list of constraints that will allow the user to only enter certain ch
 
 Constraint | Effect
 --- | ---
-`numbers` | Only allows the user to enter numbers (0-9)
 `letters` | Only allows the user to enter letters (A-Z)
+`numbers` | Only allows the user to enter numbers (0-9)
 `symbols` | Prevents the user from entering numbers or letters (0-9, A-Z)
 
 ## Conditions
@@ -264,7 +264,12 @@ The default `APIs` object is as follows:
     "briteverify":
     {
         "APIKey": null
-    }
+    },
+	"data8":
+	{
+		"APIKey": null,
+		"License": null
+	}
 }
 ```
 
@@ -294,7 +299,7 @@ $('#form').staircase(
     {
         briteverify:
         {
-            APIKey:         "abc12345-6789-0def-ghij-k12345lmn678",
+            APIKey:         "...",
             fields:         "input[name='email']",
             scoreFieldName: "email_verify_status"
         }
@@ -310,3 +315,23 @@ Once the user has entered their email, the following field is generated and plac
 
 You can read about the value that is populated over in [BriteVerify's API Documentation](http://docs.briteverify.com/status-key).  
 Staircase retrieves the **Primary Statuses** column only.
+
+### Data8
+
+[Data8](https://www.data-8.co.uk/) is a general information verification service.  
+You can enable Data8 by providing your ajax API key as part of the `options` object (see **Initialising Staircase**)
+
+The Data8 options object accepts the following values:
+
+| Option | Type | Default | Effect |
+| --- | --- | --- | --- |
+| `APIKey` | `String` | `null` | Links the Data8 instance to your account and enables the service |
+| `License` | `String` | `null` | Provides a license type for Data8 to use with Postcode Address Lookup |
+
+Data8 fields require attributes to function correctly. Below is a list of acceptable attributes:
+
+| Argument | Value | Effect |
+| --- | --- | --- |
+| `d8` | `"telephone"`, `"phone"` or `"email"` | Enables telephone or email verification on the input, which fires when the input's value is changed |
+| `d8-lookup-street` | `String` | Provide an input's `name` attribute as this attribute's value to convert the element to a `select` box filled with all available street addresses for the entered postcode. |
+| `d8-lookup-city` | `String` | Provide a `name` to create a hidden 'city' field containing the city of the selected address. Must be applied in conjunction with `d8-lookup-city`. |
