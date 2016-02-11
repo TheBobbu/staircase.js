@@ -1295,68 +1295,71 @@
 									// Staircase no longer needs to wait for this input
 									label.removeClass('awaiting-validation');
 
+									if(!address.Results)
+									{
+										// Run staircase validation with a forced value to tell the step if it can continue or not
+										return $step.Validate(input[0], false), false;
+									}
+									else
+									{
+										$step.Validate(input[0], true);
+									}
+
+									var // A list of attributes to carry over from the target to its selectbox counterpart
+										attrs = ['class', 'id', 'name', 'style'];
+
 									// Iterate through possible multiple targets
 									lookuptarget.each(function()
 									{
 										var // Keep the current target
 											curr = $(this),
-											autocomplete = curr.data('autocomplete-box');
-
-										curr
-											.on('click', function()
-											{
-												return curr.focus(), false;
-											})
-											.on('focus', function()
-											{
-												var off = $(this).offset();
-
-												autocomplete.css(
-												{
-													top: off.top + $(this).outerHeight(),
-													left: off.left
-												}).show();
-											});
-
-										$(document)
-											.on('click blur', function()
-											{
-												autocomplete.hide();
-											});
+											sel = curr;
 
 										// If the current target has not yet been converted to a select box
-										if(!autocomplete)
+										if(!curr.is('select'))
 										{
-											autocomplete = $('<ul class="staircase-autocomplete-box" style="display: none;"></ul>')
-												.hide()
-												.appendTo('body')
-												.data('targets', [lookuptarget, lookupcity]);
-
-											autocomplete
-												.on('click', 'li', function()
+											sel = $('<select validate="selected"></select>').on('change', function()
+											{
+												if(this.value == 'N/A')
 												{
-													var t = autocomplete.data('targets');
-
-													t[0].val($(this).data('value'));
-
-													if(t[1])
+													lookuptarget.each(function()
 													{
-														t[1].val($(this).data('raw-value')[3]);
+														var s = $(this).data('select-counterpart');
+
+														$(this).insertAfter(s);
+														s.remove();
+													})
+													.first().focus();
+												}
+												else
+												{
+													var option = $(this).find('option[value="' + this.value + '"]');
+
+													if(lookupcity)
+													{
+														lookupcity.val(option.attr('city'));
 													}
+												}
+											});
 
-													autocomplete.hide();
+											for(var i in attrs)
+											{
+												if(curr.is('[' + attrs[i] + ']'))
+												{
+													sel.attr(attrs[i], curr.attr(attrs[i]));
+												}
+											}
 
-													return false;
-												});
-
-											curr.data('autocomplete-box', autocomplete);
+											sel.insertAfter(curr).data('original', curr);
+											curr.data('select-counterpart', sel).detach();
 										}
 
-										autocomplete.html('');
+										sel.html('<option value="">Please Select Your Address...</option>');
 
 										for(var i in address.Results)
 										{
-											var addr = [];
+											var addr = [],
+												trueaddr = [];
 
 											for(var j = 0; j < (address.Results[i].Address.Lines.length - 1); j ++)
 											{
@@ -1366,16 +1369,16 @@
 												{
 													addr.push(ln);
 												}
+
+												trueaddr.push(ln);
 											}
 
 											addr = addr.join(', ');
 
-											$('<li>')
-												.html(addr)
-												.data('value', addr)
-												.data('raw-value', address.Results[i].Address.Lines)
-												.appendTo(autocomplete);
+											sel.append('<option value="' + addr + '" city="' + trueaddr[3] + '">' + addr + '</option>');
 										}
+
+										sel.append('<option value="N/A">My address is not listed here</option>');
 									});
 
 									// Trigger the data8lookup event
