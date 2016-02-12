@@ -268,11 +268,13 @@
 				return $this;
 			}
 
-			if($this.Cache.Addresses && $this.Cache.Addresses[postcode])
+			var pckey = postcode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+			if($this.Cache.Addresses && $this.Cache.Addresses[pckey])
 			{
-				if($this.Cache.Addresses[postcode] !== 'loading')
+				if($this.Cache.Addresses[pckey] !== 'loading')
 				{
-					callback.call($this.Cache.Addresses[postcode], $this.Cache.Addresses[postcode].IsValid);
+					callback.call($this, $this.Cache.Addresses[pckey], postcode);
 				}
 
 				return $this;
@@ -285,9 +287,10 @@
 
 			var success = function(result, valid)
 			{
-				$this.Cache.Addresses[postcode] = result;
+				$this.Cache.Addresses[pckey] = result;
+				$this.Cache.Addresses[pckey].IsValid = !!valid;
 
-				callback.call($this, $this.Cache.Addresses[postcode], postcode);
+				callback.call($this, $this.Cache.Addresses[pckey], postcode);
 			};
 
 			if(!$this.Cache.Addresses)
@@ -295,7 +298,7 @@
 				$this.Cache.Addresses = {};
 			}
 
-			$this.Cache.Addresses[postcode] = 'loading';
+			$this.Cache.Addresses[pckey] = 'loading';
 
 			var addresscapture = new data8.addresscapture();
 				addresscapture.getfulladdress($this.License, postcode, '',
@@ -303,7 +306,10 @@
 					new data8.option('MaxLines', '5'),
 					new data8.option('FixTownCounty', 'true')
 				],
-				callback);
+				function(result)
+				{
+					success.call(this, result, result.Results.length > 0);
+				});
 
 			return $this;
 		};
@@ -1011,6 +1017,10 @@
 					label = input.closest('label').length ? input.closest('label') : ((input.attr('id') && $('label[for="' + input.attr('id') + '"]').length) ? $('label[for="' + input.attr('id') + '"]') : false), // Find this input's label
 					apply = $(label ? label.add(input) : input);
 
+				// Remove the error classes
+				apply.removeClass('staircase-has-error staircase-highlight-error');
+
+				// If this input is not valid
 				if(!valid)
 				{
 					// Apply the error classes
@@ -1030,9 +1040,6 @@
 
 					return false;
 				}
-
-				// Remove the error classes
-				apply.removeClass('staircase-has-error staircase-highlight-error');
 
 				// Clear the notification class timer so that no classes are unintentionally removed in the near future
 				if(apply.data('notify-timeout'))
@@ -1106,12 +1113,8 @@
 			$this.on('change validate', $inputs, function()
 			{
 				var input = $(this),
-					label = input.closest('label');
-
-				if(label.length == 0)
-				{
-					label = input;
-				}
+					label = input.closest('label'),
+					apply = $(label ? label.add(input) : input);
 
 				if($options.APIs.briteverify.APIKey && input.filter(function()
 				{
@@ -1183,13 +1186,13 @@
 						if($step.Validate(input[0]))
 						{
 							// Tell staircase to wait for this input to validate
-							label.addClass('awaiting-validation');
+							apply.addClass('awaiting-validation');
 
 							// Trigger the beforedata8 event
 							if($staircase.trigger('beforedata8', [input]) === false)
 							{
 								// Cancel the await request
-								return label.removeClass('awaiting-validation'), false;
+								return apply.removeClass('awaiting-validation'), false;
 							}
 
 							// If Data8 has not yet been initialised
@@ -1206,7 +1209,7 @@
 								$staircase.Data8.Verify(input.val().trim(), input.attr('d8'), function(valid)
 								{
 									// Staircase no longer needs to wait for this input
-									label.removeClass('awaiting-validation');
+									apply.removeClass('awaiting-validation');
 
 									// If the response object contains a solid verifiable boolean
 									if(typeof this == 'object' && this.IsValid === undefined)
@@ -1218,7 +1221,7 @@
 									if(valid)
 									{
 										// Remove the error classes
-										input.removeClass('staircase-has-error staircase-highlight-error');
+										apply.removeClass('staircase-has-error staircase-highlight-error');
 
 										// Run staircase validation with a forced value to tell the step if it can continue or not
 										$step.Validate(input[0], true);
@@ -1226,12 +1229,12 @@
 									else
 									{
 										// Apply the error classes
-										input.addClass('staircase-has-error staircase-highlight-error');
+										apply.addClass('staircase-has-error staircase-highlight-error');
 
 										// Remove the error notification class after a delay
 										input.data('notify-timeout', setTimeout(function()
 										{
-											input.removeClass('staircase-highlight-error');
+											apply.removeClass('staircase-highlight-error');
 										},
 
 										// If the delay is larger than 300 (5 minutes), interpret it as milliseconds. Otherwise, interpret as seconds and adjust
@@ -1270,13 +1273,13 @@
 						if($step.Validate(input[0]))
 						{
 							// Tell staircase to wait for this input to validate
-							label.addClass('awaiting-validation');
+							apply.addClass('awaiting-validation');
 
 							// Trigger the beforedata8lookup event
 							if($staircase.trigger('beforedata8lookup', [input, lookuptarget]) === false)
 							{
 								// Cancel the await request
-								return label.removeClass('awaiting-validation'), false;
+								return apply.removeClass('awaiting-validation'), false;
 							}
 
 							// If Data8 has not yet been initialised
@@ -1290,12 +1293,15 @@
 							$staircase.Data8.Authenticate(function()
 							{
 								// When a response is received from Data8
-								$staircase.Data8.Lookup(input[0].value, function(address)
+								$staircase.Data8.Lookup(input[0].value, function(address, postcode)
 								{
-									// Staircase no longer needs to wait for this input
-									label.removeClass('awaiting-validation');
+									// Clean up the postcode
+									postcode = postcode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 
-									if(!address.Results)
+									// Staircase no longer needs to wait for this input
+									apply.removeClass('awaiting-validation');
+
+									if(!address.IsValid)
 									{
 										// Run staircase validation with a forced value to tell the step if it can continue or not
 										return $step.Validate(input[0], false), false;
@@ -1315,70 +1321,75 @@
 											curr = $(this),
 											sel = curr;
 
-										// If the current target has not yet been converted to a select box
-										if(!curr.is('select'))
+										if(!curr.data('current-postcode') || curr.data('current-postcode') != postcode)
 										{
-											sel = $('<select validate="selected"></select>').on('change', function()
+											// If the current target has not yet been converted to a select box
+											if(!curr.is('select'))
 											{
-												if(this.value == 'N/A')
+												sel = $('<select validate="selected"></select>').on('change', function()
 												{
-													lookuptarget.each(function()
+													if(this.value == 'N/A')
 													{
-														var s = $(this).data('select-counterpart');
+														lookuptarget.each(function()
+														{
+															var s = $(this).data('select-counterpart');
 
-														$(this).insertAfter(s);
-														s.remove();
-													})
-													.first().focus();
-												}
-												else
+															$(this).insertAfter(s);
+															s.remove();
+														})
+														.first().focus();
+													}
+													else
+													{
+														var option = $(this).find('option[value="' + this.value + '"]');
+
+														if(lookupcity)
+														{
+															lookupcity.val(option.attr('city'));
+														}
+													}
+												});
+
+												for(var i in attrs)
 												{
-													var option = $(this).find('option[value="' + this.value + '"]');
-
-													if(lookupcity)
+													if(curr.is('[' + attrs[i] + ']'))
 													{
-														lookupcity.val(option.attr('city'));
+														sel.attr(attrs[i], curr.attr(attrs[i]));
 													}
 												}
-											});
 
-											for(var i in attrs)
-											{
-												if(curr.is('[' + attrs[i] + ']'))
-												{
-													sel.attr(attrs[i], curr.attr(attrs[i]));
-												}
+												sel.insertAfter(curr).data('original', curr);
+												curr.data('select-counterpart', sel).detach();
 											}
 
-											sel.insertAfter(curr).data('original', curr);
-											curr.data('select-counterpart', sel).detach();
-										}
+											sel
+												.data('current-postcode', postcode)
+												.html('<option value="">Please Select Your Address...</option>');
 
-										sel.html('<option value="">Please Select Your Address...</option>');
-
-										for(var i in address.Results)
-										{
-											var addr = [],
-												trueaddr = [];
-
-											for(var j = 0; j < (address.Results[i].Address.Lines.length - 1); j ++)
+											for(var i in address.Results)
 											{
-												var ln = address.Results[i].Address.Lines[j];
+												var addr = [],
+													trueaddr = [];
 
-												if(ln)
+												for(var j = 0; j < (address.Results[i].Address.Lines.length - 1); j ++)
 												{
-													addr.push(ln);
+													var ln = address.Results[i].Address.Lines[j];
+
+													if(ln)
+													{
+														addr.push(ln);
+													}
+
+													trueaddr.push(ln);
 												}
 
-												trueaddr.push(ln);
+												addr = addr.join(', ');
+
+												sel.append('<option value="' + addr + '" city="' + trueaddr[3] + '">' + addr + '</option>');
 											}
 
-											addr = addr.join(', ');
-
-											sel.append('<option value="' + addr + '" city="' + trueaddr[3] + '">' + addr + '</option>');
+											sel.append('<option value="N/A">My address is not listed here</option>');
 										}
-
-										sel.append('<option value="N/A">My address is not listed here</option>');
 									});
 
 									// Trigger the data8lookup event
