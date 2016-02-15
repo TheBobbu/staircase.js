@@ -84,6 +84,19 @@
 	<body>
 		<section class="staircase">
 			<div class="step">
+				<label><input type="radio" name="radio1" value="1" /> One</label>
+				<label><input type="radio" name="radio1" value="2" /> Two</label>
+				<label><input type="radio" name="radio1" value="3" /> Three</label>
+
+				<script type="staircase/condition">
+					console.log('radio1', radio1);
+					return false;
+				</script>
+
+				<!--Next button-->
+				<input type="button" class="continue" value="NEXT" />
+			</div>
+			<div class="step">
 				<input type="text" name="postcode" placeholder="Postcode" validate="default"
 					d8-lookup-street="street1"
 					d8-lookup-city="city1" />

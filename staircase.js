@@ -1070,7 +1070,11 @@
 
 					if(inputs[name])
 					{
-						inputs[name] = [inputs[name]];
+						if(inputs[name].length === undefined)
+						{
+							inputs[name] = [inputs[name]];
+						}
+
 						inputs[name].push(this);
 					}
 					else
@@ -1080,14 +1084,12 @@
 					}
 				});
 
-				var ridx = $step.$rules.push(
+				// Trigger the addcondition event
+				$staircase.trigger('addcondition', [$step, $step.$rules.push(
 				{
 					callback: (typeof code == 'function') ? code : new Function(args, code),
 					inputs: inputs
-				});
-
-				// Trigger the addcondition event
-				$staircase.trigger('addcondition', [$step, $step.$rules[ridx - 1]]);
+				}) - 1]);
 
 				return $step;
 			};
@@ -1429,6 +1431,9 @@
 			{
 				if(!$(this).is($backbuttons))
 				{
+					var // Script don't fail me now!
+						failed = false;
+
 					// Trigger the beforesubmit event
 					if($staircase.trigger('beforesubmit', [$step, $(this)]) === false)
 					{
@@ -1491,36 +1496,45 @@
 						$staircase.scroll($('.staircase-has-error, .awaiting-validation').first());
 
 						// If there are any errors, cancel the submit event
-						return false;
+						failed = true;
 					}
 
 					// Process any hard-coded rules
 					var ruleresult = true;
 
-					for(var i in $step.$rules)
+					if($step.$rules.length > 0)
 					{
-						// Prepare the Staircase and Step arguments as sandboxed functions with limited access to Staircase
-						var args = [sandbox($staircase), sandbox($step), window.jQuery];
+						var rules = $step.$rules;
 
-						// Loop through the inputs that were present when the rule was set up (to prevent any hacking or muddling)
-						for(var j in $step.$rules[i].inputs)
+						for(var i in rules)
 						{
-							var input = $($step.$rules[i].inputs[j]);
+							var rule = rules[i],
+								// Prepare the Staircase and Step arguments as sandboxed functions with limited access to Staircase
+								args = [sandbox($staircase), sandbox($step), window.jQuery];
 
-							// Check for checkboxes or radio boxes
-							if(input.length > 1) input = input.filter(function()
+							// Loop through the inputs that were present when the rule was set up (to prevent any hacking or muddling)
+							for(var j in rule.inputs)
 							{
-								return (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && !$(this).is(':checked')) ? false : true;
-							});
+								var input = $(rule.inputs[j]);
 
-							// Add the input's value to the rule arguments
-							args.push((input.length > 0) ? (input.length > 1 ? (function(a, b){ a.each(function(){ b.push($(this)[0].value) }); return b })(input, []) : input[0].value) : undefined);
-						}
+								// Check for checkboxes or radio boxes
+								if(input.length > 1)
+								{
+									input = input.filter(function()
+									{
+										return (($(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio') && !$(this).is(':checked')) ? false : true;
+									});
+								}
 
-						// Execute the rule
-						if($step.$rules[i].callback.apply(window, args) === false)
-						{
-							ruleresult = false;
+								// Add the input's value to the rule arguments
+								args.push((input.length > 0) ? input : undefined);
+							}
+
+							// Execute the rule
+							if(rule.callback.apply(rule, args) === false)
+							{
+								ruleresult = false;
+							}
 						}
 					}
 
@@ -1532,6 +1546,11 @@
 						// Scroll to the first error
 						$staircase.scroll($('.staircase-has-error, .awaiting-validation').first());
 
+						failed = true;
+					}
+
+					if(failed)
+					{
 						return false;
 					}
 
