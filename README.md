@@ -154,7 +154,7 @@ Staircase comes with a nifty little script that scans the document for any `inpu
 <input staircase-value="#{screen.width}, #{screen.height}" /> <!-- 1920, 1080 -->
 ```
 
-`#{...}` is a filter tag. The contents between `{` and `}` are searched for in the `window` object and placed in the output if they are found.
+`#{...}` is a filter tag. The contents between `{` and `}` are searched for in the `window` scope and placed in the output if they are found.
 
 ## Title Scanner
 If the `document.title` is left blank or looks like a filename, or there is no `<title>` tag in the document, Staircase will attempt to auto-fill the document's title by searching for the first piece of relevant text within the page.
@@ -164,8 +164,7 @@ The scanner searches using the following process:
 1. Find the first `<h1>`, `<h2>`, `<h3>`, `<h4>`, `<h5>` or `<h6>` element and use its text content
 2. Find the first `<img>` element with an alt tag and use its alt tag text content
 3. Find the first `<p>` element and use the first four words
-4. Find the first available text node and use the first four words
-5. Use a clean version of the document's URL (e.g. some-website.com &raquo; Some Website)
+4. Use a filtered version of the document's filename (e.g. some-page.html &raquo; Some Page)
 
 ## Javascript API
 
