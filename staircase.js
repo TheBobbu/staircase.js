@@ -251,18 +251,7 @@
 					var caller = new data8.telephonelinevalidation();
 						caller.isvalid(value, null, function(result)
 						{
-							if(result.Result.trim().match(/^mobile$/i))
-							{
-								var mobcaller = new data8.mobilevalidation();
-									mobcaller.isvalid(value, null, function(mobresult)
-									{
-										success.call(this, mobresult, mobresult.Result.trim().match(/^success$/i));
-									});
-							}
-							else
-							{
-								success.call(this, result, result.Result.trim().match(/^valid$/i));
-							}
+							success.call(this, result, result.Result.trim().match(/^valid$/i));
 						});
 					break;
 
