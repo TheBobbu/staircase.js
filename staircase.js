@@ -1255,149 +1255,156 @@
 					// If the input needs to call an address lookup
 					else if(input.attr('d8-lookup-street'))
 					{
-						var // Get the target input
-							lookuptarget = $('*[name="' + input.attr('d8-lookup-street').toLowerCase().trim() + '"]'),
-							lookupcity = input.attr('d8-lookup-city') || '';
+						var lastvalidated = input.data('d8-postcode-validated-successfully');
 
-						if(lookupcity)
+						if(!lastvalidated || lastvalidated != input.val().replace(/[^a-zA-Z0-9]/g, '').toUpperCase())
 						{
-							lookupcity = $('*[name="' + lookupcity.toLowerCase().trim() + '"]');
+							var // Get the target input
+								lookuptarget = $('*[name="' + input.attr('d8-lookup-street').toLowerCase().trim() + '"]'),
+								lookupcity = input.attr('d8-lookup-city') || '';
 
-							if(lookupcity.length == 0)
+							if(lookupcity)
 							{
-								lookupcity = $('<input type="hidden" name="' + input.attr('d8-lookup-city') + '" />').insertAfter(lookuptarget);
+								lookupcity = $('*[name="' + lookupcity.toLowerCase().trim() + '"]');
 
-								$staircase.trigger('data8lookupcityappended', [lookupcity])
-							}
-						}
-
-						// If the input passes validation
-						if($step.Validate(input[0]))
-						{
-							// Tell staircase to wait for this input to validate
-							apply.addClass('awaiting-validation');
-
-							// Trigger the beforedata8lookup event
-							if($staircase.trigger('beforedata8lookup', [input, lookuptarget]) === false)
-							{
-								// Cancel the await request
-								return apply.removeClass('awaiting-validation'), false;
-							}
-
-							// If Data8 has not yet been initialised
-							if(!$staircase.Data8)
-							{
-								// Create a Data8 instance
-								$staircase.Data8 = new Data8API($options.APIs.data8.APIKey, $options.APIs.data8.License);
-							}
-
-							// Authenticate the Data8 API if it has not been already
-							$staircase.Data8.Authenticate(function()
-							{
-								// When a response is received from Data8
-								$staircase.Data8.Lookup(input[0].value, function(address, postcode)
+								if(lookupcity.length == 0)
 								{
-									// Clean up the postcode
-									postcode = postcode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+									lookupcity = $('<input type="hidden" name="' + input.attr('d8-lookup-city') + '" />').insertAfter(lookuptarget);
 
-									// Staircase no longer needs to wait for this input
-									apply.removeClass('awaiting-validation');
+									$staircase.trigger('data8lookupcityappended', [lookupcity])
+								}
+							}
 
-									if(!address.IsValid)
+							// If the input passes validation
+							if($step.Validate(input[0]))
+							{
+								// Tell staircase to wait for this input to validate
+								apply.addClass('awaiting-validation');
+
+								// Trigger the beforedata8lookup event
+								if($staircase.trigger('beforedata8lookup', [input, lookuptarget]) === false)
+								{
+									// Cancel the await request
+									return apply.removeClass('awaiting-validation'), false;
+								}
+
+								// If Data8 has not yet been initialised
+								if(!$staircase.Data8)
+								{
+									// Create a Data8 instance
+									$staircase.Data8 = new Data8API($options.APIs.data8.APIKey, $options.APIs.data8.License);
+								}
+
+								// Authenticate the Data8 API if it has not been already
+								$staircase.Data8.Authenticate(function()
+								{
+									// When a response is received from Data8
+									$staircase.Data8.Lookup(input[0].value, function(address, postcode)
 									{
-										// Run staircase validation with a forced value to tell the step if it can continue or not
-										return $step.Validate(input[0], false), false;
-									}
-									else
-									{
-										$step.Validate(input[0], true);
-									}
+										// Clean up the postcode
+										postcode = postcode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 
-									var // A list of attributes to carry over from the target to its selectbox counterpart
-										attrs = ['class', 'id', 'name', 'style'];
+										// Staircase no longer needs to wait for this input
+										apply.removeClass('awaiting-validation');
 
-									// Iterate through possible multiple targets
-									lookuptarget.each(function()
-									{
-										var // Keep the current target
-											curr = $(this),
-											sel = curr;
-
-										if(!curr.data('current-postcode') || curr.data('current-postcode') != postcode)
+										if(!address.IsValid)
 										{
-											// If the current target has not yet been converted to a select box
-											if(!curr.is('select'))
+											// Run staircase validation with a forced value to tell the step if it can continue or not
+											return $step.Validate(input[0], false), false;
+										}
+										else
+										{
+											input.data('d8-postcode-validated-successfully', input.val().replace(/[^a-zA-Z0-9]/g, '').toUpperCase());
+
+											$step.Validate(input[0], true);
+										}
+
+										var // A list of attributes to carry over from the target to its selectbox counterpart
+											attrs = ['class', 'id', 'name', 'style'];
+
+										// Iterate through possible multiple targets
+										lookuptarget.each(function()
+										{
+											var // Keep the current target
+												curr = $(this),
+												sel = curr;
+
+											if(!curr.data('current-postcode') || curr.data('current-postcode') != postcode)
 											{
-												sel = $('<select validate="selected"></select>').on('change', function()
+												// If the current target has not yet been converted to a select box
+												if(!curr.is('select'))
 												{
-													if(this.value == 'N/A')
+													sel = $('<select validate="selected"></select>').on('change', function()
 													{
-														lookuptarget.each(function()
+														if(this.value == 'N/A')
 														{
-															var s = $(this).data('select-counterpart');
+															lookuptarget.each(function()
+															{
+																var s = $(this).data('select-counterpart');
 
-															$(this).insertAfter(s);
-															s.remove();
-														})
-														.first().focus();
-													}
-													else
+																$(this).insertAfter(s);
+																s.remove();
+															})
+															.first().focus();
+														}
+														else
+														{
+															var option = $(this).find('option[value="' + this.value + '"]');
+
+															if(lookupcity)
+															{
+																lookupcity.val(option.attr('city'));
+															}
+														}
+													});
+
+													for(var i in attrs)
 													{
-														var option = $(this).find('option[value="' + this.value + '"]');
-
-														if(lookupcity)
+														if(curr.is('[' + attrs[i] + ']'))
 														{
-															lookupcity.val(option.attr('city'));
+															sel.attr(attrs[i], curr.attr(attrs[i]));
 														}
 													}
-												});
 
-												for(var i in attrs)
-												{
-													if(curr.is('[' + attrs[i] + ']'))
-													{
-														sel.attr(attrs[i], curr.attr(attrs[i]));
-													}
+													sel.insertAfter(curr).data('original', curr);
+													curr.data('select-counterpart', sel).detach();
 												}
 
-												sel.insertAfter(curr).data('original', curr);
-												curr.data('select-counterpart', sel).detach();
-											}
+												sel
+													.data('current-postcode', postcode)
+													.html('<option value="">Please Select Your Address...</option>');
 
-											sel
-												.data('current-postcode', postcode)
-												.html('<option value="">Please Select Your Address...</option>');
-
-											for(var i in address.Results)
-											{
-												var addr = [],
-													trueaddr = [];
-
-												for(var j = 0; j < (address.Results[i].Address.Lines.length - 1); j ++)
+												for(var i in address.Results)
 												{
-													var ln = address.Results[i].Address.Lines[j];
+													var addr = [],
+														trueaddr = [];
 
-													if(ln)
+													for(var j = 0; j < (address.Results[i].Address.Lines.length - 1); j ++)
 													{
-														addr.push(ln);
+														var ln = address.Results[i].Address.Lines[j];
+
+														if(ln)
+														{
+															addr.push(ln);
+														}
+
+														trueaddr.push(ln);
 													}
 
-													trueaddr.push(ln);
+													addr = addr.join(', ');
+
+													sel.append('<option value="' + addr + '" city="' + trueaddr[3] + '">' + addr + '</option>');
 												}
 
-												addr = addr.join(', ');
-
-												sel.append('<option value="' + addr + '" city="' + trueaddr[3] + '">' + addr + '</option>');
+												sel.append('<option value="N/A">My address is not listed here</option>');
 											}
+										});
 
-											sel.append('<option value="N/A">My address is not listed here</option>');
-										}
+										// Trigger the data8lookup event
+										$staircase.trigger('data8lookup', [input, lookuptarget, address]);
 									});
-
-									// Trigger the data8lookup event
-									$staircase.trigger('data8lookup', [input, lookuptarget, address]);
 								});
-							});
+							}
 						}
 					}
 				}
