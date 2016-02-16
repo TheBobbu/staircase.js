@@ -233,11 +233,12 @@
 					var caller = new data8.emailvalidation();
 						caller.isvalid(value, 'Address', null, function(result)
 						{
-							success.call(this, result, result.Result.trim().match(/^valid$/i));
+							success.call(this, result, result.Result.trim().match(/^(catchall|greylisted|valid)$/i));
 						});
 					break;
 
 				case 'mobile':
+					value = value.replace(/[^0-9\+]/g, '');
 					var caller = new data8.mobilevalidation();
 						caller.isvalid(value, null, function(result)
 						{
@@ -246,10 +247,22 @@
 					break;
 
 				case 'landline': case 'telephone': case 'phone':
+					value = value.replace(/[^0-9\+]/g, '');
 					var caller = new data8.telephonelinevalidation();
 						caller.isvalid(value, null, function(result)
 						{
-							success.call(this, result, result.Result.trim().match(/^valid$/i));
+							if(result.Result.trim().match(/^mobile$/i))
+							{
+								var mobcaller = new data8.mobilevalidation();
+									mobcaller.isvalid(value, null, function(mobresult)
+									{
+										success.call(this, mobresult, mobresult.Result.trim().match(/^success$/i));
+									});
+							}
+							else
+							{
+								success.call(this, result, result.Result.trim().match(/^valid$/i));
+							}
 						});
 					break;
 
