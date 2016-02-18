@@ -242,7 +242,7 @@
 					var caller = new data8.mobilevalidation();
 						caller.isvalid(value, null, function(result)
 						{
-							success.call(this, result, result.Result.trim().match(/^success$/i));
+							success.call(this, result, result.Result.trim().match(/^(blank|error|success|timedout|unavailable)$/i));
 						});
 					break;
 
@@ -251,7 +251,7 @@
 					var caller = new data8.telephonelinevalidation();
 						caller.isvalid(value, null, function(result)
 						{
-							success.call(this, result, result.Result.trim().match(/^valid$/i));
+							success.call(this, result, result.Result.trim().match(/^(ambiguous|error|foreign|numberchanged|tempinvalid|valid)$/i));
 						});
 					break;
 
