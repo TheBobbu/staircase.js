@@ -201,7 +201,7 @@
 			{
 				if($this.Cache[type][value] !== 'loading')
 				{
-					callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid, result);
+					callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid, $this.Cache[type][value]);
 				}
 
 				return $this;
