@@ -50,39 +50,44 @@
 					data8:
 					{
 						APIKey: 'K9KlI2-pOM-R4doj3WBCUZe8RHUjffjJ8XtV72wM7zqo5vEMTYHS-w',
-						License: 'FreeTrial'
+						License: 'WebClickFull',
+						logging: true
 					}
 				}
 			});
-
-			sc.on('hashchange', function(){ console.log('hashchange', arguments); });
-			sc.on('beforevalidate', function(){ console.log('beforevalidate', arguments); });
-			sc.on('stepblur', function(){ console.log('stepblur', arguments); });
-			sc.on('beforestepvalidate', function(){ console.log('beforestepvalidate', arguments); });
-			sc.on('stepvalidate', function(){ console.log('stepvalidate', arguments); });
-			sc.on('addcondition', function(){ console.log('addcondition', arguments); });
-			sc.on('constrained', function(){ console.log('constrained', arguments); });
-			sc.on('beforebriteverify', function(){ console.log('beforebriteverify', arguments); });
-			sc.on('briteverify', function(){ console.log('briteverify', arguments); });
-			sc.on('beforedata8', function(){ console.log('beforedata8', arguments); });
-			sc.on('data8', function(){ console.log('data8', arguments); });
-			sc.on('beforedata8lookup', function(){ console.log('beforedata8lookup', arguments); });
-			sc.on('data8lookup', function(){ console.log('data8lookup', arguments); });
-			sc.on('data8lookupcityappended', function(){ console.log('data8lookupcityappended', arguments); });
-			sc.on('back', function(){ console.log('back', arguments); });
-			sc.on('beforesubmit', function(){ console.log('beforesubmit', arguments); });
-			sc.on('validate', function(){ console.log('validate', arguments); });
-			sc.on('submitfailed', function(){ console.log('submitfailed', arguments); });
-			sc.on('continuefailed', function(){ console.log('continuefailed', arguments); });
-			sc.on('continue', function(){ console.log('continue', arguments); });
-			sc.on('debug', function(){ console.log('debug', arguments); });
-			sc.on('submit', function(){ console.log('submit', arguments); });
-
 		});
 		</script>
 	</head>
 	<body>
 		<section class="staircase">
+			<div class="step">
+				<input type="email" name="q1" placeholder="Email" validate="email" d8="email" />
+				<input type="text" name="mobile" placeholder="Mobile" validate="mobile" d8="mobile" />
+				<input type="text" name="postcode" placeholder="Postcode" validate="default"
+					d8-lookup-street="street1"
+					d8-lookup-city="city1" />
+				<input type="text" name="street1" placeholder="Street Address" validate="default" />
+
+				<!--Next button-->
+				<input type="button" class="continue" value="NEXT" />
+			</div>
+			<div class="step">
+				<select name="testcond">
+					<option value="NO">Not this one!</option>
+					<option value="YES">This one!</option>
+				</select>
+
+				<!--Next button-->
+				<input type="button" class="continue" value="NEXT" />
+
+				<script type="staircase/condition">
+					console.log(testcond.val());
+					if(testcond == 'NO')
+					{
+						return alert('This is an alert popup for an invalid response'), false;
+					}
+				</script>
+			</div>
 			<div class="step">
 				<input type="text" placeholder="Phone Number" validate="phone[1]" maxlength="16" />
 
@@ -98,15 +103,6 @@
 					console.log('radio1', radio1);
 					return false;
 				</script>
-
-				<!--Next button-->
-				<input type="button" class="continue" value="NEXT" />
-			</div>
-			<div class="step">
-				<input type="text" name="postcode" placeholder="Postcode" validate="default"
-					d8-lookup-street="street1"
-					d8-lookup-city="city1" />
-				<input type="text" name="street1" placeholder="Street Address" validate="default" />
 
 				<!--Next button-->
 				<input type="button" class="continue" value="NEXT" />

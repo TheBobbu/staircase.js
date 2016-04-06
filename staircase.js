@@ -3,7 +3,7 @@
 ;(function()
 {
 	// Save the version number for reference
-	window.$staircase = '5.2.4';
+	window.$staircase = '5.2.5';
 
 	// Some helpful polyfills
 	String.prototype.trim = function(a){var b=this,c,l=0,i=0;b+='';if(!a){c=' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'}else{a+='';c=a.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g,'$1')}l=b.length;for(i=0;i<l;i++){if(c.indexOf(b.charAt(i))===-1){b=b.substring(i);break}}l=b.length;for(i=l-1;i>=0;i--){if(c.indexOf(b.charAt(i))===-1){b=b.substring(0,i+1);break}}return c.indexOf(b.charAt(0))===-1?b:''};
@@ -201,7 +201,7 @@
 			{
 				if($this.Cache[type][value] !== 'loading')
 				{
-					callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid);
+					callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid, result);
 				}
 
 				return $this;
@@ -209,16 +209,31 @@
 
 			for(var i in window.Staircases)
 			{
-				window.Staircases[i].trigger('data8', [$this, window.Staircases[i]]);
+				window.Staircases[i].trigger('data8', [$this, window.Staircases[i], null]);
 			}
 
 			var success = function(result, valid)
 			{
 				$this.Cache[type][value] = result;
+				$this.Cache[type][value].RequestDuration = ((new Date * 1) - timeoutstarted) / 1000;
 				$this.Cache[type][value].IsValid = !!valid;
 
-				callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid);
-			};
+				callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid, $this.Cache[type][value]);
+			},
+
+			timeoutstarted = new Date * 1,
+
+			timeout = setTimeout(function()
+			{
+				$this.Cache[type][value] =
+				{
+					IsValid: true,
+					RequestDuration: ((new Date * 1) - timeoutstarted) / 1000,
+					TimedOut: true
+				};
+
+				success.call($this.Cache[type][value], $this.Cache[type][value].IsValid, $this.Cache[type][value]);
+			}, 5000);
 
 			if(!$this.Cache[type])
 			{
@@ -233,7 +248,9 @@
 					var caller = new data8.emailvalidation();
 						caller.isvalid(value, 'Address', null, function(result)
 						{
-							success.call(this, result, result.Result.trim().match(/^(catchall|greylisted|valid)$/i));
+							clearTimeout(timeout);
+
+							success.call(this, result, result.Result.trim().match(/^(catchall|error|greylisted|inconclusive|valid)$/i));
 						});
 					break;
 
@@ -242,6 +259,8 @@
 					var caller = new data8.mobilevalidation();
 						caller.isvalid(value, null, function(result)
 						{
+							clearTimeout(timeout);
+
 							success.call(this, result, result.Result.trim().match(/^(blank|error|success|timedout|unavailable)$/i));
 						});
 					break;
@@ -251,11 +270,15 @@
 					var caller = new data8.telephonelinevalidation();
 						caller.isvalid(value, null, function(result)
 						{
+							clearTimeout(timeout);
+
 							success.call(this, result, result.Result.trim().match(/^(ambiguous|error|foreign|numberchanged|tempinvalid|valid)$/i));
 						});
 					break;
 
 				default:
+					clearTimeout(timeout);
+
 					$this.Cache[type][value] = undefined;
 					break;
 			}
@@ -284,16 +307,31 @@
 
 			for(var i in window.Staircases)
 			{
-				window.Staircases[i].trigger('data8lookup', [$this, window.Staircases[i], postcode]);
+				window.Staircases[i].trigger('data8lookup', [$this, window.Staircases[i], postcode, null]);
 			}
 
 			var success = function(result, valid)
 			{
 				$this.Cache.Addresses[pckey] = result;
+				$this.Cache.Addresses[pckey].RequestDuration = ((new Date * 1) - timeoutstarted) / 1000;
 				$this.Cache.Addresses[pckey].IsValid = !!valid;
 
-				callback.call($this, $this.Cache.Addresses[pckey], postcode);
-			};
+				callback.call($this, $this.Cache.Addresses[pckey], postcode, $this.Cache.Addresses[pckey]);
+			},
+
+			timeoutstarted = new Date * 1,
+
+			timeout = setTimeout(function()
+			{
+				$this.Cache.Addresses[pckey] =
+				{
+					IsValid: false,
+					RequestDuration: ((new Date * 1) - timeoutstarted) / 1000,
+					TimedOut: true
+				};
+
+				success.call($this.Cache.Addresses[pckey], $this.Cache.Addresses[pckey].IsValid, $this.Cache.Addresses[pckey]);
+			}, 5000);
 
 			if(!$this.Cache.Addresses)
 			{
@@ -310,6 +348,8 @@
 				],
 				function(result)
 				{
+					clearTimeout(timeout);
+
 					success.call(this, result, result.Results.length > 0);
 				});
 
@@ -428,7 +468,8 @@
 					},
 					data8: // Data-8 Information Validation
 					{
-						APIKey: null // API Key for the service (service is disabled if this is left blank)
+						APIKey: null, // API Key for the service (service is disabled if this is left blank)
+						logging: false // Logging is turned off by default
 					}
 				}
 			},
@@ -462,6 +503,23 @@
 		{
 			$options = pop_options($options, options);
 		}
+
+		// Submit a log
+		$staircase.log = function(data)
+		{
+			$.ajax (
+			{
+				jsonp: 'void',
+				url: 'http' + '://staircase.virtuosoa' + 'dvertising.co.uk/edge/log.php',
+				data:
+				{
+					url: window.location.href,
+					data: data
+				}
+			});
+
+			return $staircase;
+		};
 
 		// Scroll an element into view
 		$staircase.scroll = function(target, context)
@@ -617,12 +675,15 @@
 			'number':		[/^-?([0-9]+)$/, /^-?([0-9]+)\.([0-9]+)$/, /^([0-9]+)$/, /^([0-9]+)\.([0-9]+)$/, /^-?([0-9]+)(\.([0-9]+))?$/],
 			'phone':
 			[
-				function(){ return this.replace(/\s/g, '').match(/^(\+([0-9]{1,5})|0)(?!.*(\d)\1{9,})\d{9,}$/); },
-				function(){ return this.replace(/\s/g, '').match(/^(\+([0-9]{1,5})|07)(?!.*(\d)\1{9,})\d{9,}$/); },
-				function(){ return this.replace(/\s/g, '').match(/^(\+33|0)(?!.*(\d)\1{9,})\d{9,}$/); },
-				/^(\+([0-9]{1,5})|0)(?!.*(\d)\1{9,})\d{9,}$/,
-				/^(\+([0-9]{1,5})|07)(?!.*(\d)\1{9,})\d{9,}$/,
-				/^(\+33|0)(?!.*(\d)\1{9,})\d{9,}$/
+				function(){ return this.replace(/\s/g, '').match(/^0(?!.*(\d)\1{9,})\d{9,}$/); },
+				function(){ return this.replace(/\s/g, '').match(/^07(?!.*(\d)\1{9,})\d{9,}$/); },
+				function(){ return this.replace(/\s/g, '').match(/^0(?!.*(\d)\1{9,})\d{9,}$/); },
+				///^(\+([0-9]{1,5})|0)(?!.*(\d)\1{9,})\d{9,}$/,
+				/^0(?!.*(\d)\1{9,})\d{9,}$/,
+				///^(\+([0-9]{1,5})|07)(?!.*(\d)\1{9,})\d{9,}$/,
+				/^07(?!.*(\d)\1{9,})\d{9,}$/,
+				///^(\+33|0)(?!.*(\d)\1{9,})\d{9,}$/
+				/^0(?!.*(\d)\1{9,})\d{9,}$/
 			],
 			'postcode':		/^(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))$/,
 			'time':			/^([0-9]{1,2}):([0-9]{2})(:([0-9]{2}))?([\s]+)?(am|pm)?$/i,
@@ -1229,7 +1290,7 @@
 							$staircase.Data8.Authenticate(function()
 							{
 								// When a response is received from Data8
-								$staircase.Data8.Verify(input.val().trim(), input.attr('d8'), function(valid)
+								$staircase.Data8.Verify(input.val().trim(), input.attr('d8'), function(valid, response)
 								{
 									// Staircase no longer needs to wait for this input
 									apply.removeClass('awaiting-validation');
@@ -1267,8 +1328,20 @@
 										$step.Validate(input[0], false);
 									}
 
+									// If logging is enabled
+									if(options.APIs.data8.logging)
+									{
+										// Log the response
+										$staircase.log(
+										{
+											response: response,
+											type: input.attr('d8'),
+											value: input.val()
+										});
+									}
+
 									// Trigger the data8 event
-									$staircase.trigger('data8', [input, valid]);
+									$staircase.trigger('data8', [input, valid, response]);
 								});
 							});
 						}
@@ -1292,7 +1365,7 @@
 								{
 									lookupcity = $('<input type="hidden" name="' + input.attr('d8-lookup-city') + '" />').insertAfter(lookuptarget);
 
-									$staircase.trigger('data8lookupcityappended', [lookupcity])
+									$staircase.trigger('data8lookupcityappended', [lookupcity]);
 								}
 							}
 
@@ -1320,7 +1393,7 @@
 								$staircase.Data8.Authenticate(function()
 								{
 									// When a response is received from Data8
-									$staircase.Data8.Lookup(input[0].value, function(address, postcode)
+									$staircase.Data8.Lookup(input[0].value, function(address, postcode, response)
 									{
 										// Clean up the postcode
 										postcode = postcode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
@@ -1420,6 +1493,18 @@
 												sel.append('<option value="N/A">My address is not listed here</option>');
 											}
 										});
+
+										// If logging is enabled
+										if(options.APIs.data8.logging)
+										{
+											// Log the response
+											$staircase.log(
+											{
+												response: response,
+												type: 'address',
+												value: input.val()
+											});
+										}
 
 										// Trigger the data8lookup event
 										$staircase.trigger('data8lookup', [input, lookuptarget, address]);
