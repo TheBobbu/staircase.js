@@ -406,7 +406,7 @@
 
 		$this.APIKey = APIKey;
 
-		$this.Verify = function(email, callback)
+		$this.Verify = function(email, callback, error)
 		{
 			if(email && typeof email == 'string' && callback && typeof callback == 'function')
 			{
@@ -422,7 +422,14 @@
 					{
 						if(response && typeof response == 'object' && !response.errors)
 						{
-							callback.call(window, response.status);
+							if(callback && typeof callback == 'function')
+							{
+								callback.call(window, response.status);
+							}
+						}
+						else if(error && typeof error == 'function')
+						{
+							error.call(window);
 						}
 					},
 					type: 'get',
@@ -463,6 +470,7 @@
 					{
 						APIKey: null, // API Key for the service (service is disabled if this is left blank)
 						fields: '[validate="email"]', // Specify which fields to verify
+						markInput: false, // Whether to markl the email input as valid/invalid depending on the returned score
 						scoreFieldName: null, // The generated score field name (leave blank to default to the main field name plus scoreFieldSuffix)
 						scoreFieldSuffix: '_bvscore' // The field name suffix for the verification results
 					},
@@ -1193,6 +1201,24 @@
 				}
 			});
 
+			$this.on('focus blur keyup keydown change paint', $inputs, function(e)
+			{
+				var input = $(this),
+					apply = input.closest('label');
+
+				apply = (apply.length == 0 && input.attr('name')) ? $('label[for="' + input.attr('name') + '"]') : [];
+				apply = (apply.length > 0) ? apply.add(input) : input;
+
+				switch(e.type)
+				{
+					case 'focusin': apply.addClass('focus'); break;
+					case 'focusout': apply.removeClass('focus'); break;
+					default: apply[input.val().trim() ? 'removeClass' : 'addClass']('empty'); break;
+				}
+			});
+
+			$($inputs).trigger('paint');
+
 			// Bind each validatable input field within this step to the validate function
 			$this.on('change validate', $inputs, function()
 			{
@@ -1251,11 +1277,49 @@
 
 					input.data('briteverify-scorefield', scoreField);
 
+					// Tell staircase to wait for this input to validate
+					apply.addClass('awaiting-validation');
+
 					new BriteVerify($options.APIs.briteverify.APIKey).Verify(input[0].value, function(score)
 					{
+						// If we need to mark the original input as valid/invalid
+						if($options.APIs.briteverify.markInput)
+						{
+							// If the input value is valid
+							if(score == 'valid')
+							{
+								// Remove the error classes
+								apply.removeClass('staircase-has-error staircase-highlight-error');
+
+								// Run staircase validation with a forced value to tell the step if it can continue or not
+								$step.Validate(input[0], true);
+							}
+							else
+							{
+								// Apply the error classes
+								apply.addClass('staircase-has-error staircase-highlight-error');
+
+								// Remove the error notification class after a delay
+								input.data('notify-timeout', setTimeout(function()
+								{
+									apply.removeClass('staircase-highlight-error');
+								},
+
+								// If the delay is larger than 300 (5 minutes), interpret it as milliseconds. Otherwise, interpret as seconds and adjust
+								$options.notifyDelay > 300 ? $options.notifyDelay : ($options.notifyDelay * 1000)));
+
+								// Run staircase validation with a forced value to tell the step if it can continue or not
+								$step.Validate(input[0], false);
+							}
+						}
+
+						// Staircase no longer needs to wait for this input
+						apply.removeClass('awaiting-validation');
+
 						// Trigger the briteverify event
 						$staircase.trigger('briteverify', [input, score]);
 
+						// Update the score field
 						scoreField.val(score);
 					});
 				}

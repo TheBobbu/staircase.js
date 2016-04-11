@@ -55,14 +55,31 @@
 					}
 				}
 			});
+
+			var checkWaiting = function()
+			{
+				var button = $('.submit-button-selector');
+
+				if($('.awaiting-validation').length > 0)
+				{
+					button.attr('disabled', true);
+				}
+				else
+				{
+					button.removeAttr('disabled');
+				}
+			};
+
+			sc.on('data8 data8lookup', checkWaiting);
+			setInterval(checkWaiting, 5000);
 		});
 		</script>
 	</head>
 	<body>
 		<section class="staircase">
 			<div class="step">
-				<input type="email" name="q1" placeholder="Email" validate="email" d8="email" />
-				<input type="text" name="mobile" placeholder="Mobile" validate="mobile" d8="mobile" />
+				<label><input type="email" name="q1" placeholder="Email" validate="email" d8="email" /></label>
+				<label><input type="text" name="mobile" placeholder="Mobile" validate="mobile" d8="mobile" /></label>
 				<input type="text" name="postcode" placeholder="Postcode" validate="default"
 					d8-lookup-street="street1"
 					d8-lookup-city="city1" />
