@@ -47,6 +47,11 @@
 				checkboxGroups: true,
 				APIs:
 				{
+					briteverify:
+					{
+						APIKey: 'd7a90287-472c-4c9a-b064-3f78f4880902',
+						markInput: true
+					},
 					data8:
 					{
 						APIKey: 'K9KlI2-pOM-R4doj3WBCUZe8RHUjffjJ8XtV72wM7zqo5vEMTYHS-w',
@@ -78,13 +83,7 @@
 	<body>
 		<section class="staircase">
 			<div class="step">
-				<label><input type="email" name="q1" placeholder="Email" validate="email" d8="email" /></label>
-				<label><input type="text" name="mobile" placeholder="Mobile" validate="mobile" d8="mobile" /></label>
-				<input type="text" name="postcode" placeholder="Postcode" validate="default"
-					d8-lookup-street="street1"
-					d8-lookup-city="city1" />
-				<input type="text" name="street1" placeholder="Street Address" validate="default" />
-
+				<label><input type="email" name="q1" placeholder="Email" validate="email" /></label>
 				<!--Next button-->
 				<input type="button" class="continue" value="NEXT" />
 			</div>

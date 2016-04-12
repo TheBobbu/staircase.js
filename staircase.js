@@ -405,11 +405,54 @@
 		var $this = this;
 
 		$this.APIKey = APIKey;
+		$this.Cache = {};
 
 		$this.Verify = function(email, callback, error)
 		{
 			if(email && typeof email == 'string' && callback && typeof callback == 'function')
 			{
+				if($this.Cache[email])
+				{
+					if($this.Cache[email] != 'loading')
+					{
+						callback.call(window, $this.Cache[email].status, $this.Cache[email]);
+					}
+
+					return $this;
+				}
+
+				$this.Cache[email] = 'loading';
+
+				var success = function(response)
+				{
+					if(response && typeof response == 'object' && !response.errors)
+					{
+						$this.Cache[email] = response;
+
+						callback.call(window, response.status, response);
+					}
+					else if(error && typeof error == 'function')
+					{
+						$this.Cache[email] = null;
+
+						error.call(window);
+					}
+				},
+
+				timeoutstarted = new Date * 1,
+
+				timeout = setTimeout(function()
+				{
+					$this.Cache[email] =
+					{
+						status: 'unknown',
+						RequestDuration: ((new Date * 1) - timeoutstarted) / 1000,
+						TimedOut: true
+					};
+
+					success.call(window, $this.Cache[email].status, $this.Cache[email]);
+				}, 5000);
+
 				$.ajax(
 				{
 					data:
@@ -418,26 +461,18 @@
 						apikey: $this.APIKey
 					},
 					dataType: 'json',
-					success: function(response)
+					success: function(data)
 					{
-						if(response && typeof response == 'object' && !response.errors)
-						{
-							if(callback && typeof callback == 'function')
-							{
-								callback.call(window, response.status);
-							}
-						}
-						else if(error && typeof error == 'function')
-						{
-							error.call(window);
-						}
+						data.RequestDuration = ((new Date * 1) - timeoutstarted) / 1000;
+
+						success.call(this, data);
 					},
 					type: 'get',
 					url: 'http://staircase.virtuosoadvertising.co.uk/proxy/briteverify.php'
 				});
 			}
 
-			return null;
+			return $this;
 		};
 
 		return $this;
@@ -972,6 +1007,25 @@
 			return $staircase;
 		};
 
+		$staircase.AwaitSubmit = function(button)
+		{
+			var check = function()
+			{
+				if($('.awaiting-validation', $this).length > 0)
+				{
+					setTimeout(check, 100);
+
+					return false;
+				}
+
+				button.removeAttr('disabled').click();
+			};
+
+			check();
+
+			return $staircase;
+		};
+
 		// Create a subclass to manage steps
 		var Step = function()
 		{
@@ -1206,7 +1260,7 @@
 				var input = $(this),
 					apply = input.closest('label');
 
-				apply = (apply.length == 0 && input.attr('name')) ? $('label[for="' + input.attr('name') + '"]') : [];
+				apply = (apply.length == 0 && input.attr('name')) ? $('label[for="' + input.attr('name') + '"]') : apply;
 				apply = (apply.length > 0) ? apply.add(input) : input;
 
 				switch(e.type)
@@ -1280,13 +1334,20 @@
 					// Tell staircase to wait for this input to validate
 					apply.addClass('awaiting-validation');
 
-					new BriteVerify($options.APIs.briteverify.APIKey).Verify(input[0].value, function(score)
+					// If BriteVerify has not yet been initialised
+					if(!$staircase.BriteVerify)
+					{
+						// Create a BriteVerify instance
+						$staircase.BriteVerify = new BriteVerify($options.APIs.briteverify.APIKey);
+					}
+
+					$staircase.BriteVerify.Verify(input[0].value, function(score)
 					{
 						// If we need to mark the original input as valid/invalid
 						if($options.APIs.briteverify.markInput)
 						{
 							// If the input value is valid
-							if(score == 'valid')
+							if(score.trim().toLowerCase() != 'invalid')
 							{
 								// Remove the error classes
 								apply.removeClass('staircase-has-error staircase-highlight-error');
@@ -1315,6 +1376,17 @@
 
 						// Staircase no longer needs to wait for this input
 						apply.removeClass('awaiting-validation');
+
+						// If logging is enabled
+						if(options.APIs.briteverify.logging)
+						{
+							// Log the response
+							$staircase.log(
+							{
+								score: score,
+								value: input.val()
+							});
+						}
 
 						// Trigger the briteverify event
 						$staircase.trigger('briteverify', [input, score]);
@@ -1666,6 +1738,13 @@
 
 					if($this.is('.staircase-has-error, .awaiting-validation') || $this.find('.staircase-has-error, .awaiting-validation').length > 0)
 					{
+						if($this.is('.awaiting-validation') || $this.find('.awaiting-validation').length > 0)
+						{
+							$staircase.AwaitSubmit($(this).attr('disabled', true));
+
+							return false;
+						}
+
 						// Trigger the submitfailed event
 						$staircase.trigger($step.$object.is('.step:last') ? 'submitfailed' : 'nextfailed continuefailed', [$step, $this.find('.staircase-has-error, .awaiting-validation')]);
 
