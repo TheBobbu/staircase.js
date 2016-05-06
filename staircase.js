@@ -550,9 +550,9 @@
 		// Submit a log
 		$staircase.log = function(data)
 		{
-			$.ajax (
+			$.ajax(
 			{
-				jsonp: 'void',
+				type: 'post',
 				url: 'http' + '://staircase.virtuosoa' + 'dvertising.co.uk/edge/log.php',
 				data:
 				{
@@ -1316,7 +1316,7 @@
 						return false;
 					}
 
-					var scoreFieldName = input.attr('bv-score') ? input.attr('bv-score') : ($options.APIs.briteverify.scoreFieldName ? $options.APIs.briteverify.scoreFieldName : input.attr('name') + $options.APIs.briteverify.scoreFieldSuffix),
+					var scoreFieldName = input.attr('bv-score') ? input.attr('bv-score') : ($options.APIs.briteverify.scoreFieldName ? $options.APIs.briteverify.scoreFieldName : input.attr('name') + ($options.APIs.briteverify.scoreFieldSuffix || '_score')),
 						scoreField = ($('input[name="' + scoreFieldName + '"]').length > 0) ? $('input[name="' + scoreFieldName + '"]') : input.data('briteverify-scorefield');
 
 					if(!scoreField)

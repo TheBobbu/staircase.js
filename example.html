@@ -77,16 +77,51 @@
 
 			sc.on('data8 data8lookup', checkWaiting);
 			setInterval(checkWaiting, 5000);
+
+			sc.on('data8', function(input, valid, response)
+			{
+				if($(input).is('[name="qTELEPHONE"][d8="telephone"]'))
+				{
+					$('input[name="qRESPONSE"]').val(response ? response.Result : '');
+				}
+			});
+
+			sc.on('submit', function()
+			{
+				var ser = $('form').serializeArray(),
+					dat = {};
+
+				for(var i = 0; i < ser.length; i ++)
+				{
+					dat[ser[i].name] = ser[i].value;
+				}
+
+				$.ajax (
+				{
+					async: false,
+					type: 'POST',
+					url: 'post.php',
+					data: dat
+				});
+			});
 		});
 		</script>
 	</head>
 	<body>
 		<section class="staircase">
 			<div class="step">
-				<label><input type="email" name="q1" placeholder="Email" validate="email" /></label>
+				<label>
+					<input type="text" name="qTELEPHONE" placeholder="Telephone" validate="telephone" d8="telephone" />
+					<input type="text" name="qRESPONSE" value="" />
+				</label>
 				<!--Next button-->
 				<input type="button" class="continue" value="NEXT" />
 			</div>
+				<div class="step">
+					<label><input type="email" name="q1" placeholder="Email" validate="email" /></label>
+					<!--Next button-->
+					<input type="button" class="continue" value="NEXT" />
+				</div>
 			<div class="step">
 				<select name="testcond">
 					<option value="NO">Not this one!</option>
