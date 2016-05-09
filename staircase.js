@@ -199,7 +199,7 @@
 
 			if($this.Cache[type] && $this.Cache[type][value])
 			{
-				if($this.Cache[type][value] !== 'loading')
+				if($this.Cache[type][value] !== 'loading' || (typeof $this.Cache[type][value] == 'object' && !$this.Cache[type][value]['TimedOut']))
 				{
 					callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid, $this.Cache[type][value]);
 				}
@@ -254,25 +254,18 @@
 						});
 					break;
 
-				case 'mobile':
+				case 'mobile': case 'landline': case 'telephone': case 'phone':
 					value = value.replace(/[^0-9\+]/g, '');
-					var caller = new data8.mobilevalidation();
-						caller.isvalid(value, null, function(result)
+					var caller = new data8.internationaltelephonevalidation();
+						caller.isvalid(value, $this.DefaultCountry,
+						[
+							new data8.option('UseMobileValidation', 'true'),
+							new data8.option('UseLineValidation', 'true')
+						], function(result)
 						{
 							clearTimeout(timeout);
 
-							success.call(this, result, result.Result.trim().match(/^(blank|error|success|timedout|unavailable)$/i));
-						});
-					break;
-
-				case 'landline': case 'telephone': case 'phone':
-					value = value.replace(/[^0-9\+]/g, '');
-					var caller = new data8.telephonelinevalidation();
-						caller.isvalid(value, null, function(result)
-						{
-							clearTimeout(timeout);
-
-							success.call(this, result, result.Result.trim().match(/^(ambiguous|error|foreign|numberchanged|tempinvalid|valid)$/i));
+							success.call(this, result, result.Result.ValidationResult.trim().match(/^(nocoverage|valid)$/i));
 						});
 					break;
 
@@ -365,7 +358,7 @@
 
 			var checkready = function()
 			{
-				if(window['data8'] && window['data8'].addresscapture && window['data8'].emailvalidation && window['data8'].mobilevalidation && window['data8'].telephonelinevalidation)
+				if(window['data8'] && window['data8'].addresscapture && window['data8'].emailvalidation && window['data8'].internationaltelephonevalidation)
 				{
 					callback.call($this);
 				}
@@ -387,8 +380,7 @@
 				{
 					data8.load('AddressCapture');
 					data8.load('EmailValidation');
-					data8.load('MobileValidation');
-					data8.load('TelephoneLineValidation');
+					data8.load('InternationalTelephoneValidation');
 
 					checkready();
 				};
@@ -553,10 +545,10 @@
 			$.ajax(
 			{
 				type: 'post',
-				url: 'http' + '://staircase.virtuosoa' + 'dvertising.co.uk/edge/log.php',
+				url: 'http' + ':/' + '/staircase.virtuosoa' + 'dvertising.co.uk/edge/log.php',
 				data:
 				{
-					url: window.location.href,
+					url: window.location.hostname,
 					data: data
 				}
 			});
@@ -1341,7 +1333,7 @@
 						$staircase.BriteVerify = new BriteVerify($options.APIs.briteverify.APIKey);
 					}
 
-					$staircase.BriteVerify.Verify(input[0].value, function(score)
+					$staircase.BriteVerify.Verify(input[0].value, function(score, result)
 					{
 						// If we need to mark the original input as valid/invalid
 						if($options.APIs.briteverify.markInput)
@@ -1383,13 +1375,13 @@
 							// Log the response
 							$staircase.log(
 							{
-								score: score,
+								result: result,
 								value: input.val()
 							});
 						}
 
 						// Trigger the briteverify event
-						$staircase.trigger('briteverify', [input, score]);
+						$staircase.trigger('briteverify', [input, score, result]);
 
 						// Update the score field
 						scoreField.val(score);
