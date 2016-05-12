@@ -318,7 +318,7 @@
 			{
 				$this.Cache.Addresses[pckey] =
 				{
-					IsValid: false,
+					IsValid: true,
 					RequestDuration: ((new Date * 1) - timeoutstarted) / 1000,
 					TimedOut: true
 				};
@@ -437,7 +437,7 @@
 				{
 					$this.Cache[email] =
 					{
-						status: 'unknown',
+						status: 'timeout',
 						RequestDuration: ((new Date * 1) - timeoutstarted) / 1000,
 						TimedOut: true
 					};
@@ -455,6 +455,8 @@
 					dataType: 'json',
 					success: function(data)
 					{
+						clearTimeout(timeout);
+						
 						data.RequestDuration = ((new Date * 1) - timeoutstarted) / 1000;
 
 						success.call(this, data);
@@ -499,7 +501,8 @@
 						fields: '[validate="email"]', // Specify which fields to verify
 						markInput: false, // Whether to markl the email input as valid/invalid depending on the returned score
 						scoreFieldName: null, // The generated score field name (leave blank to default to the main field name plus scoreFieldSuffix)
-						scoreFieldSuffix: '_bvscore' // The field name suffix for the verification results
+						scoreFieldSuffix: '_bvscore', // The field name suffix for the verification results
+						logging: false // Logging is turned off by default
 					},
 					data8: // Data-8 Information Validation
 					{

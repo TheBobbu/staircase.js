@@ -86,7 +86,7 @@
 				}
 			});
 
-			sc.on('submit', function()
+			/*sc.on('submit', function()
 			{
 				var ser = $('form').serializeArray(),
 					dat = {};
@@ -103,188 +103,18 @@
 					url: 'post.php',
 					data: dat
 				});
-			});
+			});*/
 		});
 		</script>
 	</head>
 	<body>
 		<section class="staircase">
 			<div class="step">
-				<label>
-					<input type="text" name="qTELEPHONE" placeholder="Telephone" validate="telephone" d8="telephone" />
-					<input type="text" name="qRESPONSE" value="" />
-				</label>
+				<label><input type="email" name="q1" placeholder="Email" validate="email" /></label>
 				<!--Next button-->
-				<input type="button" class="continue" value="NEXT" />
+				<input type="submit" class="continue" value="NEXT" />
 			</div>
-				<div class="step">
-					<label><input type="email" name="q1" placeholder="Email" validate="email" /></label>
-					<!--Next button-->
-					<input type="button" class="continue" value="NEXT" />
-				</div>
-			<div class="step">
-				<select name="testcond">
-					<option value="NO">Not this one!</option>
-					<option value="YES">This one!</option>
-				</select>
-
-				<!--Next button-->
-				<input type="button" class="continue" value="NEXT" />
-
-				<script type="staircase/condition">
-					console.log(testcond.val());
-					if(testcond == 'NO')
-					{
-						return alert('This is an alert popup for an invalid response'), false;
-					}
-				</script>
-			</div>
-			<div class="step">
-				<input type="text" placeholder="Phone Number" validate="phone[1]" maxlength="16" />
-
-				<!--Next button-->
-				<input type="button" class="continue" value="NEXT" />
-			</div>
-			<div class="step">
-				<label><input type="radio" name="radio1" value="1" /> One</label>
-				<label><input type="radio" name="radio1" value="2" /> Two</label>
-				<label><input type="radio" name="radio1" value="3" /> Three</label>
-
-				<script type="staircase/condition">
-					console.log('radio1', radio1);
-					return false;
-				</script>
-
-				<!--Next button-->
-				<input type="button" class="continue" value="NEXT" />
-			</div>
-			<div class="step">
-				<input type="text" name="mobile" placeholder="Mobile" validate="mobile" d8="mobile" />
-				<input type="text" name="telephone" placeholder="Telephone" validate="telephone" d8="telephone" />
-
-				<!--Next button-->
-				<input type="button" class="continue" value="NEXT" />
-			</div>
-			<div class="step">
-				<!-- Always apply "autofocus" to the first input field -->
-				<label>Which of these subjects are you interested in studying?
-				<select name="qxxxx" validate="select" autofocus>
-					<option value="">-- Select One --</option>
-					<option value="1">1</option>
-					<option value="2">2</option>
-					<option value="3">3</option>
-				</select></label>
-
-				<!-- Conditional statement to skip steps or alert -->
-				<script type="staircase/condition">
-					if(qxxxx == '3')
-					{
-						return Staircase.To(2), false;
-					}
-					else if(qxxxx == '2')
-					{
-						return alert('This is an alert popup for an invalid response'), false;
-					}
-				</script>
-
-				<!--Next button-->
-				<input type="button" class="continue" value="NEXT" />
-			</div>
-			<div class="step">
-				<fieldset class="checkbox-group" error-tooltip="Please select at least one subject">
-					<h4>What new skills interest you?</h4>
-					<label><input type="checkbox" class="checkbox-group-input" checked="checked" value="1" name="qaaa">1</label>
-					<label><input type="checkbox" class="checkbox-group-input" value="2" name="qaaa">2</label>
-					<label><input type="checkbox" class="checkbox-group-input" value="3" name="qaaa">3</label>
-					<label><input type="checkbox" class="checkbox-group-input" value="4" name="qaaa">4</label>
-					<label><input type="checkbox" class="checkbox-group-input" value="5" name="qaaa">5</label>
-				</fieldset>
-				<input type="button" class="continue" value="NEXT" />
-			</div>
-			<div class="step">
-				<div class="radio">
-					When would you like to start your studies?
-					<label><input type="radio" value="1" checked="checked" name="qyyyy" /> 1</label>
-					<label><input type="radio" value="2" name="qyyyy" /> 2</label>
-				</div>
-
-				<!-- Conditional statement to give alert or go to next step -->
-				<script type="staircase/condition">
-					if(qyyyy == '1')
-					{
-						return alert('This is an alert popup for an invalid response'), false;
-					}
-				</script>
-
-				<input type="button" class="continue" value="NEXT" />
-			</div>
-			<div class="step">
-				<!-- jQuery UI slider example implementation -->
-				<label>Your approximate total debt:
-					<input pattern="[0-9]*" type="number" id="slider" value="0" size="25" name="qxxx" validate="number" />
-				</label>
-
-				<!-- Conditional statement to give alert or submit, with "less than" conditional -->
-				<script type="staircase/condition">
-					if(parseFloat(qxxx) < 1000)
-					{
-						return alert('Sorry, your total debt must be at least £1,000.'), false;
-					}
-				</script>
-
-				<input type="button" class="continue" value="NEXT" />
-			</div>
-			<div class="step">
-				<!-- Standard AMP data points for basic user data, illustrating various validation requirements -->
-				<label class="first">Title
-				<select name="q22" class="title" validate="select" autocomplete="honorific-prefix">
-					<option value="">-- Select One-- </option>
-					<option value="Mr">Mr</option>
-					<option value="Mrs">Mrs</option>
-					<option value="Miss">Miss</option>
-					<option value="Ms">Ms</option>
-					<option value="Other">Other</option>
-				</select></label>
-
-				<label>Full Name
-				<input type="text" class="name" value="" size="25" name="q2" validate="name" autocomplete="name" bypass_validation="1" /></label>
-
-				<label>Last Name
-				<input type="text" class="surname" value="" size="25" name="q3" validate="name" autocomplete="family-name" bypass_validation="1" /></label>
-
-				<label error-tooltip="Please Enter a Valid Email Address">Email Address
-				<input type="email" class="email" value="" name="q1" validate="email" autocomplete="email"></label>
-
-				<label error-tooltip="Please Enter a Valid Phone Number">Telephone Number
-				<input type="tel" class="phone" value="" name="q10173" maxlength="11" validate="phone[0]" autocomplete="tel-national" bypass_validation="1" /></label>
-
-				<label error-tooltip="Please Enter a Valid Mobile Number">Mobile Number (Optional)
-				<input type="tel" class="mphone" value="" name="q10174" maxlength="11" validate="phone[1]" optional="true" autocomplete="tel-national" bypass_validation="1" /></label>
-
-				<label error-tooltip="Please enter your day of birth in the correct format" >Date of Birth: <span>Day (DD)</span><input type="number" class="day" value="" name="q12" maxlength="2" id="dobdate" validate="number[0]" pattern="[0-9]*" min="0" max="31" autocomplete="bday" placeholder="DD" error-tooltip="Please enter a valid date of birth"></label>
-				<label error-tooltip="Please enter your month of birth in the correct format" ><span>Month (MM)</span><input type="number" class="month" value="" name="q11" maxlength="2" validate="number[0]" pattern="[0-9]*" min="0" max="12" autocomplete="bday" placeholder="MM" id="dobmonth"></label>
-				<label error-tooltip="Please enter your year of birth in the correct format" ><span>Year (YYYY)</span><input type="number" class="year" value="" name="q13" maxlength="4" validate="number[0]" pattern="[0-9]*" min="1900" max="2000" autocomplete="bday" placeholder="YYYY" id="dobyear"></label>
-
-				<label>Postcode
-				<input type="text" class="postcode" name="q8" value="" validate="postcode" address-lookup="q4, q6, q10" autocomplete="postal-code" bypass_validation="1" /></label>
-
-				<label>Address 1
-				<input type="text" class="address1" name="q4" value="" validate="default" autocomplete="address-line1" bypass_validation="1" /></label>
-
-				<label not-required="true">Address 2 (optional)
-				<input type="text" class="address2" name="q5" value="" validate="default" autocomplete="address-line2" bypass_validation="1" /></label>
-
-				<label>City
-				<input type="text" class="city" name="q6" value="" validate="default" autocomplete="locality city" bypass_validation="1" /></label>
-
-				<label>County
-				<input type="text" class="county" name="q10180" value="" validate="default" autocomplete="state province region" bypass_validation="1" /></label>
-
-				<label>Country
-				<input type="text" class="country" name="q10" value="" validate="default" autocomplete="country-name" bypass_validation="1" /></label>
-
-				<input type="submit" value="NEXT" />
-			</div>
+			<!--PGRpdiBjbGFzcz0ic3RlcCI+CgkJCQk8bGFiZWw+CgkJCQkJPGlucHV0IHR5cGU9InRleHQiIG5hbWU9InFURUxFUEhPTkUiIHBsYWNlaG9sZGVyPSJUZWxlcGhvbmUiIHZhbGlkYXRlPSJ0ZWxlcGhvbmUiIGQ4PSJ0ZWxlcGhvbmUiIC8+CgkJCQkJPGlucHV0IHR5cGU9InRleHQiIG5hbWU9InFSRVNQT05TRSIgdmFsdWU9IiIgLz4KCQkJCTwvbGFiZWw+CgkJCQk8IS0tTmV4dCBidXR0b24tLT4KCQkJCTxpbnB1dCB0eXBlPSJidXR0b24iIGNsYXNzPSJjb250aW51ZSIgdmFsdWU9Ik5FWFQiIC8+CgkJCTwvZGl2PgoJCQk8ZGl2IGNsYXNzPSJzdGVwIj4KCQkJCTxzZWxlY3QgbmFtZT0idGVzdGNvbmQiPgoJCQkJCTxvcHRpb24gdmFsdWU9Ik5PIj5Ob3QgdGhpcyBvbmUhPC9vcHRpb24+CgkJCQkJPG9wdGlvbiB2YWx1ZT0iWUVTIj5UaGlzIG9uZSE8L29wdGlvbj4KCQkJCTwvc2VsZWN0PgoKCQkJCTwhLS1OZXh0IGJ1dHRvbi0tPgoJCQkJPGlucHV0IHR5cGU9ImJ1dHRvbiIgY2xhc3M9ImNvbnRpbnVlIiB2YWx1ZT0iTkVYVCIgLz4KCgkJCQk8c2NyaXB0IHR5cGU9InN0YWlyY2FzZS9jb25kaXRpb24iPgoJCQkJCWNvbnNvbGUubG9nKHRlc3Rjb25kLnZhbCgpKTsKCQkJCQlpZih0ZXN0Y29uZCA9PSAnTk8nKQoJCQkJCXsKCQkJCQkJcmV0dXJuIGFsZXJ0KCdUaGlzIGlzIGFuIGFsZXJ0IHBvcHVwIGZvciBhbiBpbnZhbGlkIHJlc3BvbnNlJyksIGZhbHNlOwoJCQkJCX0KCQkJCTwvc2NyaXB0PgoJCQk8L2Rpdj4KCQkJPGRpdiBjbGFzcz0ic3RlcCI+CgkJCQk8aW5wdXQgdHlwZT0idGV4dCIgcGxhY2Vob2xkZXI9IlBob25lIE51bWJlciIgdmFsaWRhdGU9InBob25lWzFdIiBtYXhsZW5ndGg9IjE2IiAvPgoKCQkJCTwhLS1OZXh0IGJ1dHRvbi0tPgoJCQkJPGlucHV0IHR5cGU9ImJ1dHRvbiIgY2xhc3M9ImNvbnRpbnVlIiB2YWx1ZT0iTkVYVCIgLz4KCQkJPC9kaXY+CgkJCTxkaXYgY2xhc3M9InN0ZXAiPgoJCQkJPGxhYmVsPjxpbnB1dCB0eXBlPSJyYWRpbyIgbmFtZT0icmFkaW8xIiB2YWx1ZT0iMSIgLz4gT25lPC9sYWJlbD4KCQkJCTxsYWJlbD48aW5wdXQgdHlwZT0icmFkaW8iIG5hbWU9InJhZGlvMSIgdmFsdWU9IjIiIC8+IFR3bzwvbGFiZWw+CgkJCQk8bGFiZWw+PGlucHV0IHR5cGU9InJhZGlvIiBuYW1lPSJyYWRpbzEiIHZhbHVlPSIzIiAvPiBUaHJlZTwvbGFiZWw+CgoJCQkJPHNjcmlwdCB0eXBlPSJzdGFpcmNhc2UvY29uZGl0aW9uIj4KCQkJCQljb25zb2xlLmxvZygncmFkaW8xJywgcmFkaW8xKTsKCQkJCQlyZXR1cm4gZmFsc2U7CgkJCQk8L3NjcmlwdD4KCgkJCQk8IS0tTmV4dCBidXR0b24tLT4KCQkJCTxpbnB1dCB0eXBlPSJidXR0b24iIGNsYXNzPSJjb250aW51ZSIgdmFsdWU9Ik5FWFQiIC8+CgkJCTwvZGl2PgoJCQk8ZGl2IGNsYXNzPSJzdGVwIj4KCQkJCTxpbnB1dCB0eXBlPSJ0ZXh0IiBuYW1lPSJtb2JpbGUiIHBsYWNlaG9sZGVyPSJNb2JpbGUiIHZhbGlkYXRlPSJtb2JpbGUiIGQ4PSJtb2JpbGUiIC8+CgkJCQk8aW5wdXQgdHlwZT0idGV4dCIgbmFtZT0idGVsZXBob25lIiBwbGFjZWhvbGRlcj0iVGVsZXBob25lIiB2YWxpZGF0ZT0idGVsZXBob25lIiBkOD0idGVsZXBob25lIiAvPgoKCQkJCTwhLS1OZXh0IGJ1dHRvbi0tPgoJCQkJPGlucHV0IHR5cGU9ImJ1dHRvbiIgY2xhc3M9ImNvbnRpbnVlIiB2YWx1ZT0iTkVYVCIgLz4KCQkJPC9kaXY+CgkJCTxkaXYgY2xhc3M9InN0ZXAiPgoJCQkJPCEtLSBBbHdheXMgYXBwbHkgImF1dG9mb2N1cyIgdG8gdGhlIGZpcnN0IGlucHV0IGZpZWxkIC0tPgoJCQkJPGxhYmVsPldoaWNoIG9mIHRoZXNlIHN1YmplY3RzIGFyZSB5b3UgaW50ZXJlc3RlZCBpbiBzdHVkeWluZz8KCQkJCTxzZWxlY3QgbmFtZT0icXh4eHgiIHZhbGlkYXRlPSJzZWxlY3QiIGF1dG9mb2N1cz4KCQkJCQk8b3B0aW9uIHZhbHVlPSIiPi0tIFNlbGVjdCBPbmUgLS08L29wdGlvbj4KCQkJCQk8b3B0aW9uIHZhbHVlPSIxIj4xPC9vcHRpb24+CgkJCQkJPG9wdGlvbiB2YWx1ZT0iMiI+Mjwvb3B0aW9uPgoJCQkJCTxvcHRpb24gdmFsdWU9IjMiPjM8L29wdGlvbj4KCQkJCTwvc2VsZWN0PjwvbGFiZWw+CgoJCQkJPCEtLSBDb25kaXRpb25hbCBzdGF0ZW1lbnQgdG8gc2tpcCBzdGVwcyBvciBhbGVydCAtLT4KCQkJCTxzY3JpcHQgdHlwZT0ic3RhaXJjYXNlL2NvbmRpdGlvbiI+CgkJCQkJaWYocXh4eHggPT0gJzMnKQoJCQkJCXsKCQkJCQkJcmV0dXJuIFN0YWlyY2FzZS5UbygyKSwgZmFsc2U7CgkJCQkJfQoJCQkJCWVsc2UgaWYocXh4eHggPT0gJzInKQoJCQkJCXsKCQkJCQkJcmV0dXJuIGFsZXJ0KCdUaGlzIGlzIGFuIGFsZXJ0IHBvcHVwIGZvciBhbiBpbnZhbGlkIHJlc3BvbnNlJyksIGZhbHNlOwoJCQkJCX0KCQkJCTwvc2NyaXB0PgoKCQkJCTwhLS1OZXh0IGJ1dHRvbi0tPgoJCQkJPGlucHV0IHR5cGU9ImJ1dHRvbiIgY2xhc3M9ImNvbnRpbnVlIiB2YWx1ZT0iTkVYVCIgLz4KCQkJPC9kaXY+CgkJCTxkaXYgY2xhc3M9InN0ZXAiPgoJCQkJPGZpZWxkc2V0IGNsYXNzPSJjaGVja2JveC1ncm91cCIgZXJyb3ItdG9vbHRpcD0iUGxlYXNlIHNlbGVjdCBhdCBsZWFzdCBvbmUgc3ViamVjdCI+CgkJCQkJPGg0PldoYXQgbmV3IHNraWxscyBpbnRlcmVzdCB5b3U/PC9oND4KCQkJCQk8bGFiZWw+PGlucHV0IHR5cGU9ImNoZWNrYm94IiBjbGFzcz0iY2hlY2tib3gtZ3JvdXAtaW5wdXQiIGNoZWNrZWQ9ImNoZWNrZWQiIHZhbHVlPSIxIiBuYW1lPSJxYWFhIj4xPC9sYWJlbD4KCQkJCQk8bGFiZWw+PGlucHV0IHR5cGU9ImNoZWNrYm94IiBjbGFzcz0iY2hlY2tib3gtZ3JvdXAtaW5wdXQiIHZhbHVlPSIyIiBuYW1lPSJxYWFhIj4yPC9sYWJlbD4KCQkJCQk8bGFiZWw+PGlucHV0IHR5cGU9ImNoZWNrYm94IiBjbGFzcz0iY2hlY2tib3gtZ3JvdXAtaW5wdXQiIHZhbHVlPSIzIiBuYW1lPSJxYWFhIj4zPC9sYWJlbD4KCQkJCQk8bGFiZWw+PGlucHV0IHR5cGU9ImNoZWNrYm94IiBjbGFzcz0iY2hlY2tib3gtZ3JvdXAtaW5wdXQiIHZhbHVlPSI0IiBuYW1lPSJxYWFhIj40PC9sYWJlbD4KCQkJCQk8bGFiZWw+PGlucHV0IHR5cGU9ImNoZWNrYm94IiBjbGFzcz0iY2hlY2tib3gtZ3JvdXAtaW5wdXQiIHZhbHVlPSI1IiBuYW1lPSJxYWFhIj41PC9sYWJlbD4KCQkJCTwvZmllbGRzZXQ+CgkJCQk8aW5wdXQgdHlwZT0iYnV0dG9uIiBjbGFzcz0iY29udGludWUiIHZhbHVlPSJORVhUIiAvPgoJCQk8L2Rpdj4KCQkJPGRpdiBjbGFzcz0ic3RlcCI+CgkJCQk8ZGl2IGNsYXNzPSJyYWRpbyI+CgkJCQkJV2hlbiB3b3VsZCB5b3UgbGlrZSB0byBzdGFydCB5b3VyIHN0dWRpZXM/CgkJCQkJPGxhYmVsPjxpbnB1dCB0eXBlPSJyYWRpbyIgdmFsdWU9IjEiIGNoZWNrZWQ9ImNoZWNrZWQiIG5hbWU9InF5eXl5IiAvPiAxPC9sYWJlbD4KCQkJCQk8bGFiZWw+PGlucHV0IHR5cGU9InJhZGlvIiB2YWx1ZT0iMiIgbmFtZT0icXl5eXkiIC8+IDI8L2xhYmVsPgoJCQkJPC9kaXY+CgoJCQkJPCEtLSBDb25kaXRpb25hbCBzdGF0ZW1lbnQgdG8gZ2l2ZSBhbGVydCBvciBnbyB0byBuZXh0IHN0ZXAgLS0+CgkJCQk8c2NyaXB0IHR5cGU9InN0YWlyY2FzZS9jb25kaXRpb24iPgoJCQkJCWlmKHF5eXl5ID09ICcxJykKCQkJCQl7CgkJCQkJCXJldHVybiBhbGVydCgnVGhpcyBpcyBhbiBhbGVydCBwb3B1cCBmb3IgYW4gaW52YWxpZCByZXNwb25zZScpLCBmYWxzZTsKCQkJCQl9CgkJCQk8L3NjcmlwdD4KCgkJCQk8aW5wdXQgdHlwZT0iYnV0dG9uIiBjbGFzcz0iY29udGludWUiIHZhbHVlPSJORVhUIiAvPgoJCQk8L2Rpdj4KCQkJPGRpdiBjbGFzcz0ic3RlcCI+CgkJCQk8IS0tIGpRdWVyeSBVSSBzbGlkZXIgZXhhbXBsZSBpbXBsZW1lbnRhdGlvbiAtLT4KCQkJCTxsYWJlbD5Zb3VyIGFwcHJveGltYXRlIHRvdGFsIGRlYnQ6CgkJCQkJPGlucHV0IHBhdHRlcm49IlswLTldKiIgdHlwZT0ibnVtYmVyIiBpZD0ic2xpZGVyIiB2YWx1ZT0iMCIgc2l6ZT0iMjUiIG5hbWU9InF4eHgiIHZhbGlkYXRlPSJudW1iZXIiIC8+CgkJCQk8L2xhYmVsPgoKCQkJCTwhLS0gQ29uZGl0aW9uYWwgc3RhdGVtZW50IHRvIGdpdmUgYWxlcnQgb3Igc3VibWl0LCB3aXRoICJsZXNzIHRoYW4iIGNvbmRpdGlvbmFsIC0tPgoJCQkJPHNjcmlwdCB0eXBlPSJzdGFpcmNhc2UvY29uZGl0aW9uIj4KCQkJCQlpZihwYXJzZUZsb2F0KHF4eHgpIDwgMTAwMCkKCQkJCQl7CgkJCQkJCXJldHVybiBhbGVydCgnU29ycnksIHlvdXIgdG90YWwgZGVidCBtdXN0IGJlIGF0IGxlYXN0IMKjMSwwMDAuJyksIGZhbHNlOwoJCQkJCX0KCQkJCTwvc2NyaXB0PgoKCQkJCTxpbnB1dCB0eXBlPSJidXR0b24iIGNsYXNzPSJjb250aW51ZSIgdmFsdWU9Ik5FWFQiIC8+CgkJCTwvZGl2PgoJCQk8ZGl2IGNsYXNzPSJzdGVwIj4KCQkJCTwhLS0gU3RhbmRhcmQgQU1QIGRhdGEgcG9pbnRzIGZvciBiYXNpYyB1c2VyIGRhdGEsIGlsbHVzdHJhdGluZyB2YXJpb3VzIHZhbGlkYXRpb24gcmVxdWlyZW1lbnRzIC0tPgoJCQkJPGxhYmVsIGNsYXNzPSJmaXJzdCI+VGl0bGUKCQkJCTxzZWxlY3QgbmFtZT0icTIyIiBjbGFzcz0idGl0bGUiIHZhbGlkYXRlPSJzZWxlY3QiIGF1dG9jb21wbGV0ZT0iaG9ub3JpZmljLXByZWZpeCI+CgkJCQkJPG9wdGlvbiB2YWx1ZT0iIj4tLSBTZWxlY3QgT25lLS0gPC9vcHRpb24+CgkJCQkJPG9wdGlvbiB2YWx1ZT0iTXIiPk1yPC9vcHRpb24+CgkJCQkJPG9wdGlvbiB2YWx1ZT0iTXJzIj5NcnM8L29wdGlvbj4KCQkJCQk8b3B0aW9uIHZhbHVlPSJNaXNzIj5NaXNzPC9vcHRpb24+CgkJCQkJPG9wdGlvbiB2YWx1ZT0iTXMiPk1zPC9vcHRpb24+CgkJCQkJPG9wdGlvbiB2YWx1ZT0iT3RoZXIiPk90aGVyPC9vcHRpb24+CgkJCQk8L3NlbGVjdD48L2xhYmVsPgoKCQkJCTxsYWJlbD5GdWxsIE5hbWUKCQkJCTxpbnB1dCB0eXBlPSJ0ZXh0IiBjbGFzcz0ibmFtZSIgdmFsdWU9IiIgc2l6ZT0iMjUiIG5hbWU9InEyIiB2YWxpZGF0ZT0ibmFtZSIgYXV0b2NvbXBsZXRlPSJuYW1lIiBieXBhc3NfdmFsaWRhdGlvbj0iMSIgLz48L2xhYmVsPgoKCQkJCTxsYWJlbD5MYXN0IE5hbWUKCQkJCTxpbnB1dCB0eXBlPSJ0ZXh0IiBjbGFzcz0ic3VybmFtZSIgdmFsdWU9IiIgc2l6ZT0iMjUiIG5hbWU9InEzIiB2YWxpZGF0ZT0ibmFtZSIgYXV0b2NvbXBsZXRlPSJmYW1pbHktbmFtZSIgYnlwYXNzX3ZhbGlkYXRpb249IjEiIC8+PC9sYWJlbD4KCgkJCQk8bGFiZWwgZXJyb3ItdG9vbHRpcD0iUGxlYXNlIEVudGVyIGEgVmFsaWQgRW1haWwgQWRkcmVzcyI+RW1haWwgQWRkcmVzcwoJCQkJPGlucHV0IHR5cGU9ImVtYWlsIiBjbGFzcz0iZW1haWwiIHZhbHVlPSIiIG5hbWU9InExIiB2YWxpZGF0ZT0iZW1haWwiIGF1dG9jb21wbGV0ZT0iZW1haWwiPjwvbGFiZWw+CgoJCQkJPGxhYmVsIGVycm9yLXRvb2x0aXA9IlBsZWFzZSBFbnRlciBhIFZhbGlkIFBob25lIE51bWJlciI+VGVsZXBob25lIE51bWJlcgoJCQkJPGlucHV0IHR5cGU9InRlbCIgY2xhc3M9InBob25lIiB2YWx1ZT0iIiBuYW1lPSJxMTAxNzMiIG1heGxlbmd0aD0iMTEiIHZhbGlkYXRlPSJwaG9uZVswXSIgYXV0b2NvbXBsZXRlPSJ0ZWwtbmF0aW9uYWwiIGJ5cGFzc192YWxpZGF0aW9uPSIxIiAvPjwvbGFiZWw+CgoJCQkJPGxhYmVsIGVycm9yLXRvb2x0aXA9IlBsZWFzZSBFbnRlciBhIFZhbGlkIE1vYmlsZSBOdW1iZXIiPk1vYmlsZSBOdW1iZXIgKE9wdGlvbmFsKQoJCQkJPGlucHV0IHR5cGU9InRlbCIgY2xhc3M9Im1waG9uZSIgdmFsdWU9IiIgbmFtZT0icTEwMTc0IiBtYXhsZW5ndGg9IjExIiB2YWxpZGF0ZT0icGhvbmVbMV0iIG9wdGlvbmFsPSJ0cnVlIiBhdXRvY29tcGxldGU9InRlbC1uYXRpb25hbCIgYnlwYXNzX3ZhbGlkYXRpb249IjEiIC8+PC9sYWJlbD4KCgkJCQk8bGFiZWwgZXJyb3ItdG9vbHRpcD0iUGxlYXNlIGVudGVyIHlvdXIgZGF5IG9mIGJpcnRoIGluIHRoZSBjb3JyZWN0IGZvcm1hdCIgPkRhdGUgb2YgQmlydGg6IDxzcGFuPkRheSAoREQpPC9zcGFuPjxpbnB1dCB0eXBlPSJudW1iZXIiIGNsYXNzPSJkYXkiIHZhbHVlPSIiIG5hbWU9InExMiIgbWF4bGVuZ3RoPSIyIiBpZD0iZG9iZGF0ZSIgdmFsaWRhdGU9Im51bWJlclswXSIgcGF0dGVybj0iWzAtOV0qIiBtaW49IjAiIG1heD0iMzEiIGF1dG9jb21wbGV0ZT0iYmRheSIgcGxhY2Vob2xkZXI9IkREIiBlcnJvci10b29sdGlwPSJQbGVhc2UgZW50ZXIgYSB2YWxpZCBkYXRlIG9mIGJpcnRoIj48L2xhYmVsPgoJCQkJPGxhYmVsIGVycm9yLXRvb2x0aXA9IlBsZWFzZSBlbnRlciB5b3VyIG1vbnRoIG9mIGJpcnRoIGluIHRoZSBjb3JyZWN0IGZvcm1hdCIgPjxzcGFuPk1vbnRoIChNTSk8L3NwYW4+PGlucHV0IHR5cGU9Im51bWJlciIgY2xhc3M9Im1vbnRoIiB2YWx1ZT0iIiBuYW1lPSJxMTEiIG1heGxlbmd0aD0iMiIgdmFsaWRhdGU9Im51bWJlclswXSIgcGF0dGVybj0iWzAtOV0qIiBtaW49IjAiIG1heD0iMTIiIGF1dG9jb21wbGV0ZT0iYmRheSIgcGxhY2Vob2xkZXI9Ik1NIiBpZD0iZG9ibW9udGgiPjwvbGFiZWw+CgkJCQk8bGFiZWwgZXJyb3ItdG9vbHRpcD0iUGxlYXNlIGVudGVyIHlvdXIgeWVhciBvZiBiaXJ0aCBpbiB0aGUgY29ycmVjdCBmb3JtYXQiID48c3Bhbj5ZZWFyIChZWVlZKTwvc3Bhbj48aW5wdXQgdHlwZT0ibnVtYmVyIiBjbGFzcz0ieWVhciIgdmFsdWU9IiIgbmFtZT0icTEzIiBtYXhsZW5ndGg9IjQiIHZhbGlkYXRlPSJudW1iZXJbMF0iIHBhdHRlcm49IlswLTldKiIgbWluPSIxOTAwIiBtYXg9IjIwMDAiIGF1dG9jb21wbGV0ZT0iYmRheSIgcGxhY2Vob2xkZXI9IllZWVkiIGlkPSJkb2J5ZWFyIj48L2xhYmVsPgoKCQkJCTxsYWJlbD5Qb3N0Y29kZQoJCQkJPGlucHV0IHR5cGU9InRleHQiIGNsYXNzPSJwb3N0Y29kZSIgbmFtZT0icTgiIHZhbHVlPSIiIHZhbGlkYXRlPSJwb3N0Y29kZSIgYWRkcmVzcy1sb29rdXA9InE0LCBxNiwgcTEwIiBhdXRvY29tcGxldGU9InBvc3RhbC1jb2RlIiBieXBhc3NfdmFsaWRhdGlvbj0iMSIgLz48L2xhYmVsPgoKCQkJCTxsYWJlbD5BZGRyZXNzIDEKCQkJCTxpbnB1dCB0eXBlPSJ0ZXh0IiBjbGFzcz0iYWRkcmVzczEiIG5hbWU9InE0IiB2YWx1ZT0iIiB2YWxpZGF0ZT0iZGVmYXVsdCIgYXV0b2NvbXBsZXRlPSJhZGRyZXNzLWxpbmUxIiBieXBhc3NfdmFsaWRhdGlvbj0iMSIgLz48L2xhYmVsPgoKCQkJCTxsYWJlbCBub3QtcmVxdWlyZWQ9InRydWUiPkFkZHJlc3MgMiAob3B0aW9uYWwpCgkJCQk8aW5wdXQgdHlwZT0idGV4dCIgY2xhc3M9ImFkZHJlc3MyIiBuYW1lPSJxNSIgdmFsdWU9IiIgdmFsaWRhdGU9ImRlZmF1bHQiIGF1dG9jb21wbGV0ZT0iYWRkcmVzcy1saW5lMiIgYnlwYXNzX3ZhbGlkYXRpb249IjEiIC8+PC9sYWJlbD4KCgkJCQk8bGFiZWw+Q2l0eQoJCQkJPGlucHV0IHR5cGU9InRleHQiIGNsYXNzPSJjaXR5IiBuYW1lPSJxNiIgdmFsdWU9IiIgdmFsaWRhdGU9ImRlZmF1bHQiIGF1dG9jb21wbGV0ZT0ibG9jYWxpdHkgY2l0eSIgYnlwYXNzX3ZhbGlkYXRpb249IjEiIC8+PC9sYWJlbD4KCgkJCQk8bGFiZWw+Q291bnR5CgkJCQk8aW5wdXQgdHlwZT0idGV4dCIgY2xhc3M9ImNvdW50eSIgbmFtZT0icTEwMTgwIiB2YWx1ZT0iIiB2YWxpZGF0ZT0iZGVmYXVsdCIgYXV0b2NvbXBsZXRlPSJzdGF0ZSBwcm92aW5jZSByZWdpb24iIGJ5cGFzc192YWxpZGF0aW9uPSIxIiAvPjwvbGFiZWw+CgoJCQkJPGxhYmVsPkNvdW50cnkKCQkJCTxpbnB1dCB0eXBlPSJ0ZXh0IiBjbGFzcz0iY291bnRyeSIgbmFtZT0icTEwIiB2YWx1ZT0iIiB2YWxpZGF0ZT0iZGVmYXVsdCIgYXV0b2NvbXBsZXRlPSJjb3VudHJ5LW5hbWUiIGJ5cGFzc192YWxpZGF0aW9uPSIxIiAvPjwvbGFiZWw+CgoJCQkJPGlucHV0IHR5cGU9InN1Ym1pdCIgdmFsdWU9Ik5FWFQiIC8+CgkJCTwvZGl2Pg==-->
 		</section><!-- end .staircase -->
 	</body>
 </html>
