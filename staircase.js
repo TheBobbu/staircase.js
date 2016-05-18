@@ -1432,6 +1432,11 @@
 								$step.Validate(input[0], false);
 							}
 						}
+						else
+						{
+							// Run staircase validation with a forced value to tell the step if it can continue or not
+							$step.Validate(input[0], !(result.status.trim().toLowerCase() == 'invalid'));
+						}
 
 						// If logging is enabled
 						if(options.APIs.briteverify.logging && !cached)
@@ -1451,9 +1456,8 @@
 						scoreField.val(result.status);
 					});
 				}
-
 				// If the input utilizes Data8 integration
-				if((input.attr('d8') || input.attr('d8-lookup-street')) && input[0].value && $options.APIs.data8 && $options.APIs.data8.APIKey)
+				else if((input.attr('d8') || input.attr('d8-lookup-street')) && input[0].value && $options.APIs.data8 && $options.APIs.data8.APIKey)
 				{
 					// If the input requires extra Data8 validation
 					if(input.attr('d8'))
