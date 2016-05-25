@@ -3,8 +3,8 @@
 ;(function()
 {
 	// Version Information
-	window.$scv = '5.2.5';
-	window.$scb = '136b';
+	window.$scv = '5.2.6';
+	window.$scb = '32a';
 
 	// Cookie setter and getter
 	window.Cookies =
@@ -868,6 +868,13 @@
 
 			if(validate)
 			{
+				// If we are dealing with email or telephone validation
+				if(validate.match(/^(email|(tele)?phone|mobile|landline)$/))
+				{
+					// Strip all whitespace from the input value
+					input.val(input.val().replace(/\s/g, '').trim());
+				}
+
 				// Trigger the beforevalidate event
 				if($staircase.trigger('beforevalidate', [input]) === false)
 				{
@@ -1184,7 +1191,7 @@
 					{
 						if($(this).attr('optional'))
 						{
-							if($(this).val() && !$step.Validate(this))
+							if($(this).val().trim() && !$step.Validate(this))
 							{
 								result = false;
 							}
@@ -1206,7 +1213,7 @@
 					return false;
 				}
 
-				var valid = (forcevalid !== undefined) ? (!!forcevalid) : (input.attr('optional') ? (!input.val() || !!$staircase.Validate(input)) : !!$staircase.Validate(input)), // Convert the validation result to a boolean
+				var valid = (forcevalid !== undefined) ? (!!forcevalid) : (input.attr('optional') ? (!input.val().trim() || !!$staircase.Validate(input)) : !!$staircase.Validate(input)), // Convert the validation result to a boolean
 					label = input.closest('label').length ? input.closest('label') : ((input.attr('id') && $('label[for="' + input.attr('id') + '"]').length) ? $('label[for="' + input.attr('id') + '"]') : false), // Find this input's label
 					apply = $(label ? label.add(input) : input);
 
