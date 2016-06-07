@@ -3,8 +3,8 @@
 ;(function()
 {
 	// Version Information
-	window.$scv = '5.2.6';
-	window.$scb = '32a';
+	window.$scv = '5.2.7';
+	window.$scb = '81a';
 
 	// Cookie setter and getter
 	window.Cookies =
@@ -1698,6 +1698,11 @@
 													addr = addr.join(', ');
 
 													sel.append('<option value="' + addr + '" city="' + trueaddr[3] + '">' + addr + '</option>');
+
+													if(lookupcity && trueaddr[3] && lookupcity[0].value != trueaddr[3])
+													{
+														lookupcity.val(trueaddr[3]);
+													}
 												}
 
 												sel.append('<option value="N/A">My address is not listed here</option>');
