@@ -939,6 +939,25 @@
 
 						return valid;
 					}
+					// If the validator is looking for a radiobox with at least one box in the radio series checked
+					if(validate == 'exists' && input.attr('type') == 'radio' && input.attr('name'))
+					{
+						var // Retrieve all checked checkboxes in the radio series
+							checked = $('input[type="radio"][name="' + input.attr('name') + '"]:checked'),
+							// Valid if a checked radiobox exists in the radio series
+							valid = !!(checked.length > 0),
+							// Trigger the validate events
+							trigresponse = $staircase.trigger('aftervalidate validate', [checked, valid]);
+
+						console.log(input, checked);
+
+						if(trigresponse === true || trigresponse === false)
+						{
+							return trigresponse;
+						}
+
+						return valid;
+					}
 
 					// Find the element's corresponding regular expression
 					var exp = $staircase.Patterns,
