@@ -4,7 +4,7 @@
 {
 	// Version Information
 	window.$scv = '5.2.7';
-	window.$scb = '81a';
+	window.$scb = '82a';
 
 	// Cookie setter and getter
 	window.Cookies =
@@ -301,7 +301,16 @@
 						{
 							clearTimeout(timeout);
 
-							success(result, !!result.Result.ValidationResult.trim().match(/^(nocoverage|valid)$/i));
+							var valid = !!result.Result.ValidationResult.trim().match(/^(nocoverage|valid)$/i);
+
+							if(result.Status.CreditsRemaining == '0')
+							{
+								valid = true;
+
+								result.OutOfCredits = true;
+							}
+
+							success(result, valid);
 						});
 					break;
 
@@ -949,8 +958,6 @@
 							// Trigger the validate events
 							trigresponse = $staircase.trigger('aftervalidate validate', [checked, valid]);
 
-						console.log(input, checked);
-
 						if(trigresponse === true || trigresponse === false)
 						{
 							return trigresponse;
@@ -1587,7 +1594,7 @@
 								{
 									lookupcity = $('<input type="hidden" name="' + input.attr('d8-lookup-city') + '" />').insertAfter(lookuptarget);
 
-									$staircase.trigger('data8lookupcityappended', [lookupcity]);
+									$staircase.trigger('data8lookupcityappended', [input, lookupcity]);
 								}
 							}
 
@@ -1740,7 +1747,7 @@
 										}
 
 										// Trigger the data8lookup event
-										$staircase.trigger('data8lookup', [input, lookuptarget, address]);
+										$staircase.trigger('data8lookup', [input, response]);
 									});
 								});
 							}
