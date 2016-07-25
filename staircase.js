@@ -4,7 +4,7 @@
 {
 	// Version Information
 	window.$scv = '5.2.7';
-	window.$scb = '82a';
+	window.$scb = '83a';
 
 	// Cookie setter and getter
 	window.Cookies =
@@ -766,29 +766,41 @@
 		// Regular Expression Store
 		$staircase.Patterns =
 		{
-			'currency':		/^(-)?([^a-zA-Z0-9 ])?([0-9\,]+)(\.([0-9]{2,}))?$/,
-			'date':			[/^([0-9]{1,2})(\/|-|\.|,| )([0-9]{1,2})(\/|-|\.|,| )([0-9]{2,4})$/, /^((mon|monday|tue|tues|tuesday|wed|wednesday|thu|thurs|thursday|fri|friday|sat|saturday|sun|sunday)([\s]+))?([0-9]{1,2})(st|nd|rd|th)?([\s]+)?(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)([\s]+)?([0-9]{2,4})$/i, /^([0-9]{2})$/, /^(1|2)([0-9]{3})$/],
-			'datepicker':	/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/,
-			'default':		/^(?!\s*$).+/,
-			'email':		/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
-			'filename':		/^(([^\/\\\?%\*:|"<>]+)?\.([^\/\\\?%\*:|"<>\.]+)|([^\/\\\?%\*:|"<>\.]+))$/,
-			'name':			/^([ A-Za-z\.\-']+)$/,
-			'number':		[/^-?([0-9]+)$/, /^-?([0-9]+)\.([0-9]+)$/, /^([0-9]+)$/, /^([0-9]+)\.([0-9]+)$/, /^-?([0-9]+)(\.([0-9]+))?$/],
+			'currency':			/^(-)?([^a-zA-Z0-9 ])?([0-9\,]+)(\.([0-9]{2,}))?$/,
+			'date':
+			[
+				/^([0-9]{1,2})(\/|-|\.|,| )([0-9]{1,2})(\/|-|\.|,| )([0-9]{2,4})$/,
+				/^((mon|monday|tue|tues|tuesday|wed|wednesday|thu|thurs|thursday|fri|friday|sat|saturday|sun|sunday)([\s]+))?([0-9]{1,2})(st|nd|rd|th)?([\s]+)?(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)([\s]+)?([0-9]{2,4})$/i,
+				/^([0-9]{2})$/,
+				/^(1|2)([0-9]{3})$/
+			],
+			'datepicker':		/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/,
+			'default':			/^(?!\s*$).+/,
+			'email':			/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
+			'filename':			/^(([^\/\\\?%\*:|"<>]+)?\.([^\/\\\?%\*:|"<>\.]+)|([^\/\\\?%\*:|"<>\.]+))$/,
+			'fullname':			/^([A-Za-z\.\-\']{2,})( ([A-Za-z\.\-\']+)){1,}$/,
+			'name':				/^([ A-Za-z\.\-']+)$/,
+			'number':
+			[
+				/^-?([0-9]+)$/,
+				/^-?([0-9]+)\.([0-9]+)$/,
+				/^([0-9]+)$/,
+				/^([0-9]+)\.([0-9]+)$/,
+				/^-?([0-9]+)(\.([0-9]+))?$/
+			],
 			'phone':
 			[
-				function(){ return this.replace(/\s/g, '').match(/^0(?!.*(\d)\1{9,})\d{9,}$/); },
-				function(){ return this.replace(/\s/g, '').match(/^07(?!.*(\d)\1{9,})\d{9,}$/); },
-				function(){ return this.replace(/\s/g, '').match(/^0(?!.*(\d)\1{9,})\d{9,}$/); },
-				///^(\+([0-9]{1,5})|0)(?!.*(\d)\1{9,})\d{9,}$/,
+				function(){ return this.replace(/\s/g, '').match(/^0(?!.*(\d)\1{9,})\d{9,}$/) },
+				function(){ return this.replace(/\s/g, '').match(/^07(?!.*(\d)\1{9,})\d{9,}$/) },
+				function(){ return this.replace(/\s/g, '').match(/^0(?!.*(\d)\1{9,})\d{9,}$/) },
 				/^0(?!.*(\d)\1{9,})\d{9,}$/,
-				///^(\+([0-9]{1,5})|07)(?!.*(\d)\1{9,})\d{9,}$/,
 				/^07(?!.*(\d)\1{9,})\d{9,}$/,
-				///^(\+33|0)(?!.*(\d)\1{9,})\d{9,}$/
 				/^0(?!.*(\d)\1{9,})\d{9,}$/
 			],
-			'postcode':		/^(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))$/,
-			'time':			/^([0-9]{1,2}):([0-9]{2})(:([0-9]{2}))?([\s]+)?(am|pm)?$/i,
-			'zipcode':		/^(^\d{5}$)|(^\d{5}-\d{4}$)$/
+			'postcode':			/^(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))$/,
+			'time':				/^([0-9]{1,2}):([0-9]{2})(:([0-9]{2}))?([\s]+)?(am|pm)?$/i,
+			'nationalphone':	/^0([1-9])(?!.*(\d)\1{6,9})\d{6,9}$/,
+			'zipcode':			/^(^\d{5}$)|(^\d{5}-\d{4}$)$/
 		};
 
 		// Prevent code inflation by copying objects
