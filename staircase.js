@@ -388,7 +388,7 @@
 				{
 					clearTimeout(timeout);
 
-					success(result, !!(result.Results.length > 0));
+					success(result, true);
 				});
 
 			return $this;
@@ -890,7 +890,7 @@
 			if(validate)
 			{
 				// If we are dealing with email or telephone validation
-				if(validate.match(/^(email|(tele)?phone|mobile|landline)$/))
+				if(validate.match(/^(email|(tele|national)?phone|mobile|landline|(post|zip)code)$/))
 				{
 					// Strip all whitespace from the input value
 					input.val(input.val().replace(/\s/g, '').trim());
