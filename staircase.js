@@ -1721,11 +1721,11 @@
 													var addr = [],
 														trueaddr = [];
 
-													for(var j = 0; j < (response.Results[i].Address.Lines.length - 4); j ++)
+													for(var j = 0; j < (response.Results[i].Address.Lines.length - 1); j ++)
 													{
 														var ln = response.Results[i].Address.Lines[j];
 
-														if(ln)
+														if(ln < 2)
 														{
 															addr.push(ln);
 														}
