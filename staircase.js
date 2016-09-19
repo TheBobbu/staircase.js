@@ -1727,7 +1727,9 @@
 
 														if(j < 2)
 														{
-															addr.push(ln);
+															if (ln != "") {
+																addr.push(ln);
+															}
 														}
 
 														trueaddr.push(ln);
