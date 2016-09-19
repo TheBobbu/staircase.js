@@ -1721,7 +1721,7 @@
 													var addr = [],
 														trueaddr = [];
 
-													for(var j = 0; j < (response.Results[i].Address.Lines.length - 1); j ++)
+													for(var j = 0; j < (response.Results[i].Address.Lines.length - 2); j ++)
 													{
 														var ln = response.Results[i].Address.Lines[j];
 
@@ -1733,7 +1733,7 @@
 														trueaddr.push(ln);
 													}
 
-													addr = addr.join(', ');
+													addr = addr.join(' ');
 
 													sel.append('<option value="' + addr + '" city="' + trueaddr[3] + '">' + addr + '</option>');
 
