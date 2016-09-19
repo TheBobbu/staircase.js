@@ -1733,7 +1733,7 @@
 														trueaddr.push(ln);
 													}
 
-													addr = addr.join(' ');
+													addr = addr.join(', ');
 
 													sel.append('<option value="' + addr + '" city="' + trueaddr[3] + '">' + addr + '</option>');
 
