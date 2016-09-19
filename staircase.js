@@ -1721,7 +1721,7 @@
 													var addr = [],
 														trueaddr = [];
 
-													for(var j = 0; j < (response.Results[i].Address.Lines.length - 2); j ++)
+													for(var j = 0; j < (response.Results[i].Address.Lines.length - 4); j ++)
 													{
 														var ln = response.Results[i].Address.Lines[j];
 
