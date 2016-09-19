@@ -1725,7 +1725,7 @@
 													{
 														var ln = response.Results[i].Address.Lines[j];
 
-														if(ln < 2)
+														if(j < 2)
 														{
 															addr.push(ln);
 														}
