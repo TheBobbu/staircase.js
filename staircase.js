@@ -1595,12 +1595,12 @@
 						if(!lastvalidated || lastvalidated != input.val().replace(/[^a-zA-Z0-9]/g, '').toUpperCase())
 						{
 							var // Get the target input
-								lookuptarget = $('*[name="' + input.attr('d8-lookup-street').toLowerCase().trim() + '"]'),
+								lookuptarget = $('*[name="' + input.attr('d8-lookup-street').trim() + '"]'),
 								lookupcity = input.attr('d8-lookup-city') || '';
 
 							if(lookupcity)
 							{
-								lookupcity = $('*[name="' + lookupcity.toLowerCase().trim() + '"]');
+								lookupcity = $('*[name="' + lookupcity.trim() + '"]');
 
 								if(lookupcity.length == 0)
 								{
