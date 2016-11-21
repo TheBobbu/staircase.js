@@ -1,11 +1,11 @@
-# Staircase 5.2.3
+# Staircase 5.2.7
 
 Staircase is a lightweight framework for online form validation and auto population.
 Requires jQuery 1.8 or later.
 
 To embed Staircase in your document, simply add the following script tag below jQuery:  
 
-`<script type="text/javascript" src="http://staircase.tech/5.2.3/staircase.min.js"></script>`
+`<script type="text/javascript" src="http://staircase.tech/5.2.7/staircase.min.js"></script>`
 
 
 If you want to live on the bleeding edge (we advise against this as Staircase is always evolving and features may change), you can instead use the following:
