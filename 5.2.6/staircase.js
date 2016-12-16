@@ -503,7 +503,7 @@
 						success(data);
 					},
 					type: 'get',
-					url: 'http://beta.staircase.tech/api/ext/bv'
+					url: 'http://www.staircase.tech/beta/'
 				});
 			}
 
@@ -589,7 +589,7 @@
 			$.ajax(
 			{
 				type: 'post',
-				url: 'http://beta.staircase.tech/api/log',
+				url: 'http://www.staircase.tech/log/',
 				data:
 				{
 					data: data,

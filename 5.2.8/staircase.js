@@ -1,11 +1,47 @@
-/* Staircase | © Zeta Interactive 2013 - 2015 */
+/* Staircase | © Zeta Interactive 2013 - 2016 */
 
 ;(function()
 {
-	// Save the version number for reference
-	window.$staircase = '5.2.5';
+	// Version Information
+	window.$scv = '5.2.8';
+	window.$scb = '83a';
 
-	// Some helpful polyfills
+	// Cookie setter and getter
+	window.Cookies =
+	{
+		get: function(key)
+		{
+			var cookies = document.cookie.split(';');
+
+			for(var i = 0; i < cookies.length; i++)
+			{
+				if(cookies[i].split('=')[0] == key)
+				{
+					return cookies[i].substr(key.length + 1);
+				}
+			}
+
+			return null;
+		},
+		set: function(key, val, days)
+		{
+			if(days !== undefined)
+			{
+				var exp = new Date();
+					exp.setTime(exp.getTime() + (days * 24 * 60 * 60 * 1000));
+			}
+
+			document.cookie = key + "=" + val + (days ? "; expires=" + exp.toGMTString() : "") + "; path=/";
+
+			return window.Cookies;
+		},
+		remove: function(key)
+		{
+			return window.Cookies.set(key, null, -1);
+		}
+	};
+
+	// Polyfills
 	String.prototype.trim = function(a){var b=this,c,l=0,i=0;b+='';if(!a){c=' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'}else{a+='';c=a.replace(/([\[\]\(\)\.\?\/\*\{\}\+\$\^\:])/g,'$1')}l=b.length;for(i=0;i<l;i++){if(c.indexOf(b.charAt(i))===-1){b=b.substring(i);break}}l=b.length;for(i=l-1;i>=0;i--){if(c.indexOf(b.charAt(i))===-1){b=b.substring(0,i+1);break}}return c.indexOf(b.charAt(0))===-1?b:''};
 	String.prototype.hash = function(c){var a='',b='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>!:;,.$';c=c?c:8;for(var i=0;i<c;i++)a+=b.charAt(Math.floor(Math.random()*b.length));return a};
 	Number.prototype.toDate = function date(k){var d,a,h="Sun Mon Tues Wednes Thurs Fri Satur January February March April May June July August September October November December".split(" "),f=/\\?(.?)/gi,g=function(b,c){return a[b]?a[b]():c},e=function(b,a){for(b=String(b);b.length<a;)b="0"+b;return b};a={d:function(){return e(a.j(),2)},D:function(){return a.l().slice(0,3)},j:function(){return d.getDate()},l:function(){return h[a.w()]+"day"},N:function(){return a.w()||7},S:function(){var b=a.j(),c=b%10;3>=c&&1==parseInt(b%100/10,10)&&(c=0);return["st","nd","rd"][c-1]||"th"},w:function(){return d.getDay()},z:function(){var b=new Date(a.Y(),a.n()-1,a.j()),c=new Date(a.Y(),0,1);return Math.round((b-c)/864E5)},W:function(){var b=new Date(a.Y(),a.n()-1,a.j()-a.N()+3),c=new Date(b.getFullYear(),0,4);return e(1+Math.round((b-c)/864E5/7),2)},F:function(){return h[6+a.n()]},m:function(){return e(a.n(),2)},M:function(){return a.F().slice(0,3)},n:function(){return d.getMonth()+1},t:function(){return(new Date(a.Y(),a.n(),0)).getDate()},L:function(){var b=a.Y();return 0===b%4&0!==b%100|0===b%400},o:function(){var b=a.n(),c=a.W();return a.Y()+(12===b&&9>c?1:1===b&&9<c?-1:0)},Y:function(){return d.getFullYear()},y:function(){return a.Y().toString().slice(-2)},a:function(){return 11<d.getHours()?"pm":"am"},A:function(){return a.a().toUpperCase()},B:function(){var a=3600*d.getUTCHours(),c=60*d.getUTCMinutes(),f=d.getUTCSeconds();return e(Math.floor((a+c+f+3600)/86.4)%1E3,3)},g:function(){return a.G()%12||12},G:function(){return d.getHours()},h:function(){return e(a.g(),2)},H:function(){return e(a.G(),2)},i:function(){return e(d.getMinutes(),2)},s:function(){return e(d.getSeconds(),2)},u:function(){return e(1E3*d.getMilliseconds(),6)},e:function(){throw"Not supported (see source code of date() for timezone on how to add support)";},I:function(){var b=new Date(a.Y(),0),c=Date.UTC(a.Y(),0),d=new Date(a.Y(),6),e=Date.UTC(a.Y(),6);return b-c!==d-e?1:0},O:function(){var a=d.getTimezoneOffset(),c=Math.abs(a);return(0<a?"-":"+")+e(100*Math.floor(c/60)+c%60,4)},P:function(){var b=a.O();return b.substr(0,3)+":"+b.substr(3,2)},T:function(){return"UTC"},Z:function(){return 60*-d.getTimezoneOffset()},c:function(){return"Y-m-d\\TH:i:sP".replace(f,g)},r:function(){return"D, d M Y H:i:s O".replace(f,g)},U:function(){return d/1E3|0}};return function(a,c){d=void 0===c?new Date:c instanceof Date?new Date(c):new Date(1E3*c);return a.replace(f,g)}(k,this)};
@@ -199,26 +235,26 @@
 
 			if($this.Cache[type] && $this.Cache[type][value])
 			{
-				if($this.Cache[type][value] !== 'loading')
+				if(typeof $this.Cache[type][value] != 'object')
 				{
-					callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid, $this.Cache[type][value]);
+					return $this;
 				}
 
-				return $this;
-			}
+				if(!($this.Cache[type][value]['TimedOut'] || false))
+				{
+					callback.call($this, $this.Cache[type][value], true);
 
-			for(var i in window.Staircases)
-			{
-				window.Staircases[i].trigger('data8', [$this, window.Staircases[i], null]);
+					return $this;
+				}
 			}
 
 			var success = function(result, valid)
 			{
 				$this.Cache[type][value] = result;
 				$this.Cache[type][value].RequestDuration = ((new Date * 1) - timeoutstarted) / 1000;
-				$this.Cache[type][value].IsValid = !!valid;
+				$this.Cache[type][value].IsValid = valid;
 
-				callback.call($this.Cache[type][value], $this.Cache[type][value].IsValid, $this.Cache[type][value]);
+				callback.call($this, $this.Cache[type][value], false);
 			},
 
 			timeoutstarted = new Date * 1,
@@ -232,7 +268,7 @@
 					TimedOut: true
 				};
 
-				success.call($this.Cache[type][value], $this.Cache[type][value].IsValid, $this.Cache[type][value]);
+				success($this.Cache[type][value], $this.Cache[type][value].IsValid);
 			}, 5000);
 
 			if(!$this.Cache[type])
@@ -250,29 +286,31 @@
 						{
 							clearTimeout(timeout);
 
-							success.call(this, result, result.Result.trim().match(/^(catchall|error|greylisted|inconclusive|valid)$/i));
+							success(result, !!result.Result.trim().match(/^(catchall|error|greylisted|inconclusive|valid)$/i));
 						});
 					break;
 
-				case 'mobile':
+				case 'mobile': case 'landline': case 'telephone': case 'phone':
 					value = value.replace(/[^0-9\+]/g, '');
-					var caller = new data8.mobilevalidation();
-						caller.isvalid(value, null, function(result)
+					var caller = new data8.internationaltelephonevalidation();
+						caller.isvalid(value, $this.DefaultCountry,
+						[
+							new data8.option('UseMobileValidation', 'true'),
+							new data8.option('UseLineValidation', 'true')
+						], function(result)
 						{
 							clearTimeout(timeout);
 
-							success.call(this, result, result.Result.trim().match(/^(blank|error|success|timedout|unavailable)$/i));
-						});
-					break;
+							var valid = !!result.Result.ValidationResult.trim().match(/^(nocoverage|valid)$/i);
 
-				case 'landline': case 'telephone': case 'phone':
-					value = value.replace(/[^0-9\+]/g, '');
-					var caller = new data8.telephonelinevalidation();
-						caller.isvalid(value, null, function(result)
-						{
-							clearTimeout(timeout);
+							if(result.Status.CreditsRemaining == '0')
+							{
+								valid = true;
 
-							success.call(this, result, result.Result.trim().match(/^(ambiguous|error|foreign|numberchanged|tempinvalid|valid)$/i));
+								result.OutOfCredits = true;
+							}
+
+							success(result, valid);
 						});
 					break;
 
@@ -297,26 +335,26 @@
 
 			if($this.Cache.Addresses && $this.Cache.Addresses[pckey])
 			{
-				if($this.Cache.Addresses[pckey] !== 'loading')
+				if(typeof $this.Cache.Addresses[pckey] != 'object')
 				{
-					callback.call($this, $this.Cache.Addresses[pckey], postcode);
+					return $this;
 				}
 
-				return $this;
-			}
+				if(!($this.Cache.Addresses[pckey]['TimedOut'] || false))
+				{
+					callback.call($this, $this.Cache.Addresses[pckey], postcode, true);
 
-			for(var i in window.Staircases)
-			{
-				window.Staircases[i].trigger('data8lookup', [$this, window.Staircases[i], postcode, null]);
+					return $this;
+				}
 			}
 
 			var success = function(result, valid)
 			{
 				$this.Cache.Addresses[pckey] = result;
 				$this.Cache.Addresses[pckey].RequestDuration = ((new Date * 1) - timeoutstarted) / 1000;
-				$this.Cache.Addresses[pckey].IsValid = !!valid;
+				$this.Cache.Addresses[pckey].IsValid = valid;
 
-				callback.call($this, $this.Cache.Addresses[pckey], postcode, $this.Cache.Addresses[pckey]);
+				callback.call($this, $this.Cache.Addresses[pckey], postcode, false);
 			},
 
 			timeoutstarted = new Date * 1,
@@ -325,12 +363,12 @@
 			{
 				$this.Cache.Addresses[pckey] =
 				{
-					IsValid: false,
+					IsValid: true,
 					RequestDuration: ((new Date * 1) - timeoutstarted) / 1000,
 					TimedOut: true
 				};
 
-				success.call($this.Cache.Addresses[pckey], $this.Cache.Addresses[pckey].IsValid, $this.Cache.Addresses[pckey]);
+				success($this.Cache.Addresses[pckey], $this.Cache.Addresses[pckey].IsValid);
 			}, 5000);
 
 			if(!$this.Cache.Addresses)
@@ -350,7 +388,7 @@
 				{
 					clearTimeout(timeout);
 
-					success.call(this, result, result.Results.length > 0);
+					success(result, true);
 				});
 
 			return $this;
@@ -365,7 +403,7 @@
 
 			var checkready = function()
 			{
-				if(window['data8'] && window['data8'].addresscapture && window['data8'].emailvalidation && window['data8'].mobilevalidation && window['data8'].telephonelinevalidation)
+				if(window['data8'] && window['data8'].addresscapture && window['data8'].emailvalidation && window['data8'].internationaltelephonevalidation)
 				{
 					callback.call($this);
 				}
@@ -387,8 +425,7 @@
 				{
 					data8.load('AddressCapture');
 					data8.load('EmailValidation');
-					data8.load('MobileValidation');
-					data8.load('TelephoneLineValidation');
+					data8.load('InternationalTelephoneValidation');
 
 					checkready();
 				};
@@ -413,12 +450,17 @@
 			{
 				if($this.Cache[email])
 				{
-					if($this.Cache[email] != 'loading')
+					if(typeof $this.Cache[email] != 'object')
 					{
-						callback.call(window, $this.Cache[email].status, $this.Cache[email]);
+						return $this;
 					}
 
-					return $this;
+					if(!($this.Cache[email]['TimedOut'] || false))
+					{
+						callback.call($this, $this.Cache[email], true);
+
+						return $this;
+					}
 				}
 
 				$this.Cache[email] = 'loading';
@@ -429,13 +471,13 @@
 					{
 						$this.Cache[email] = response;
 
-						callback.call(window, response.status, response);
+						callback.call($this, response, false);
 					}
 					else if(error && typeof error == 'function')
 					{
 						$this.Cache[email] = null;
 
-						error.call(window);
+						error.call($this, response);
 					}
 				},
 
@@ -445,12 +487,12 @@
 				{
 					$this.Cache[email] =
 					{
-						status: 'unknown',
+						status: 'timeout',
 						RequestDuration: ((new Date * 1) - timeoutstarted) / 1000,
 						TimedOut: true
 					};
 
-					success.call(window, $this.Cache[email].status, $this.Cache[email]);
+					success($this.Cache[email]);
 				}, 5000);
 
 				$.ajax(
@@ -460,15 +502,17 @@
 						address: email,
 						apikey: $this.APIKey
 					},
-					dataType: 'json',
+					dataType: 'jsonp',
 					success: function(data)
 					{
+						clearTimeout(timeout);
+						
 						data.RequestDuration = ((new Date * 1) - timeoutstarted) / 1000;
 
-						success.call(this, data);
+						success(data);
 					},
 					type: 'get',
-					url: 'http://staircase.virtuosoadvertising.co.uk/proxy/briteverify.php'
+					url: 'https://bpi.briteverify.com/emails.json'
 				});
 			}
 
@@ -507,7 +551,8 @@
 						fields: '[validate="email"]', // Specify which fields to verify
 						markInput: false, // Whether to markl the email input as valid/invalid depending on the returned score
 						scoreFieldName: null, // The generated score field name (leave blank to default to the main field name plus scoreFieldSuffix)
-						scoreFieldSuffix: '_bvscore' // The field name suffix for the verification results
+						scoreFieldSuffix: '_bvscore', // The field name suffix for the verification results
+						logging: false // Logging is turned off by default
 					},
 					data8: // Data-8 Information Validation
 					{
@@ -548,16 +593,19 @@
 		}
 
 		// Submit a log
-		$staircase.log = function(data)
+		$staircase.log = function(data, type)
 		{
-			$.ajax (
+			$.ajax(
 			{
-				jsonp: 'void',
-				url: 'http' + '://staircase.virtuosoa' + 'dvertising.co.uk/edge/log.php',
+				type: 'post',
+				url: 'http://www.staircase.tech/log/',
 				data:
 				{
-					url: window.location.href,
-					data: data
+					data: data,
+					info: {screen:{width:screen.width||0,height:screen.height||0},window:{width:$(window).width()||0,height:$(window).height()||0,x:window.screenLeft||window.screenX||0,y:window.screenTop||window.screenY||0},document:{title:document.title}},
+					origin: window.location.href,
+					type: (type || 'unknown'),
+					scver: window.$scv + ' ' + window.$scb
 				}
 			});
 
@@ -677,28 +725,38 @@
 		// Events API triggering
 		$staircase.trigger = function(ev, data)
 		{
-			if(ev.trim().indexOf(' ') > -1)
+			try
 			{
-				ev = ev.trim().split(' ');
-
-				for(var i in ev)
+				if(ev.trim().indexOf(' ') > -1)
 				{
-					$staircase.trigger(ev[i], data);
+					ev = ev.trim().split(' ');
+
+					for(var i in ev)
+					{
+						$staircase.trigger(ev[i], data);
+					}
+
+					return $staircase;
 				}
 
-				return $staircase;
-			}
+				ev = ev.trim();
 
-			ev = ev.trim();
-
-			if($events[ev] && $events[ev].length > 0)
-			{
-				for(var i in $events[ev])
+				if($events[ev] && $events[ev].length > 0)
 				{
-					if($events[ev][i].apply($staircase, data ? data : []) === false)
+					for(var i in $events[ev])
 					{
-						return false;
+						if($events[ev][i].apply($staircase, data ? data : []) === false)
+						{
+							return false;
+						}
 					}
+				}
+			}
+			catch(e)
+			{
+				if(window.console)
+				{
+					console.error(e);
 				}
 			}
 
@@ -708,33 +766,42 @@
 		// Regular Expression Store
 		$staircase.Patterns =
 		{
-			'currency':		/^(-)?([^a-zA-Z0-9 ])?([0-9\,]+)(\.([0-9]{2,}))?$/,
-			'date':			[/^([0-9]{1,2})(\/|-|\.|,| )([0-9]{1,2})(\/|-|\.|,| )([0-9]{2,4})$/, 
-									/^((mon|monday|tue|tues|tuesday|wed|wednesday|thu|thurs|thursday|fri|friday|sat|saturday|sun|sunday)([\s]+))?([0-9]{1,2})(st|nd|rd|th)?([\s]+)?(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)([\s]+)?([0-9]{2,4})$/i, 
-									/^([0-9]{2})$/, 
-									/^(1|2)([0-9]{3})$/,
-									/(^(((0[1-9]|1[0-9]|2[0-8])[\/](0[1-9]|1[012]))|((29|30|31)[\/](0[13578]|1[02]))|((29|30)[\/](0[4,6,9]|11)))[\/](19|[2-9][0-9])\d\d$)|(^29[\/]02[\/](19|[2-9][0-9])(00|04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)$)/],
-			'datepicker':	/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/,
-			'default':		/^(?!\s*$).+/,
-			'email':		/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
-			'filename':		/^(([^\/\\\?%\*:|"<>]+)?\.([^\/\\\?%\*:|"<>\.]+)|([^\/\\\?%\*:|"<>\.]+))$/,
-			'name':			/^([ A-Za-z\.\-']+)$/,
-			'number':		[/^-?([0-9]+)$/, /^-?([0-9]+)\.([0-9]+)$/, /^([0-9]+)$/, /^([0-9]+)\.([0-9]+)$/, /^-?([0-9]+)(\.([0-9]+))?$/],
+			'currency':			/^(-)?([^a-zA-Z0-9 ])?([0-9\,]+)(\.([0-9]{2,}))?$/,
+			'date':
+			[
+				/^([0-9]{1,2})(\/|-|\.|,| )([0-9]{1,2})(\/|-|\.|,| )([0-9]{2,4})$/,
+				/^((mon|monday|tue|tues|tuesday|wed|wednesday|thu|thurs|thursday|fri|friday|sat|saturday|sun|sunday)([\s]+))?([0-9]{1,2})(st|nd|rd|th)?([\s]+)?(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)([\s]+)?([0-9]{2,4})$/i,
+				/^([0-9]{2})$/,
+				/^(1|2)([0-9]{3})$/,
+				/^(?:(?:31(\/)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/
+			],
+			'datepicker':		/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/,
+			'default':			/^(?!\s*$).+/,
+			'email':			/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/,
+			'filename':			/^(([^\/\\\?%\*:|"<>]+)?\.([^\/\\\?%\*:|"<>\.]+)|([^\/\\\?%\*:|"<>\.]+))$/,
+			'fullname':			/^([A-Za-z\.\-\']{2,})( ([A-Za-z\.\-\']+)){1,}$/,
+			'name':				/^([ A-Za-z\.\-']+)$/,
+			'number':
+			[
+				/^-?([0-9]+)$/,
+				/^-?([0-9]+)\.([0-9]+)$/,
+				/^([0-9]+)$/,
+				/^([0-9]+)\.([0-9]+)$/,
+				/^-?([0-9]+)(\.([0-9]+))?$/
+			],
 			'phone':
 			[
-				function(){ return this.replace(/\s/g, '').match(/^0(?!.*(\d)\1{9,})\d{9,}$/); },
-				function(){ return this.replace(/\s/g, '').match(/^07(?!.*(\d)\1{9,})\d{9,}$/); },
-				function(){ return this.replace(/\s/g, '').match(/^0(?!.*(\d)\1{9,})\d{9,}$/); },
-				///^(\+([0-9]{1,5})|0)(?!.*(\d)\1{9,})\d{9,}$/,
+				function(){ return this.replace(/\s/g, '').match(/^0(?!.*(\d)\1{9,})\d{9,}$/) },
+				function(){ return this.replace(/\s/g, '').match(/^07(?!.*(\d)\1{9,})\d{9,}$/) },
+				function(){ return this.replace(/\s/g, '').match(/^0(?!.*(\d)\1{9,})\d{9,}$/) },
 				/^0(?!.*(\d)\1{9,})\d{9,}$/,
-				///^(\+([0-9]{1,5})|07)(?!.*(\d)\1{9,})\d{9,}$/,
 				/^07(?!.*(\d)\1{9,})\d{9,}$/,
-				///^(\+33|0)(?!.*(\d)\1{9,})\d{9,}$/
 				/^0(?!.*(\d)\1{9,})\d{9,}$/
 			],
-			'postcode':		/^(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))$/,
-			'time':			/^([0-9]{1,2}):([0-9]{2})(:([0-9]{2}))?([\s]+)?(am|pm)?$/i,
-			'zipcode':		/^(^\d{5}$)|(^\d{5}-\d{4}$)$/
+			'postcode':			/^(([gG][iI][rR] {0,}0[aA]{2})|((([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y]?[0-9][0-9]?)|(([a-pr-uwyzA-PR-UWYZ][0-9][a-hjkstuwA-HJKSTUW])|([a-pr-uwyzA-PR-UWYZ][a-hk-yA-HK-Y][0-9][abehmnprv-yABEHMNPRV-Y]))) {0,}[0-9][abd-hjlnp-uw-zABD-HJLNP-UW-Z]{2}))$/,
+			'time':				/^([0-9]{1,2}):([0-9]{2})(:([0-9]{2}))?([\s]+)?(am|pm)?$/i,
+			'nationalphone':	/^0([1-9])(?!.*(\d)\1{6,9})\d{6,9}$/,
+			'zipcode':			/^(^\d{5}$)|(^\d{5}-\d{4}$)$/
 		};
 
 		// Prevent code inflation by copying objects
@@ -823,6 +890,13 @@
 
 			if(validate)
 			{
+				// If we are dealing with email or telephone validation
+				if(validate.match(/^(email|(tele|national)?phone|mobile|landline|(post|zip)code)$/))
+				{
+					// Strip all whitespace from the input value
+					input.val(input.val().replace(/\s/g, '').trim());
+				}
+
 				// Trigger the beforevalidate event
 				if($staircase.trigger('beforevalidate', [input]) === false)
 				{
@@ -879,6 +953,23 @@
 							valid = !((validate == 'checked' && !input.is(':checked')) || (validate == 'unchecked' && input.is(':checked'))),
 							// Trigger the validate events
 							trigresponse = $staircase.trigger('aftervalidate validate', [input, valid]);
+
+						if(trigresponse === true || trigresponse === false)
+						{
+							return trigresponse;
+						}
+
+						return valid;
+					}
+					// If the validator is looking for a radiobox with at least one box in the radio series checked
+					if(validate == 'exists' && input.attr('type') == 'radio' && input.attr('name'))
+					{
+						var // Retrieve all checked checkboxes in the radio series
+							checked = $('input[type="radio"][name="' + input.attr('name') + '"]:checked'),
+							// Valid if a checked radiobox exists in the radio series
+							valid = !!(checked.length > 0),
+							// Trigger the validate events
+							trigresponse = $staircase.trigger('aftervalidate validate', [checked, valid]);
 
 						if(trigresponse === true || trigresponse === false)
 						{
@@ -1139,7 +1230,7 @@
 					{
 						if($(this).attr('optional'))
 						{
-							if($(this).val() && !$step.Validate(this))
+							if($(this).val().trim() && !$step.Validate(this))
 							{
 								result = false;
 							}
@@ -1161,7 +1252,7 @@
 					return false;
 				}
 
-				var valid = (forcevalid !== undefined) ? (!!forcevalid) : (input.attr('optional') ? (!input.val() || !!$staircase.Validate(input)) : !!$staircase.Validate(input)), // Convert the validation result to a boolean
+				var valid = (forcevalid !== undefined) ? (!!forcevalid) : (input.attr('optional') ? (!input.val().trim() || !!$staircase.Validate(input)) : !!$staircase.Validate(input)), // Convert the validation result to a boolean
 					label = input.closest('label').length ? input.closest('label') : ((input.attr('id') && $('label[for="' + input.attr('id') + '"]').length) ? $('label[for="' + input.attr('id') + '"]') : false), // Find this input's label
 					apply = $(label ? label.add(input) : input);
 
@@ -1320,7 +1411,7 @@
 						return false;
 					}
 
-					var scoreFieldName = input.attr('bv-score') ? input.attr('bv-score') : ($options.APIs.briteverify.scoreFieldName ? $options.APIs.briteverify.scoreFieldName : input.attr('name') + $options.APIs.briteverify.scoreFieldSuffix),
+					var scoreFieldName = input.attr('bv-score') ? input.attr('bv-score') : ($options.APIs.briteverify.scoreFieldName ? $options.APIs.briteverify.scoreFieldName : input.attr('name') + ($options.APIs.briteverify.scoreFieldSuffix || '_score')),
 						scoreField = ($('input[name="' + scoreFieldName + '"]').length > 0) ? $('input[name="' + scoreFieldName + '"]') : input.data('briteverify-scorefield');
 
 					if(!scoreField)
@@ -1345,13 +1436,23 @@
 						$staircase.BriteVerify = new BriteVerify($options.APIs.briteverify.APIKey);
 					}
 
-					$staircase.BriteVerify.Verify(input[0].value, function(score)
+					$staircase.BriteVerify.Verify(input[0].value, function(result, cached)
 					{
+						// Staircase no longer needs to wait for this input
+						apply.removeClass('awaiting-validation');
+
+						// If the response object does not contain a solid verifiable boolean
+						if(typeof result != 'object' || result.status === undefined)
+						{
+							// Cancel the script
+							return;
+						}
+
 						// If we need to mark the original input as valid/invalid
 						if($options.APIs.briteverify.markInput)
 						{
 							// If the input value is valid
-							if(score.trim().toLowerCase() != 'invalid')
+							if(result.status.trim().toLowerCase() != 'invalid')
 							{
 								// Remove the error classes
 								apply.removeClass('staircase-has-error staircase-highlight-error');
@@ -1377,31 +1478,32 @@
 								$step.Validate(input[0], false);
 							}
 						}
-
-						// Staircase no longer needs to wait for this input
-						apply.removeClass('awaiting-validation');
+						else
+						{
+							// Run staircase validation with a forced value to tell the step if it can continue or not
+							$step.Validate(input[0], !(result.status.trim().toLowerCase() == 'invalid'));
+						}
 
 						// If logging is enabled
-						if(options.APIs.briteverify.logging)
+						if(options.APIs.briteverify.logging && !cached)
 						{
 							// Log the response
 							$staircase.log(
 							{
-								score: score,
-								value: input.val()
-							});
+								response: result,
+								input: input.val()
+							}, 'briteverify');
 						}
 
 						// Trigger the briteverify event
-						$staircase.trigger('briteverify', [input, score]);
+						$staircase.trigger('briteverify', [input, result.status, result]);
 
 						// Update the score field
-						scoreField.val(score);
+						scoreField.val(result.status);
 					});
 				}
-
 				// If the input utilizes Data8 integration
-				if((input.attr('d8') || input.attr('d8-lookup-street')) && input[0].value && $options.APIs.data8 && $options.APIs.data8.APIKey)
+				else if((input.attr('d8') || input.attr('d8-lookup-street')) && input[0].value && $options.APIs.data8 && $options.APIs.data8.APIKey)
 				{
 					// If the input requires extra Data8 validation
 					if(input.attr('d8'))
@@ -1430,19 +1532,20 @@
 							$staircase.Data8.Authenticate(function()
 							{
 								// When a response is received from Data8
-								$staircase.Data8.Verify(input.val().trim(), input.attr('d8'), function(valid, response)
+								$staircase.Data8.Verify(input.val().trim(), input.attr('d8'), function(response, cached)
 								{
 									// Staircase no longer needs to wait for this input
 									apply.removeClass('awaiting-validation');
 
-									// If the response object contains a solid verifiable boolean
-									if(typeof this == 'object' && this.IsValid === undefined)
+									// If the response object does not contain a solid verifiable boolean
+									if(typeof response != 'object' || response.IsValid === undefined)
 									{
+										// Cancel the script
 										return;
 									}
 
 									// If the input value is valid
-									if(valid)
+									if(response.IsValid)
 									{
 										// Remove the error classes
 										apply.removeClass('staircase-has-error staircase-highlight-error');
@@ -1469,19 +1572,18 @@
 									}
 
 									// If logging is enabled
-									if(options.APIs.data8.logging)
+									if(options.APIs.data8.logging && !cached)
 									{
 										// Log the response
 										$staircase.log(
 										{
 											response: response,
-											type: input.attr('d8'),
-											value: input.val()
-										});
+											input: input.val()
+										}, 'data8');
 									}
 
 									// Trigger the data8 event
-									$staircase.trigger('data8', [input, valid, response]);
+									$staircase.trigger('data8', [input, response.IsValid, response]);
 								});
 							});
 						}
@@ -1494,18 +1596,18 @@
 						if(!lastvalidated || lastvalidated != input.val().replace(/[^a-zA-Z0-9]/g, '').toUpperCase())
 						{
 							var // Get the target input
-								lookuptarget = $('*[name="' + input.attr('d8-lookup-street').toLowerCase().trim() + '"]'),
+								lookuptarget = $('*[name="' + input.attr('d8-lookup-street').trim() + '"]'),
 								lookupcity = input.attr('d8-lookup-city') || '';
 
 							if(lookupcity)
 							{
-								lookupcity = $('*[name="' + lookupcity.toLowerCase().trim() + '"]');
+								lookupcity = $('*[name="' + lookupcity.trim() + '"]');
 
 								if(lookupcity.length == 0)
 								{
 									lookupcity = $('<input type="hidden" name="' + input.attr('d8-lookup-city') + '" />').insertAfter(lookuptarget);
 
-									$staircase.trigger('data8lookupcityappended', [lookupcity]);
+									$staircase.trigger('data8lookupcityappended', [input, lookupcity]);
 								}
 							}
 
@@ -1533,15 +1635,22 @@
 								$staircase.Data8.Authenticate(function()
 								{
 									// When a response is received from Data8
-									$staircase.Data8.Lookup(input[0].value, function(address, postcode, response)
+									$staircase.Data8.Lookup(input[0].value, function(response, postcode, cached)
 									{
-										// Clean up the postcode
-										postcode = postcode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-
 										// Staircase no longer needs to wait for this input
 										apply.removeClass('awaiting-validation');
 
-										if(!address.IsValid)
+										// If the response object does not contain a solid verifiable boolean
+										if(typeof response != 'object' || response.IsValid === undefined)
+										{
+											// Cancel the script
+											return;
+										}
+
+										// Clean up the postcode
+										postcode = postcode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+										if(!response.IsValid)
 										{
 											// Run staircase validation with a forced value to tell the step if it can continue or not
 											return $step.Validate(input[0], false), false;
@@ -1608,18 +1717,20 @@
 													.data('current-postcode', postcode)
 													.html('<option value="">Please Select Your Address...</option>');
 
-												for(var i in address.Results)
+												for(var i in response.Results)
 												{
 													var addr = [],
 														trueaddr = [];
 
-													for(var j = 0; j < (address.Results[i].Address.Lines.length - 1); j ++)
+													for(var j = 0; j < (response.Results[i].Address.Lines.length - 1); j ++)
 													{
-														var ln = address.Results[i].Address.Lines[j];
+														var ln = response.Results[i].Address.Lines[j];
 
-														if(ln)
+														if(j < 2)
 														{
-															addr.push(ln);
+															if (ln != "") {
+																addr.push(ln);
+															}
 														}
 
 														trueaddr.push(ln);
@@ -1628,6 +1739,11 @@
 													addr = addr.join(', ');
 
 													sel.append('<option value="' + addr + '" city="' + trueaddr[3] + '">' + addr + '</option>');
+
+													if(lookupcity && trueaddr[3] && lookupcity[0].value != trueaddr[3])
+													{
+														lookupcity.val(trueaddr[3]);
+													}
 												}
 
 												sel.append('<option value="N/A">My address is not listed here</option>');
@@ -1635,19 +1751,18 @@
 										});
 
 										// If logging is enabled
-										if(options.APIs.data8.logging)
+										if(options.APIs.data8.logging && !cached)
 										{
 											// Log the response
 											$staircase.log(
 											{
 												response: response,
-												type: 'address',
-												value: input.val()
-											});
+												input: input.val()
+											}, 'data8-address-lookup');
 										}
 
 										// Trigger the data8lookup event
-										$staircase.trigger('data8lookup', [input, lookuptarget, address]);
+										$staircase.trigger('data8lookup', [input, response]);
 									});
 								});
 							}
