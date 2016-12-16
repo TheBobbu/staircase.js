@@ -502,7 +502,7 @@
 						address: email,
 						apikey: $this.APIKey
 					},
-					dataType: 'json',
+					dataType: 'jsonp',
 					success: function(data)
 					{
 						clearTimeout(timeout);
@@ -512,7 +512,7 @@
 						success(data);
 					},
 					type: 'get',
-					url: 'http://www.staircase.tech/beta/'
+					url: 'https://bpi.briteverify.com/emails.json'
 				});
 			}
 
