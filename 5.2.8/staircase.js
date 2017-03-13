@@ -1,32 +1,25 @@
 /* Staircase | © Zeta Interactive 2013 - 2016 */
 
-;(function()
-{
+;(function() {
 	// Version Information
 	window.$scv = '5.2.8';
 	window.$scb = '83a';
 
 	// Cookie setter and getter
-	window.Cookies =
-	{
-		get: function(key)
-		{
+	window.Cookies = {
+		get: function(key) {
 			var cookies = document.cookie.split(';');
 
-			for(var i = 0; i < cookies.length; i++)
-			{
-				if(cookies[i].split('=')[0] == key)
-				{
+			for(var i = 0; i < cookies.length; i++) {
+				if(cookies[i].split('=')[0] == key) {
 					return cookies[i].substr(key.length + 1);
 				}
 			}
 
 			return null;
 		},
-		set: function(key, val, days)
-		{
-			if(days !== undefined)
-			{
+		set: function(key, val, days) {
+			if(days !== undefined) {
 				var exp = new Date();
 					exp.setTime(exp.getTime() + (days * 24 * 60 * 60 * 1000));
 			}
@@ -35,8 +28,7 @@
 
 			return window.Cookies;
 		},
-		remove: function(key)
-		{
+		remove: function(key) {
 			return window.Cookies.set(key, null, -1);
 		}
 	};
@@ -46,13 +38,10 @@
 	String.prototype.hash = function(c){var a='',b='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>!:;,.$';c=c?c:8;for(var i=0;i<c;i++)a+=b.charAt(Math.floor(Math.random()*b.length));return a};
 	Number.prototype.toDate = function date(k){var d,a,h="Sun Mon Tues Wednes Thurs Fri Satur January February March April May June July August September October November December".split(" "),f=/\\?(.?)/gi,g=function(b,c){return a[b]?a[b]():c},e=function(b,a){for(b=String(b);b.length<a;)b="0"+b;return b};a={d:function(){return e(a.j(),2)},D:function(){return a.l().slice(0,3)},j:function(){return d.getDate()},l:function(){return h[a.w()]+"day"},N:function(){return a.w()||7},S:function(){var b=a.j(),c=b%10;3>=c&&1==parseInt(b%100/10,10)&&(c=0);return["st","nd","rd"][c-1]||"th"},w:function(){return d.getDay()},z:function(){var b=new Date(a.Y(),a.n()-1,a.j()),c=new Date(a.Y(),0,1);return Math.round((b-c)/864E5)},W:function(){var b=new Date(a.Y(),a.n()-1,a.j()-a.N()+3),c=new Date(b.getFullYear(),0,4);return e(1+Math.round((b-c)/864E5/7),2)},F:function(){return h[6+a.n()]},m:function(){return e(a.n(),2)},M:function(){return a.F().slice(0,3)},n:function(){return d.getMonth()+1},t:function(){return(new Date(a.Y(),a.n(),0)).getDate()},L:function(){var b=a.Y();return 0===b%4&0!==b%100|0===b%400},o:function(){var b=a.n(),c=a.W();return a.Y()+(12===b&&9>c?1:1===b&&9<c?-1:0)},Y:function(){return d.getFullYear()},y:function(){return a.Y().toString().slice(-2)},a:function(){return 11<d.getHours()?"pm":"am"},A:function(){return a.a().toUpperCase()},B:function(){var a=3600*d.getUTCHours(),c=60*d.getUTCMinutes(),f=d.getUTCSeconds();return e(Math.floor((a+c+f+3600)/86.4)%1E3,3)},g:function(){return a.G()%12||12},G:function(){return d.getHours()},h:function(){return e(a.g(),2)},H:function(){return e(a.G(),2)},i:function(){return e(d.getMinutes(),2)},s:function(){return e(d.getSeconds(),2)},u:function(){return e(1E3*d.getMilliseconds(),6)},e:function(){throw"Not supported (see source code of date() for timezone on how to add support)";},I:function(){var b=new Date(a.Y(),0),c=Date.UTC(a.Y(),0),d=new Date(a.Y(),6),e=Date.UTC(a.Y(),6);return b-c!==d-e?1:0},O:function(){var a=d.getTimezoneOffset(),c=Math.abs(a);return(0<a?"-":"+")+e(100*Math.floor(c/60)+c%60,4)},P:function(){var b=a.O();return b.substr(0,3)+":"+b.substr(3,2)},T:function(){return"UTC"},Z:function(){return 60*-d.getTimezoneOffset()},c:function(){return"Y-m-d\\TH:i:sP".replace(f,g)},r:function(){return"D, d M Y H:i:s O".replace(f,g)},U:function(){return d/1E3|0}};return function(a,c){d=void 0===c?new Date:c instanceof Date?new Date(c):new Date(1E3*c);return a.replace(f,g)}(k,this)};
 
-	try
-	{
+	try {
 		// Supply the window with an array of parameters (?param1=value&param2=value)
-		window.location.param = function(n,u)
-		{
-			if(!u)
-			{
+		window.location.param = function(n,u) {
+			if(!u) {
 				var u = window.location.search;
 			}
 
@@ -61,26 +50,20 @@
 			return a && decodeURIComponent(a[1].replace(/\+/g, ' '));
 		};
 
-		Object.defineProperty(window.location, 'params',
-		{
+		Object.defineProperty(window.location, 'params', {
 			set: function() {},
-			get: function()
-			{
+			get: function() {
 				var a = {},
 					b = window.location.search.substr(1).split('&');
 
-				if(b)
-				{
-					for(var i in b)
-					{
+				if(b) {
+					for(var i in b) {
 						b[i] = b[i].replace(/^(?:amp;)?([^=]+)=(.*)?$/,'$1\n$2').split('\n');
-						if(a[b[i][0]])
-						{
+						if(a[b[i][0]]) {
 							a[b[i][0]] = [a[b[i][0]]];
 							a[b[i][0]].push(b[i][1]);
 						}
-						else
-						{
+						else {
 							a[b[i][0]] = b[i][1];
 						}
 					}
@@ -90,36 +73,28 @@
 			}
 		});
 	}
-	catch(e)
-	{
-		if(window.console)
-		{
+	catch(e) {
+		if(window.console) {
 			console.error('Your browser does not support changes to window.location.', e);
 		}
 	}
 
 	// Set up the jQuery extension
-	window.jQuery.fn.staircase = function(options)
-	{
+	window.jQuery.fn.staircase = function(options) {
 		var $ = window.jQuery;
 
-		if($(this).length == 1)
-		{
+		if($(this).length == 1) {
 			var sc = $(this).data('staircase');
 
-			if(!sc)
-			{
+			if(!sc) {
 				$(this).data('staircase', sc = new Staircase(this, options ? options : {}));
 			}
 
 			return sc;
 		}
-		else
-		{
-			return $(this).each(function()
-			{
-				if(!$(this).data('staircase'))
-				{
+		else {
+			return $(this).each(function() {
+				if(!$(this).data('staircase')) {
 					$(this).data('staircase', new Staircase(this, options ? options : {}));
 				}
 			});
@@ -127,49 +102,38 @@
 	};
 
 	// Fill any autofill inputs
-	window.jQuery('input[staircase-value]').each(function()
-	{
+	window.jQuery('input[staircase-value]').each(function() {
 		var $ = window.jQuery,
-			fillstr = $(this).attr('staircase-value').replace(/#{(.*?)}/g, function(m, key)
-			{
-				if(key.match(/^date\.(.*)$/i))
-				{
+			fillstr = $(this).attr('staircase-value').replace(/#{(.*?)}/g, function(m, key) {
+				if(key.match(/^date\.(.*)$/i)) {
 					return (new Date / 1000).toDate(key.replace(/^date\.(.*)$/i, '$1'));
 				}
-				else if(key.match(/^cookies?\.(.*)$/i))
-				{
+				else if(key.match(/^cookies?\.(.*)$/i)) {
 					var cookie = key.replace(/^cookies?\.(.*)$/i, '$1'),
 						cookies = document.cookie.split('; ');
 
-					for(var i in cookies)
-					{
-						if(cookies[i].split('=')[0] == cookie)
-						{
+					for(var i in cookies) {
+						if(cookies[i].split('=')[0] == cookie) {
 							return cookies[i].substr(cookie.length + 1);
 						}
 					}
 
 					return '';
 				}
-				else
-				{
+				else {
 					var val = window;
 						key = key.split('.');
 
-					for(var i in key)
-					{
-						if(val[key[i]])
-						{
+					for(var i in key) {
+						if(val[key[i]]) {
 							val = val[key[i]];
 						}
-						else
-						{
+						else {
 							return undefined;
 						}
 					}
 
-					if(val != window)
-					{
+					if(val != window) {
 						return val;
 					}
 				}
@@ -179,26 +143,21 @@
 	});
 
 	// Title Scanner
-	if(!document.title || document.title.match(/\.(html?|php)((\?|#)(.*?)?)?$/i) || $('title').length == 0)
-	{
+	if(!document.title || document.title.match(/\.(html?|php)((\?|#)(.*?)?)?$/i) || $('title').length == 0) {
 		var title = ($('h1, h2, h3, h4, h5, h6').first().text() || '').trim();
 
-		if(!title)
-		{
+		if(!title) {
 			title = ($('img[alt]').first().attr('alt') || '').trim();
 		}
 
-		if(!title)
-		{
+		if(!title) {
 			title = ($('p').first().text().trim() || '').split(' ').slice(0, 4).join(' ').trim();
 		}
 
-		if(!title && window.location.href.match(/\.(html?|php)((\?|#)(.*?)?)?$/i))
-		{
+		if(!title && window.location.href.match(/\.(html?|php)((\?|#)(.*?)?)?$/i)) {
 			title = window.location.href.replace(/(.*)\/(.*?)\.(html?|php)((\?|#)(.*?)?)?$/i, '$2').replace(/[-_\.]/g, ' ').split(' ');
 
-			for(var i in title)
-			{
+			for(var i in title) {
 				title[i] = title[i][0].toUpperCase() + title[i].substr(1).toLowerCase();
 			}
 
@@ -209,8 +168,7 @@
 	}
 
 	// Data8 is a third party information verification service
-	window.Data8API = function(APIKey, License)
-	{
+	window.Data8API = function(APIKey, License) {
 		var $this = this,
 			$authed = false;
 
@@ -220,36 +178,29 @@
 		$this.Cache = {};
 		$this.DefaultCountry = 'GB';
 
-		$this.Verify = function(value, type, callback)
-		{
-			if(!callback && type && typeof type == 'function')
-			{
+		$this.Verify = function(value, type, callback) {
+			if(!callback && type && typeof type == 'function') {
 				callback = type;
 				type = 'email';
 			}
 
-			if(!callback || typeof callback != 'function')
-			{
+			if(!callback || typeof callback != 'function') {
 				return $this;
 			}
 
-			if($this.Cache[type] && $this.Cache[type][value])
-			{
-				if(typeof $this.Cache[type][value] != 'object')
-				{
+			if($this.Cache[type] && $this.Cache[type][value]) {
+				if(typeof $this.Cache[type][value] != 'object') {
 					return $this;
 				}
 
-				if(!($this.Cache[type][value]['TimedOut'] || false))
-				{
+				if(!($this.Cache[type][value]['TimedOut'] || false)) {
 					callback.call($this, $this.Cache[type][value], true);
 
 					return $this;
 				}
 			}
 
-			var success = function(result, valid)
-			{
+			var success = function(result, valid) {
 				$this.Cache[type][value] = result;
 				$this.Cache[type][value].RequestDuration = ((new Date * 1) - timeoutstarted) / 1000;
 				$this.Cache[type][value].IsValid = valid;
@@ -259,10 +210,8 @@
 
 			timeoutstarted = new Date * 1,
 
-			timeout = setTimeout(function()
-			{
-				$this.Cache[type][value] =
-				{
+			timeout = setTimeout(function() {
+				$this.Cache[type][value] = {
 					IsValid: true,
 					RequestDuration: ((new Date * 1) - timeoutstarted) / 1000,
 					TimedOut: true
@@ -271,19 +220,16 @@
 				success($this.Cache[type][value], $this.Cache[type][value].IsValid);
 			}, 5000);
 
-			if(!$this.Cache[type])
-			{
+			if(!$this.Cache[type]) {
 				$this.Cache[type] = {};
 			}
 
 			$this.Cache[type][value] = 'loading';
 
-			switch(String(type).trim().toLowerCase())
-			{
+			switch(String(type).trim().toLowerCase()) {
 				case 'email':
 					var caller = new data8.emailvalidation();
-						caller.isvalid(value, 'Address', null, function(result)
-						{
+						caller.isvalid(value, 'Address', null, function(result) {
 							clearTimeout(timeout);
 
 							success(result, !!result.Result.trim().match(/^(catchall|error|greylisted|inconclusive|valid)$/i));
@@ -297,8 +243,7 @@
 						[
 							new data8.option('UseMobileValidation', 'true'),
 							new data8.option('UseLineValidation', 'true')
-						], function(result)
-						{
+						], function(result) {
 							clearTimeout(timeout);
 
 							var valid = !!result.Result.ValidationResult.trim().match(/^(nocoverage|valid)$/i);
@@ -324,32 +269,26 @@
 			return $this;
 		};
 
-		$this.Lookup = function(postcode, callback)
-		{
-			if(!callback || typeof callback != 'function')
-			{
+		$this.Lookup = function(postcode, callback) {
+			if(!callback || typeof callback != 'function') {
 				return $this;
 			}
 
 			var pckey = postcode.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 
-			if($this.Cache.Addresses && $this.Cache.Addresses[pckey])
-			{
-				if(typeof $this.Cache.Addresses[pckey] != 'object')
-				{
+			if($this.Cache.Addresses && $this.Cache.Addresses[pckey]) {
+				if(typeof $this.Cache.Addresses[pckey] != 'object') {
 					return $this;
 				}
 
-				if(!($this.Cache.Addresses[pckey]['TimedOut'] || false))
-				{
+				if(!($this.Cache.Addresses[pckey]['TimedOut'] || false)) {
 					callback.call($this, $this.Cache.Addresses[pckey], postcode, true);
 
 					return $this;
 				}
 			}
 
-			var success = function(result, valid)
-			{
+			var success = function(result, valid) {
 				$this.Cache.Addresses[pckey] = result;
 				$this.Cache.Addresses[pckey].RequestDuration = ((new Date * 1) - timeoutstarted) / 1000;
 				$this.Cache.Addresses[pckey].IsValid = valid;
@@ -359,10 +298,8 @@
 
 			timeoutstarted = new Date * 1,
 
-			timeout = setTimeout(function()
-			{
-				$this.Cache.Addresses[pckey] =
-				{
+			timeout = setTimeout(function() {
+				$this.Cache.Addresses[pckey] = {
 					IsValid: true,
 					RequestDuration: ((new Date * 1) - timeoutstarted) / 1000,
 					TimedOut: true
@@ -371,8 +308,7 @@
 				success($this.Cache.Addresses[pckey], $this.Cache.Addresses[pckey].IsValid);
 			}, 5000);
 
-			if(!$this.Cache.Addresses)
-			{
+			if(!$this.Cache.Addresses) {
 				$this.Cache.Addresses = {};
 			}
 
@@ -384,8 +320,7 @@
 					new data8.option('MaxLines', '5'),
 					new data8.option('FixTownCounty', 'true')
 				],
-				function(result)
-				{
+				function(result) {
 					clearTimeout(timeout);
 
 					success(result, true);
@@ -394,35 +329,28 @@
 			return $this;
 		};
 
-		$this.Authenticate = function(callback)
-		{
-			if(!callback || typeof callback != 'function')
-			{
+		$this.Authenticate = function(callback) {
+			if(!callback || typeof callback != 'function') {
 				return $this;
 			}
 
-			var checkready = function()
-			{
-				if(window['data8'] && window['data8'].addresscapture && window['data8'].emailvalidation && window['data8'].internationaltelephonevalidation)
-				{
+			var checkready = function() {
+				if(window['data8'] && window['data8'].addresscapture && window['data8'].emailvalidation && window['data8'].internationaltelephonevalidation) {
 					callback.call($this);
 				}
-				else
-				{
+				else {
 					setTimeout(checkready, 50);
 				}
 			};
 
-			if($authed || $('script[src*="data-8.co.uk"]').lenght > 0)
-			{
+			if($authed || $('script[src*="data-8.co.uk"]').lenght > 0) {
 				return checkready(), $this;
 			}
 
 			$authed = true;
 
 			var scr = $(document.createElement('script')).appendTo('head')[0];
-				scr.onload = function()
-				{
+				scr.onload = function() {
 					data8.load('AddressCapture');
 					data8.load('EmailValidation');
 					data8.load('InternationalTelephoneValidation');
@@ -437,26 +365,20 @@
 	};
 
 	// BriteVerify is a third party email address verification service
-	window.BriteVerify = function(APIKey)
-	{
+	window.BriteVerify = function(APIKey) {
 		var $this = this;
 
 		$this.APIKey = APIKey;
 		$this.Cache = {};
 
-		$this.Verify = function(email, callback, error)
-		{
-			if(email && typeof email == 'string' && callback && typeof callback == 'function')
-			{
-				if($this.Cache[email])
-				{
-					if(typeof $this.Cache[email] != 'object')
-					{
+		$this.Verify = function(email, callback, error) {
+			if(email && typeof email == 'string' && callback && typeof callback == 'function') {
+				if($this.Cache[email]) {
+					if(typeof $this.Cache[email] != 'object') {
 						return $this;
 					}
 
-					if(!($this.Cache[email]['TimedOut'] || false))
-					{
+					if(!($this.Cache[email]['TimedOut'] || false)) {
 						callback.call($this, $this.Cache[email], true);
 
 						return $this;
@@ -465,16 +387,13 @@
 
 				$this.Cache[email] = 'loading';
 
-				var success = function(response)
-				{
-					if(response && typeof response == 'object' && !response.errors)
-					{
+				var success = function(response) {
+					if(response && typeof response == 'object' && !response.errors) {
 						$this.Cache[email] = response;
 
 						callback.call($this, response, false);
 					}
-					else if(error && typeof error == 'function')
-					{
+					else if(error && typeof error == 'function') {
 						$this.Cache[email] = null;
 
 						error.call($this, response);
@@ -483,10 +402,8 @@
 
 				timeoutstarted = new Date * 1,
 
-				timeout = setTimeout(function()
-				{
-					$this.Cache[email] =
-					{
+				timeout = setTimeout(function() {
+					$this.Cache[email] = {
 						status: 'timeout',
 						RequestDuration: ((new Date * 1) - timeoutstarted) / 1000,
 						TimedOut: true
@@ -495,16 +412,13 @@
 					success($this.Cache[email]);
 				}, 5000);
 
-				$.ajax(
-				{
-					data:
-					{
+				$.ajax( {
+					data: {
 						address: email,
 						apikey: $this.APIKey
 					},
 					dataType: 'jsonp',
-					success: function(data)
-					{
+					success: function(data) {
 						clearTimeout(timeout);
 						
 						data.RequestDuration = ((new Date * 1) - timeoutstarted) / 1000;
@@ -526,15 +440,13 @@
 	window.Staircases = {};
 
 	// Create the Staircase object
-	window.Staircase = function(dom, options)
-	{
+	window.Staircase = function(dom, options) {
 		var $ = window.jQuery, // Capture jQuery
 			$this = $(dom), // Store the DOM element
 			$events = {}, // Events API
 			$staircase = this, // Create a scoped global
 			$scrollTop = 0, // Store the window's scrollTop
-			$options = // Populate the default options object
-			{
+			$options = // Populate the default options object {
 				checkboxGroups: false, // Enable/Disable checkbox group scanning
 				history: false, // Enable/Disable URL hash modifications
 				ID: ''.hash(8), // An optional ID string for the URL
@@ -543,10 +455,8 @@
 				stepBlur: null, // Extra function to call when a step is hidden from view
 				stepFocus: null, // Extra function to call when a step enters the view
 				validate: null, // Extra function to call during validation
-				APIs: // Set of options for third party API integrations
-				{
-					briteverify: // Briteverify email verification
-					{
+				APIs: // Set of options for third party API integrations {
+					briteverify: // Briteverify email verification {
 						APIKey: null, // API Key for the service (service is disabled if this is left blank)
 						fields: '[validate="email"]', // Specify which fields to verify
 						markInput: false, // Whether to markl the email input as valid/invalid depending on the returned score
@@ -554,8 +464,7 @@
 						scoreFieldSuffix: '_bvscore', // The field name suffix for the verification results
 						logging: false // Logging is turned off by default
 					},
-					data8: // Data-8 Information Validation
-					{
+					data8: // Data-8 Information Validation {
 						APIKey: null, // API Key for the service (service is disabled if this is left blank)
 						logging: false // Logging is turned off by default
 					}
@@ -563,22 +472,17 @@
 			},
 
 		// Sandbox is a WIP
-		sandbox = function($class)
-		{
+		sandbox = function($class) {
 			return $class;
 		},
 
 		// Recursively populate the options
-		pop_options = function(from, to)
-		{
-			for(var i in to)
-			{
-				if(from[i] && typeof from[i] == 'object' && typeof to[i] == 'object')
-				{
+		pop_options = function(from, to) {
+			for(var i in to) {
+				if(from[i] && typeof from[i] == 'object' && typeof to[i] == 'object') {
 					from[i] = pop_options(from[i], to[i]);
 				}
-				else
-				{
+				else {
 					from[i] = to[i];
 				}
 			}
@@ -587,20 +491,16 @@
 		};
 
 		// Import user-defined options
-		if(options && typeof options == 'object')
-		{
+		if(options && typeof options == 'object') {
 			$options = pop_options($options, options);
 		}
 
 		// Submit a log
-		$staircase.log = function(data, type)
-		{
-			$.ajax(
-			{
+		$staircase.log = function(data, type) {
+			$.ajax( {
 				type: 'post',
 				url: 'http://www.staircase.tech/log/',
-				data:
-				{
+				data: {
 					data: data,
 					info: {screen:{width:screen.width||0,height:screen.height||0},window:{width:$(window).width()||0,height:$(window).height()||0,x:window.screenLeft||window.screenX||0,y:window.screenTop||window.screenY||0},document:{title:document.title}},
 					origin: window.location.href,
@@ -613,43 +513,34 @@
 		};
 
 		// Scroll an element into view
-		$staircase.scroll = function(target, context)
-		{
+		$staircase.scroll = function(target, context) {
 			target = $(target);
 			context = $(context ? context : document.body);
 
-			if(target.length == 0 || context.length == 0)
-			{
+			if(target.length == 0 || context.length == 0) {
 				return $staircase;
 			}
 
-			if(jQuery.fn.scrollTo)
-			{
+			if(jQuery.fn.scrollTo) {
 				context.scrollTo(target, 500);
 			}
-			else if(target[0].scrollIntoView)
-			{
-				try
-				{
-					target[0].scrollIntoView(
-					{
+			else if(target[0].scrollIntoView) {
+				try {
+					target[0].scrollIntoView( {
 						behavior: "smooth",
 						block: "start"
 					});
 				}
-				catch(e)
-				{
+				catch(e) {
 					target[0].scrollIntoView();
 				}
 
 				context[0].scrollTop -= 20;
 			}
-			else
-			{
+			else {
 				var offset = target.offset();
 
-				if(offset)
-				{
+				if(offset) {
 					context.scrollTop(offset.top - 20);
 				}
 			}
@@ -658,14 +549,11 @@
 		};
 
 		// Events API binding
-		$staircase.on = function(ev, callback)
-		{
-			if(ev.trim().indexOf(' ') > -1)
-			{
+		$staircase.on = function(ev, callback) {
+			if(ev.trim().indexOf(' ') > -1) {
 				ev = ev.trim().split(' ');
 
-				for(var i in ev)
-				{
+				for(var i in ev) {
 					$staircase.on(ev[i], callback);
 				}
 
@@ -674,8 +562,7 @@
 
 			ev = ev.trim();
 
-			if(!$events[ev])
-			{
+			if(!$events[ev]) {
 				$events[ev] = [];
 			}
 
@@ -685,14 +572,11 @@
 		};
 
 		// Events API unbinding
-		$staircase.off = function(ev, callback)
-		{
-			if(ev.trim().indexOf(' ') > -1)
-			{
+		$staircase.off = function(ev, callback) {
+			if(ev.trim().indexOf(' ') > -1) {
 				ev = ev.trim().split(' ');
 
-				for(var i in ev)
-				{
+				for(var i in ev) {
 					$staircase.off(ev[i], callback);
 				}
 
@@ -701,16 +585,12 @@
 
 			ev = ev.trim();
 
-			if($events[ev] && $events[ev].length > 0)
-			{
+			if($events[ev] && $events[ev].length > 0) {
 				$newevents = [];
 
-				if(callback !== undeefined)
-				{
-					for(var i in $events[ev])
-					{
-						if($events[ev][i] != callback)
-						{
+				if(callback !== undeefined) {
+					for(var i in $events[ev]) {
+						if($events[ev][i] != callback) {
 							$newevents.push($events[ev][i]);
 						}
 					}
@@ -723,16 +603,12 @@
 		};
 
 		// Events API triggering
-		$staircase.trigger = function(ev, data)
-		{
-			try
-			{
-				if(ev.trim().indexOf(' ') > -1)
-				{
+		$staircase.trigger = function(ev, data) {
+			try {
+				if(ev.trim().indexOf(' ') > -1) {
 					ev = ev.trim().split(' ');
 
-					for(var i in ev)
-					{
+					for(var i in ev) {
 						$staircase.trigger(ev[i], data);
 					}
 
@@ -741,21 +617,16 @@
 
 				ev = ev.trim();
 
-				if($events[ev] && $events[ev].length > 0)
-				{
-					for(var i in $events[ev])
-					{
-						if($events[ev][i].apply($staircase, data ? data : []) === false)
-						{
+				if($events[ev] && $events[ev].length > 0) {
+					for(var i in $events[ev]) {
+						if($events[ev][i].apply($staircase, data ? data : []) === false) {
 							return false;
 						}
 					}
 				}
 			}
-			catch(e)
-			{
-				if(window.console)
-				{
+			catch(e) {
+				if(window.console) {
 					console.error(e);
 				}
 			}
@@ -764,8 +635,7 @@
 		};
 
 		// Regular Expression Store
-		$staircase.Patterns =
-		{
+		$staircase.Patterns = {
 			'currency':			/^(-)?([^a-zA-Z0-9 ])?([0-9\,]+)(\.([0-9]{2,}))?$/,
 			'date':
 			[
@@ -773,7 +643,8 @@
 				/^((mon|monday|tue|tues|tuesday|wed|wednesday|thu|thurs|thursday|fri|friday|sat|saturday|sun|sunday)([\s]+))?([0-9]{1,2})(st|nd|rd|th)?([\s]+)?(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)([\s]+)?([0-9]{2,4})$/i,
 				/^([0-9]{2})$/,
 				/^(1|2)([0-9]{3})$/,
-				/^(?:(?:31(\/)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/
+				/^(?:(?:31(\/)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/)(?:0?[1,3-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/,
+				/(^(((0[1-9]|1[0-9]|2[0-8])[\/](0[1-9]|1[012]))|((29|30|31)[\/](0[13578]|1[02]))|((29|30)[\/](0[4,6,9]|11)))[\/](19|[2-9][0-9])\d\d$)|(^29[\/]02[\/](19|[2-9][0-9])(00|04|08|12|16|20|24|28|32|36|40|44|48|52|56|60|64|68|72|76|80|84|88|92|96)$)/
 			],
 			'datepicker':		/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/,
 			'default':			/^(?!\s*$).+/,
@@ -810,8 +681,7 @@
 		$staircase.Patterns.telephone = $staircase.Patterns.phone;
 
 		// Constraints Store
-		$staircase.Constraints =
-		{
+		$staircase.Constraints = {
 			'letters':		/^([^0-9])$/,
 			'numbers':		/^([^a-zA-Z])$/,
 			'symbols':		/^([^0-9a-zA-Z])$/
@@ -822,17 +692,13 @@
 		$staircase.Steps = []; // Prepare an empty list of steps inside this staircase
 
 		// When the hash or history state changes (i.e. When a user clicks 'Back')
-		$(window).on('hashchange popstate', function()
-		{
+		$(window).on('hashchange popstate', function() {
 			var regex = /^#!\/([A-Z0-9<>\!\:\;\,\.\$]{8})\/([0-9]+)$/i;
 
 			// If the URL is blank, go back to the first step
-			if(window.location.hash.match(/^#!?\/?$/))
-			{
-				for(var i in window.Staircases)
-				{
-					if(window.Staircases[i].trigger('hashchange popstate', [window.Staircases[$staircase.$current], window.location.hash]) === false)
-					{
+			if(window.location.hash.match(/^#!?\/?$/)) {
+				for(var i in window.Staircases) {
+					if(window.Staircases[i].trigger('hashchange popstate', [window.Staircases[$staircase.$current], window.location.hash]) === false) {
 						return false;
 					}
 
@@ -841,15 +707,12 @@
 			}
 
 			// Otherwise, find the specific staircase/step pair via the URL and show it
-			else if(window.location.hash.match(regex))
-			{
+			else if(window.location.hash.match(regex)) {
 				var ID = window.location.hash.replace(regex, '$1'),
 					step = parseInt(window.location.hash.replace(regex, '$2'));
 
-				if(window.Staircases[ID] && window.Staircases[ID].Steps[step] && window.Staircases[ID].Steps[step].Visited)
-				{
-					if(window.Staircases[ID].trigger('hashchange popstate', [ID, step]) === false)
-					{
+				if(window.Staircases[ID] && window.Staircases[ID].Steps[step] && window.Staircases[ID].Steps[step].Visited) {
+					if(window.Staircases[ID].trigger('hashchange popstate', [ID, step]) === false) {
 						return false;
 					}
 
@@ -863,8 +726,7 @@
 		});
 
 		// Adds a regex pattern
-		$staircase.Extend = function(name, pattern)
-		{
+		$staircase.Extend = function(name, pattern) {
 			$staircase.Patterns[name] = pattern;
 
 			return $staircase;
@@ -872,50 +734,41 @@
 
 		// The validation function - all elements with the [validate] attribute will be passed through this function on their change events and on the form's beforesubmit event.
 		// This function must return either true (the input has passed validation) or false (if it fails)
-		$staircase.Validate = function(input, validate)
-		{
+		$staircase.Validate = function(input, validate) {
 			// Ensure `input` is a jQuery object
-			if(!input)
-			{
+			if(!input) {
 				return false;
 			}
 
 			input = $(input);
 
 			// Retrieve the input's validation method if one is not supplied
-			if(!validate)
-			{
+			if(!validate) {
 				validate = input.attr('validate');
 			}
 
-			if(validate)
-			{
+			if(validate) {
 				// If we are dealing with email or telephone validation
-				if(validate.match(/^(email|(tele|national)?phone|mobile|landline|(post|zip)code)$/))
-				{
+				if(validate.match(/^(email|(tele|national)?phone|mobile|landline|(post|zip)code)$/)) {
 					// Strip all whitespace from the input value
 					input.val(input.val().replace(/\s/g, '').trim());
 				}
 
 				// Trigger the beforevalidate event
-				if($staircase.trigger('beforevalidate', [input]) === false)
-				{
+				if($staircase.trigger('beforevalidate', [input]) === false) {
 					return false;
 				}
 
 				// If we're dealing with a select element
-				if((validate == 'select' || validate == 'selected') && input.is('select'))
-				{
+				if((validate == 'select' || validate == 'selected') && input.is('select')) {
 					var myval = input.val(),
 						// Find the first <option> in the <select> and store its value to check against
 						placeholder = input.find('option').first(),
 						placeholderval = (placeholder.attr('value') === undefined) ? placeholder.html() : placeholder.attr('value');
 
 					// If we're dealing with a multiple select
-					if(typeof myval == 'object')
-					{
-						for(var i in myval)
-						{
+					if(typeof myval == 'object') {
+						for(var i in myval) {
 							if(myval[i] == placeholderval)
 							{
 								return false;
@@ -924,11 +777,9 @@
 					}
 
 					// Otherwise just a simple string comparison
-					if(myval == placeholderval)
-					{
+					if(myval == placeholderval) {
 						// Trigger the validate events
-						if($staircase.trigger('aftervalidate validate', [input, false]) === true)
-						{
+						if($staircase.trigger('aftervalidate validate', [input, false]) === true) {
 							return true;
 						}
 
@@ -936,34 +787,29 @@
 					}
 
 					// Trigger the validate events
-					if($staircase.trigger('aftervalidate validate', [input, true]) === false)
-					{
+					if($staircase.trigger('aftervalidate validate', [input, true]) === false) {
 						return false;
 					}
 
 					return true;
 				}
 
-				else
-				{
+				else {
 					// If the validator is looking for a checkbox
-					if((validate == 'checked' || validate == 'unchecked') && (input.attr('type') == 'checkbox' || input.attr('type') == 'radio'))
-					{
+					if((validate == 'checked' || validate == 'unchecked') && (input.attr('type') == 'checkbox' || input.attr('type') == 'radio')) {
 						var // Valid if the checkbox is in the same state as the validation requirement (checked or unchecked)
 							valid = !((validate == 'checked' && !input.is(':checked')) || (validate == 'unchecked' && input.is(':checked'))),
 							// Trigger the validate events
 							trigresponse = $staircase.trigger('aftervalidate validate', [input, valid]);
 
-						if(trigresponse === true || trigresponse === false)
-						{
+						if(trigresponse === true || trigresponse === false) {
 							return trigresponse;
 						}
 
 						return valid;
 					}
 					// If the validator is looking for a radiobox with at least one box in the radio series checked
-					if(validate == 'exists' && input.attr('type') == 'radio' && input.attr('name'))
-					{
+					if(validate == 'exists' && input.attr('type') == 'radio' && input.attr('name')) {
 						var // Retrieve all checked checkboxes in the radio series
 							checked = $('input[type="radio"][name="' + input.attr('name') + '"]:checked'),
 							// Valid if a checked radiobox exists in the radio series
@@ -971,8 +817,7 @@
 							// Trigger the validate events
 							trigresponse = $staircase.trigger('aftervalidate validate', [checked, valid]);
 
-						if(trigresponse === true || trigresponse === false)
-						{
+						if(trigresponse === true || trigresponse === false) {
 							return trigresponse;
 						}
 
@@ -984,11 +829,9 @@
 						key = (validate.indexOf('[') > -1) ? validate.replace(/\[([0-9]+)\]/g, '\n$1').split('\n') : [validate];
 
 					// If the validation expression exists
-					if(exp)
-					{
+					if(exp) {
 						// Climb the attibute's key list (e.g. phone[0], date[1][2][3], etc.)
-						if(key.length > 1)
-						{
+						if(key.length > 1) {
 							for(var i = 0; i < key.length; i ++)
 							{
 								if(exp[key[i]])
@@ -1002,8 +845,7 @@
 							}
 						}
 
-						else
-						{
+						else {
 							if(typeof exp[key[0]] == 'object' && !(exp[key[0]] instanceof RegExp))
 							{
 								exp = exp[key[0]][0];
@@ -1014,8 +856,7 @@
 							}
 						}
 
-						if(exp && (exp instanceof RegExp || typeof exp == 'function'))
-						{
+						if(exp && (exp instanceof RegExp || typeof exp == 'function')) {
 							var valid = false;
 
 							if(exp instanceof RegExp)
@@ -1044,8 +885,7 @@
 				}
 			}
 
-			if($options.validate && typeof $options.validate == 'function')
-			{
+			if($options.validate && typeof $options.validate == 'function') {
 				var // If all else fails, call the optional user defined function
 					valid = !!$options.validate.call(input[0], $staircase);
 
@@ -1059,55 +899,45 @@
 		};
 
 		// Step switching functions
-		$staircase.To = function(index)
-		{
+		$staircase.To = function(index) {
 			// Trigger the switch event
 			$staircase.trigger('switch', [index]);
 
-			if(index < $staircase.$current)
-			{
+			if(index < $staircase.$current) {
 				$staircase.Steps[index].Focus();
 			}
-			else if($staircase.Steps[index] && $staircase.Steps[$staircase.$current].Validate())
-			{
+			else if($staircase.Steps[index] && $staircase.Steps[$staircase.$current].Validate()) {
 				$staircase.Steps[index].Focus();
 			}
 
 			return $staircase;
 		};
 
-		$staircase.Next = function()
-		{
+		$staircase.Next = function() {
 			// Trigger the next event
 			$staircase.trigger('switch next', [$staircase.$current + 1]);
 
-			if($staircase.Steps[$staircase.$current + 1] && $staircase.Steps[$staircase.$current].Validate())
-			{
+			if($staircase.Steps[$staircase.$current + 1] && $staircase.Steps[$staircase.$current].Validate()) {
 				$staircase.Steps[$staircase.$current + 1].Focus();
 			}
 
 			return $staircase;
 		};
 
-		$staircase.Prev = function()
-		{
+		$staircase.Prev = function() {
 			// Trigger the previous event
 			$staircase.trigger('switch prev previous', [$staircase.$current - 1]);
 
-			if($staircase.Steps[$staircase.$current - 1])
-			{
+			if($staircase.Steps[$staircase.$current - 1]) {
 				$staircase.Steps[$staircase.$current - 1].Focus();
 			}
 
 			return $staircase;
 		};
 
-		$staircase.AwaitSubmit = function(button)
-		{
-			var check = function()
-			{
-				if($('.awaiting-validation', $this).length > 0)
-				{
+		$staircase.AwaitSubmit = function(button) {
+			var check = function() {
+				if($('.awaiting-validation', $this).length > 0) {
 					setTimeout(check, 100);
 
 					return false;
@@ -1122,8 +952,7 @@
 		};
 
 		// Create a subclass to manage steps
-		var Step = function()
-		{
+		var Step = function() {
 			var $this = $(arguments[0]), // Store the DOM element
 				$step = this, // Create a super
 				$visited = null; // Cache the `Visited` state
@@ -1138,36 +967,30 @@
 			$step.$rules = []; // Create a blank rulebook
 
 			// The `Visited` state of a step cannot be set to a falsy value - once a step has been visited, it cannot be un-visited
-			Object.defineProperty($this, 'Visited',
-			{
+			Object.defineProperty($this, 'Visited', {
 				get: function() { return $visited },
 				set: function() { $visited = (arguments[0] ? arguments[0] : true) }
 			});
 
 			// `Focus` hides all other steps, shows this step and triggers a focus event on the DOM
-			$step.Focus = function(silent)
-			{
+			$step.Focus = function(silent) {
 				// Blur all the other Steps
-				for(var i in $staircase.Steps)
-				{
+				for(var i in $staircase.Steps) {
 					$staircase.Steps[i].Blur(silent);
 				}
 
 				// If this Step isn't already in focus
-				if(!$this.is(':visible'))
-				{
+				if(!$this.is(':visible')) {
 					// Set the current index
 					$staircase.$current = $step.$index;
 
 					// Observe the Step's `Visited` state
-					if(!$this.Visited)
-					{
+					if(!$this.Visited) {
 						$this.Visited = new Date();
 					}
 
 					// Try to trigger a focus event
-					if(!silent)
-					{
+					if(!silent) {
 						$this.trigger('focus');
 					}
 
@@ -1181,12 +1004,10 @@
 					$scrollTop = $(window).scrollTop();
 
 					// Update the URL
-					if($step.$index > 0 && window.location.hash != '#' + hash)
-					{
+					if($step.$index > 0 && window.location.hash != '#' + hash) {
 						location.hash = hash;
 					}
-					else if($step.$index == 0)
-					{
+					else if($step.$index == 0) {
 						location.hash = '!/';
 					}
 
@@ -1198,14 +1019,11 @@
 			};
 
 			// `Blur` hides the step and triggers a blur event on the DOM
-			$step.Blur = function(silent)
-			{
+			$step.Blur = function(silent) {
 				// If this Step isn't already hidden
-				if($this.is(':visible'))
-				{
+				if($this.is(':visible')) {
 					// Try to trigger a blur event
-					if(!silent)
-					{
+					if(!silent) {
 						$this.trigger('blur');
 					}
 
@@ -1220,23 +1038,18 @@
 			};
 
 			// Perform validation
-			$step.Validate = function(input, forcevalid)
-			{
-				if(!input)
-				{
+			$step.Validate = function(input, forcevalid) {
+				if(!input) {
 					var result = true;
 
-					$this.find($inputs).each(function()
-					{
-						if($(this).attr('optional'))
-						{
+					$this.find($inputs).each(function() {
+						if($(this).attr('optional')) {
 							if($(this).val().trim() && !$step.Validate(this))
 							{
 								result = false;
 							}
 						}
-						else if(!$step.Validate(this))
-						{
+						else if(!$step.Validate(this)) {
 							result = false;
 						}
 					});
@@ -1247,8 +1060,7 @@
 				input = $(input);
 
 				// Trigger the beforestepvalidate event
-				if($staircase.trigger('beforestepvalidate', [$step, input]) === false)
-				{
+				if($staircase.trigger('beforestepvalidate', [$step, input]) === false) {
 					return false;
 				}
 
@@ -1260,14 +1072,12 @@
 				apply.removeClass('staircase-has-error staircase-highlight-error');
 
 				// If this input is not valid
-				if(!valid)
-				{
+				if(!valid) {
 					// Apply the error classes
 					apply.addClass('staircase-has-error staircase-highlight-error');
 
 					// Remove the error notification class
-					apply.data('notify-timeout', setTimeout(function()
-					{
+					apply.data('notify-timeout', setTimeout(function() {
 						apply.removeClass('staircase-highlight-error');
 					},
 
@@ -1281,8 +1091,7 @@
 				}
 
 				// Clear the notification class timer so that no classes are unintentionally removed in the near future
-				if(apply.data('notify-timeout'))
-				{
+				if(apply.data('notify-timeout')) {
 					window.clearTimeout(apply.data('notify-timeout'));
 				}
 
@@ -1293,39 +1102,32 @@
 			};
 
 			// Add a condition to the rulebook
-			$step.Condition = function(code)
-			{
-				if(typeof code != 'function' && typeof code != 'string')
-				{
+			$step.Condition = function(code) {
+				if(typeof code != 'function' && typeof code != 'string') {
 					return $step;
 				}
 
 				var args = ['Staircase', 'Step', '$'],
 					inputs = {};
 
-				$this.find('input:not([type="button"], [type="submit"], [type="image"])[name], textarea[name], select[name]').each(function()
-				{
+				$this.find('input:not([type="button"], [type="submit"], [type="image"])[name], textarea[name], select[name]').each(function() {
 					var name = $(this).attr('name');
 
-					if(inputs[name])
-					{
-						if(inputs[name].length === undefined)
-						{
+					if(inputs[name]) {
+						if(inputs[name].length === undefined) {
 							inputs[name] = [inputs[name]];
 						}
 
 						inputs[name].push(this);
 					}
-					else
-					{
+					else {
 						args.push(name);
 						inputs[name] = this;
 					}
 				});
 
 				// Trigger the addcondition event
-				$staircase.trigger('addcondition', [$step, $step.$rules.push(
-				{
+				$staircase.trigger('addcondition', [$step, $step.$rules.push( {
 					callback: (typeof code == 'function') ? code : new Function(args, code),
 					inputs: inputs
 				}) - 1]);
@@ -1334,15 +1136,13 @@
 			};
 
 			// Bind constraints
-			$this.on('keydown', $toconstrain, function(e)
-			{
+			$this.on('keydown', $toconstrain, function(e) {
 				var input = $(this),
 					constraint = input.attr('constrain');
 					constraint = $staircase.Constraints[constraint] ? $staircase.Constraints[constraint] : null;
 
 				// Convert the pressed key to its character. If the key pressed is on the keypad, convert it to a number key
-				if(constraint && !String.fromCharCode(e.keyCode >= 96 && e.keyCode <= 105 ? (e.keyCode - 48) : e.keyCode).match(constraint))
-				{
+				if(constraint && !String.fromCharCode(e.keyCode >= 96 && e.keyCode <= 105 ? (e.keyCode - 48) : e.keyCode).match(constraint)) {
 					// Trigger the constrained event
 					$staircase.trigger('constrained', [input, constraint]);
 
@@ -1350,16 +1150,14 @@
 				}
 			});
 
-			$this.on('focus blur keyup keydown change paint', $inputs, function(e)
-			{
+			$this.on('focus blur keyup keydown change paint', $inputs, function(e) {
 				var input = $(this),
 					apply = input.closest('label');
 
 				apply = (apply.length == 0 && input.attr('name')) ? $('label[for="' + input.attr('name') + '"]') : apply;
 				apply = (apply.length > 0) ? apply.add(input) : input;
 
-				switch(e.type)
-				{
+				switch(e.type) {
 					case 'focusin': apply.addClass('focus'); break;
 					case 'focusout': apply.removeClass('focus'); break;
 					default: apply[input.val().trim() ? 'removeClass' : 'addClass']('empty'); break;
@@ -1369,53 +1167,43 @@
 			$($inputs).trigger('paint');
 
 			// Bind each validatable input field within this step to the validate function
-			$this.on('change validate', $inputs, function()
-			{
+			$this.on('change validate', $inputs, function() {
 				var input = $(this),
 					label = input.closest('label'),
 					apply = $(label ? label.add(input) : input);
 
-				if($options.APIs.briteverify.APIKey && input.filter(function()
-				{
+				if($options.APIs.briteverify.APIKey && input.filter(function() {
 					var fields = $options.APIs.briteverify.fields,
 						valid = false;
 
-					if(typeof fields == 'string')
-					{
-						if(fields.indexOf(',') > -1)
-						{
+					if(typeof fields == 'string') {
+						if(fields.indexOf(',') > -1) {
 							fields = fields.split(', ');
 						}
-						else
-						{
+						else {
 							fields = [fields];
 						}
 					}
 
 					fields.push('*[bv-score]');
 
-					for(var i in fields)
-					{
-						if(fields[i].trim())
-						{
+					for(var i in fields) {
+						if(fields[i].trim()) {
 							valid = valid ? true : input.is(fields[i].trim());
 						}
 					}
 
 					return valid;
-				}).length && $staircase.Validate(input[0], 'email'))
-				{
+				}).length && $staircase.Validate(input[0], 'email')) {
 					// Trigger the beforebriteverify event
-					if($staircase.trigger('beforebriteverify', [input]) === false)
-					{
+					if($staircase.trigger('beforebriteverify', [input]) === false) {
 						return false;
 					}
 
 					var scoreFieldName = input.attr('bv-score') ? input.attr('bv-score') : ($options.APIs.briteverify.scoreFieldName ? $options.APIs.briteverify.scoreFieldName : input.attr('name') + ($options.APIs.briteverify.scoreFieldSuffix || '_score')),
 						scoreField = ($('input[name="' + scoreFieldName + '"]').length > 0) ? $('input[name="' + scoreFieldName + '"]') : input.data('briteverify-scorefield');
 
-					if(!scoreField)
-					{
+					if(!scoreField) {
 						scoreField = $('<input type="hidden" tabindex="-1" name="' + scoreFieldName + '" />')
 							.insertAfter(input)
 							.on('focus', function()
@@ -1430,27 +1218,23 @@
 					apply.addClass('awaiting-validation');
 
 					// If BriteVerify has not yet been initialised
-					if(!$staircase.BriteVerify)
-					{
+					if(!$staircase.BriteVerify) {
 						// Create a BriteVerify instance
 						$staircase.BriteVerify = new BriteVerify($options.APIs.briteverify.APIKey);
 					}
 
-					$staircase.BriteVerify.Verify(input[0].value, function(result, cached)
-					{
+					$staircase.BriteVerify.Verify(input[0].value, function(result, cached) {
 						// Staircase no longer needs to wait for this input
 						apply.removeClass('awaiting-validation');
 
 						// If the response object does not contain a solid verifiable boolean
-						if(typeof result != 'object' || result.status === undefined)
-						{
+						if(typeof result != 'object' || result.status === undefined) {
 							// Cancel the script
 							return;
 						}
 
 						// If we need to mark the original input as valid/invalid
-						if($options.APIs.briteverify.markInput)
-						{
+						if($options.APIs.briteverify.markInput) {
 							// If the input value is valid
 							if(result.status.trim().toLowerCase() != 'invalid')
 							{
@@ -1478,15 +1262,13 @@
 								$step.Validate(input[0], false);
 							}
 						}
-						else
-						{
+						else {
 							// Run staircase validation with a forced value to tell the step if it can continue or not
 							$step.Validate(input[0], !(result.status.trim().toLowerCase() == 'invalid'));
 						}
 
 						// If logging is enabled
-						if(options.APIs.briteverify.logging && !cached)
-						{
+						if(options.APIs.briteverify.logging && !cached) {
 							// Log the response
 							$staircase.log(
 							{
@@ -1503,14 +1285,11 @@
 					});
 				}
 				// If the input utilizes Data8 integration
-				else if((input.attr('d8') || input.attr('d8-lookup-street')) && input[0].value && $options.APIs.data8 && $options.APIs.data8.APIKey)
-				{
+				else if((input.attr('d8') || input.attr('d8-lookup-street')) && input[0].value && $options.APIs.data8 && $options.APIs.data8.APIKey) {
 					// If the input requires extra Data8 validation
-					if(input.attr('d8'))
-					{
+					if(input.attr('d8')) {
 						// If the input passes primary validation
-						if($step.Validate(input[0]))
-						{
+						if($step.Validate(input[0])) {
 							// Tell staircase to wait for this input to validate
 							apply.addClass('awaiting-validation');
 
@@ -1589,12 +1368,10 @@
 						}
 					}
 					// If the input needs to call an address lookup
-					else if(input.attr('d8-lookup-street'))
-					{
+					else if(input.attr('d8-lookup-street')) {
 						var lastvalidated = input.data('d8-postcode-validated-successfully');
 
-						if(!lastvalidated || lastvalidated != input.val().replace(/[^a-zA-Z0-9]/g, '').toUpperCase())
-						{
+						if(!lastvalidated || lastvalidated != input.val().replace(/[^a-zA-Z0-9]/g, '').toUpperCase()) {
 							var // Get the target input
 								lookuptarget = $('*[name="' + input.attr('d8-lookup-street').trim() + '"]'),
 								lookupcity = input.attr('d8-lookup-city') || '';
@@ -1769,25 +1546,20 @@
 						}
 					}
 				}
-				else
-				{
+				else {
 					// Run staircase validation to tell the step if it can continue or not
 					$step.Validate(input[0]);
 				}
 			});
 
-			$this.on('click', $backbuttons, function()
-			{
-				if(!$(this).is($buttons))
-				{
+			$this.on('click', $backbuttons, function() {
+				if(!$(this).is($buttons)) {
 					// Trigger the back event
-					if($staircase.trigger('back', [$step, $(this)]) === false)
-					{
+					if($staircase.trigger('back', [$step, $(this)]) === false) {
 						return false;
 					}
 
-					if($step.$index > 0)
-					{
+					if($step.$index > 0) {
 						$staircase.Steps[$step.$index - 1].Focus();
 					}
 
@@ -1795,16 +1567,13 @@
 				}
 			});
 
-			$this.on('click', $buttons, function()
-			{
-				if(!$(this).is($backbuttons))
-				{
+			$this.on('click', $buttons, function() {
+				if(!$(this).is($backbuttons)) {
 					var // Script don't fail me now!
 						failed = false;
 
 					// Trigger the beforesubmit event
-					if($staircase.trigger('beforesubmit', [$step, $(this)]) === false)
-					{
+					if($staircase.trigger('beforesubmit', [$step, $(this)]) === false) {
 						return false;
 					}
 
@@ -1812,11 +1581,9 @@
 					$this.find($inputs).trigger('validate');
 
 					// If validation has passed (or been ignored) check for checkbox groups
-					if($options.checkboxGroups)
-					{
+					if($options.checkboxGroups) {
 						// If a selector has been specified, search for it. Fallback to `.checkbox-group`, then to the Step's DOM Element.
-						$((typeof $options.checkboxGroups == 'string') ? $this.find($options.checkboxGroups) : (($this.find('.checkbox-group').length) > 0 ? $this.find('.checkbox-group') : $this)).each(function()
-						{
+						$((typeof $options.checkboxGroups == 'string') ? $this.find($options.checkboxGroups) : (($this.find('.checkbox-group').length) > 0 ? $this.find('.checkbox-group') : $this)).each(function() {
 							var // Store a reference to this group
 								group = $(this);
 
@@ -1855,10 +1622,8 @@
 						});
 					}
 
-					if($this.is('.staircase-has-error, .awaiting-validation') || $this.find('.staircase-has-error, .awaiting-validation').length > 0)
-					{
-						if($this.is('.awaiting-validation') || $this.find('.awaiting-validation').length > 0)
-						{
+					if($this.is('.staircase-has-error, .awaiting-validation') || $this.find('.staircase-has-error, .awaiting-validation').length > 0) {
+						if($this.is('.awaiting-validation') || $this.find('.awaiting-validation').length > 0) {
 							$staircase.AwaitSubmit($(this).attr('disabled', true));
 
 							return false;
@@ -1877,12 +1642,10 @@
 					// Process any hard-coded rules
 					var ruleresult = true;
 
-					if($step.$rules.length > 0)
-					{
+					if($step.$rules.length > 0) {
 						var rules = $step.$rules;
 
-						for(var i in rules)
-						{
+						for(var i in rules) {
 							var rule = rules[i],
 								// Prepare the Staircase and Step arguments as sandboxed functions with limited access to Staircase
 								args = [sandbox($staircase), sandbox($step), window.jQuery];
@@ -1913,8 +1676,7 @@
 						}
 					}
 
-					if(!ruleresult)
-					{
+					if(!ruleresult) {
 						// Trigger the submitfailed event
 						$staircase.trigger($step.$object.is('.step:last') ? 'submitfailed' : 'nextfailed continuefailed', [$step]);
 
@@ -1924,17 +1686,14 @@
 						failed = true;
 					}
 
-					if(failed)
-					{
+					if(failed) {
 						return false;
 					}
 
 					// If this is NOT the last step, focus the next step and cancel the submit event
-					if($staircase.Steps.length > ($step.$index + 1))
-					{
+					if($staircase.Steps.length > ($step.$index + 1)) {
 						// Trigger the next events
-						if($staircase.trigger('next continue', [$step, $staircase.Steps[$step.$index + 1]]) === false)
-						{
+						if($staircase.trigger('next continue', [$step, $staircase.Steps[$step.$index + 1]]) === false) {
 							return false;
 						}
 
@@ -1942,16 +1701,14 @@
 					}
 
 					// If there is no form, default to debug
-					if(!$this.closest('form').length && window.console)
-					{
+					if(!$this.closest('form').length && window.console) {
 						console.log('%cStaircase Submit Event:', 'font-weight: bold; font-size: 1.2em; color: #333;');
 						console.log('%cYou are seeing this table because no submissible <form> element was found in the DOM.', 'font-size: .8em;');
 						console.log(' ');
 
 						var table = [];
 
-						$($allinputs).each(function()
-						{
+						$($allinputs).each(function() {
 							table.push(
 							{
 								Field: $(this).attr('name'),
@@ -1960,12 +1717,10 @@
 							});
 						});
 
-						if(window.console.table)
-						{
+						if(window.console.table) {
 							console.table(table, ['Field', 'Value', 'Type']);
 						}
-						else
-						{
+						else {
 							console.log(table);
 						}
 
@@ -1974,30 +1729,25 @@
 					}
 
 					// Trigger the submit event
-					if($staircase.trigger('submit', [$staircase]) === false)
-					{
+					if($staircase.trigger('submit', [$staircase]) === false) {
 						return false;
 					}
 				}
 			});
 
 			// If checkbox groups are enabled
-			if($options.checkboxGroups)
-			{
+			if($options.checkboxGroups) {
 				// If a selector has been specified, search for it. Fallback to `.checkbox-group`, then to the Step's DOM Element.
-				$((typeof $options.checkboxGroups == 'string') ? $this.find($options.checkboxGroups) : (($this.find('.checkbox-group').length) > 0 ? $this.find('.checkbox-group') : $this)).on('change', 'input[type="checkbox"]', function()
-				{
+				$((typeof $options.checkboxGroups == 'string') ? $this.find($options.checkboxGroups) : (($this.find('.checkbox-group').length) > 0 ? $this.find('.checkbox-group') : $this)).on('change', 'input[type="checkbox"]', function() {
 					// If this checkbox is checked
-					if($(this).is(':checked'))
-					{
+					if($(this).is(':checked')) {
 						// Remove this checkbox group's error class
 						$(this).closest('.staircase-has-error').removeClass('staircase-has-error');
 					}
 				});
 			}
 
-			$this.find('script[type="staircase/condition"]').each(function()
-			{
+			$this.find('script[type="staircase/condition"]').each(function() {
 				$step.Condition($(this).html());
 			}).remove();
 
@@ -2005,8 +1755,7 @@
 		};
 
 		// Find each step within this Staircase and assign it a Step object
-		$this.find($options.steps).each(function()
-		{
+		$this.find($options.steps).each(function() {
 			$staircase.Steps.push(new Step(this, arguments[0]).Blur(true)); // Save the step to the list
 		});
 
