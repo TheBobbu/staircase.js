@@ -446,7 +446,7 @@
 			$events = {}, // Events API
 			$staircase = this, // Create a scoped global
 			$scrollTop = 0, // Store the window's scrollTop
-			$options = // Populate the default options object {
+			$options = { // Populate the default options object
 				checkboxGroups: false, // Enable/Disable checkbox group scanning
 				history: false, // Enable/Disable URL hash modifications
 				ID: ''.hash(8), // An optional ID string for the URL
@@ -455,8 +455,8 @@
 				stepBlur: null, // Extra function to call when a step is hidden from view
 				stepFocus: null, // Extra function to call when a step enters the view
 				validate: null, // Extra function to call during validation
-				APIs: // Set of options for third party API integrations {
-					briteverify: // Briteverify email verification {
+				APIs: { // Set of options for third party API integrations
+					briteverify: { // Briteverify email verification
 						APIKey: null, // API Key for the service (service is disabled if this is left blank)
 						fields: '[validate="email"]', // Specify which fields to verify
 						markInput: false, // Whether to markl the email input as valid/invalid depending on the returned score
@@ -464,7 +464,7 @@
 						scoreFieldSuffix: '_bvscore', // The field name suffix for the verification results
 						logging: false // Logging is turned off by default
 					},
-					data8: // Data-8 Information Validation {
+					data8: { // Data-8 Information Validation
 						APIKey: null, // API Key for the service (service is disabled if this is left blank)
 						logging: false // Logging is turned off by default
 					}
